@@ -1,6 +1,6 @@
 # Django settings for paigow project.
 
-#PROJECT_PATH = '/Users/rsherry/Documents/Personal/projects/paigow_app/'
+#PROJECT_PATH = '/Users/rsherry/Documents/Personal/projects/paigow_app/mainsite'
 import os
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
@@ -24,6 +24,8 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+print DATABASES['default']['NAME']
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -102,7 +104,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'paigow.urls'
+ROOT_URLCONF = 'mainsite.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'paigow.wsgi.application'
@@ -113,9 +115,6 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 	PROJECT_PATH + '/templates/',
 )
-
-print TEMPLATE_DIRS
-
 
 INSTALLED_APPS = (
     'django.contrib.auth',
