@@ -1,0 +1,353 @@
+[
+	{
+		"model" : "paigow.tile",
+		"pk": 1,
+		"fields": {
+			"name": "gee joon 6",
+			"tile_rank": 0,
+			"pair_rank": 15,
+			"tile_value": 3
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 2,
+		"fields": {
+			"name": "gee joon 3",
+			"tile_rank": 0,
+			"pair_rank": 15,
+			"tile_value": 3
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 3,
+		"fields": {
+			"name": "teen",
+			"tile_rank": 15,
+			"pair_rank": 14,
+			"tile_value": 12
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 4,
+		"fields": {
+			"name": "teen",
+			"tile_rank": 15,
+			"pair_rank": 14,
+			"tile_value": 12
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 5,
+		"fields": {
+			"name": "day",
+			"tile_rank": 14,
+			"pair_rank": 13,
+			"tile_value": 2
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 6,
+		"fields": {
+			"name": "day",
+			"tile_rank": 14,
+			"pair_rank": 13,
+			"tile_value": 2
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 7,
+		"fields": {
+			"name": "high eight",
+			"tile_rank": 13,
+			"pair_rank": 12,
+			"tile_value": 8
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 8,
+		"fields": {
+			"name": "high eight",
+			"tile_rank": 13,
+			"pair_rank": 12,
+			"tile_value": 8
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 9,
+		"fields": {
+			"name": "harmony four",
+			"tile_rank": 12,
+			"pair_rank": 11,
+			"tile_value": 4
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 10,
+		"fields": {
+			"name": "harmony four",
+			"tile_rank": 12,
+			"pair_rank": 11,
+			"tile_value": 4
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 11,
+		"fields": {
+			"name": "high ten",
+			"tile_rank": 11,
+			"pair_rank": 10,
+			"tile_value": 10
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 12,
+		"fields": {
+			"name": "high ten",
+			"tile_rank": 11,
+			"pair_rank": 10,
+			"tile_value": 10
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 13,
+		"fields": {
+			"name": "long six",
+			"tile_rank": 10,
+			"pair_rank": 9,
+			"tile_value": 6
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 14,
+		"fields": {
+			"name": "long six",
+			"tile_rank": 10,
+			"pair_rank": 9,
+			"tile_value": 6
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 15,
+		"fields": {
+			"name": "low four",
+			"tile_rank": 9,
+			"pair_rank": 8,
+			"tile_value": 4
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 16,
+		"fields": {
+			"name": "low four",
+			"tile_rank": 9,
+			"pair_rank": 8,
+			"tile_value": 4
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 17,
+		"fields": {
+			"name": "eleven",
+			"tile_rank": 8,
+			"pair_rank": 7,
+			"tile_value": 11
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 18,
+		"fields": {
+			"name": "eleven",
+			"tile_rank": 8,
+			"pair_rank": 7,
+			"tile_value": 11
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 19,
+		"fields": {
+			"name": "low ten",
+			"tile_rank": 7,
+			"pair_rank": 6,
+			"tile_value": 10
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 20,
+		"fields": {
+			"name": "low ten",
+			"tile_rank": 7,
+			"pair_rank": 6,
+			"tile_value": 10
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 21,
+		"fields": {
+			"name": "high seven",
+			"tile_rank": 6,
+			"pair_rank": 5,
+			"tile_value": 7
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 22,
+		"fields": {
+			"name": "high seven",
+			"tile_rank": 6,
+			"pair_rank": 5,
+			"tile_value": 7
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 23,
+		"fields": {
+			"name": "low six",
+			"tile_rank": 5,
+			"pair_rank": 4,
+			"tile_value": 6
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 24,
+		"fields": {
+			"name": "low six",
+			"tile_rank": 5,
+			"pair_rank": 4,
+			"tile_value": 6
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 25,
+		"fields": {
+			"name": "mixed nine",
+			"tile_rank": 4,
+			"pair_rank": 3,
+			"tile_value": 9
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 26,
+		"fields": {
+			"name": "mixed nine",
+			"tile_rank": 4,
+			"pair_rank": 3,
+			"tile_value": 9
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 27,
+		"fields": {
+			"name": "mixed eight",
+			"tile_rank": 3,
+			"pair_rank": 2,
+			"tile_value": 8
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 28,
+		"fields": {
+			"name": "mixed eight",
+			"tile_rank": 3,
+			"pair_rank": 2,
+			"tile_value": 8
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 29,
+		"fields": {
+			"name": "mixed seven",
+			"tile_rank": 2,
+			"pair_rank": 1,
+			"tile_value": 7
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 30,
+		"fields": {
+			"name": "mixed seven",
+			"tile_rank": 2,
+			"pair_rank": 1,
+			"tile_value": 7
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 31,
+		"fields": {
+			"name": "mixed five",
+			"tile_rank": 1,
+			"pair_rank": 0,
+			"tile_value": 5
+		}
+	},
+
+	{
+		"model" : "paigow.tile",
+		"pk": 32,
+		"fields": {
+			"name": "mixed five",
+			"tile_rank": 1,
+			"pair_rank": 0,
+			"tile_value": 5
+		}
+	}
+]

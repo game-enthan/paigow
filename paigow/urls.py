@@ -1,8 +1,10 @@
 from django.conf.urls import patterns, include, url
+from django.views.generic import DetailView, ListView
+from paigow.models import Tile
 
 # Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
@@ -13,5 +15,16 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^paigow/tiles$',
+        ListView.as_view(
+            queryset=Tile.objects,
+            #context_object_name='tile_list',
+            #template_name='tile_list.html'
+            )),
+#    url(r'^(?P<pk>\d+)/$',
+#        DetailView.as_view(
+#            model=Poll,
+#            template_name='polls/detail.html')),
 )
