@@ -1,7 +1,9 @@
+{% load paigow_extras %}
+
 {% if tile_list %}
     <ul>
     {% for tile in tile_list %}
-        <li><a href="tiles/{{ tile.id }}/">{{ tile.name }}</a></li>
+        <li><a href="tiles/{{ tile.id }}/">{{ tile.name }}</a>&nbsp;<img {{ tile|tile_html_string }}></img></li>
     {% endfor %}
     </ul>
 {% else %}

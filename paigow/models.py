@@ -3,10 +3,33 @@
 # gets them defined for the database and allows python methods
 # to work with the database.
 
-import datetime
-from django.utils import timezone
+# These statements allow this file to know what certain classes
+# for subclassing.
+#import datetime
+#from django.utils import timezone
+
+from mainsite.settings import STATIC_URL
+
 from django.db import models
 
+# 'models' is a package, or bundle, that contains a bunch of
+# python classes that are connected to the underlying database.
+# django.db is the overarching django group of packages that
+# contain the 'models' class.
+#
+# 'models.Model' is a class that represents one table in the
+# relational database underlying these models.
+#
+# 'models.XXXField' is a class that represents one column in
+# the table it's within.
+
+# As an example:
+#
+#      class Thing(models.Model)
+#        name = models.CharField
+#
+#  means that the database has a table named 'Thing', and that
+# table has a single CHAR column named 'name'.
 
 
 # ----------------------------------------------------
@@ -33,10 +56,33 @@ class Tile(models.Model):
   # knows it may be 6 as well.
   tile_value = models.PositiveSmallIntegerField()
   
+  # The picture is a CSS sprite of an image of all the
+  # tiles: this is the x, y of the top-left of the sprite
+  # in pixels.  Note we negate this to move the background
+  # into position.
+  sprite_left = models.PositiveSmallIntegerField()
+  sprite_top = models.PositiveSmallIntegerField()
+  
   # This will make the object return value print out as
   # the name of the tile.
   def __unicode__(self):
     return self.name
+  
+  # This returns the file name of the image file
+  # TBD: this should not be in models, it should be in Views
+  # or in some sort of template that handles CSS Sprites.
+  def html_image(self):
+    #out_str = "<img style=\""
+    out_str = " style=\""
+    out_str += "display:block;background-image:url('" + STATIC_URL + "tiles.jpg');"
+    out_str += "background-repeat:no-repeat;"
+    out_str += "height:250px;width:100px;"
+    out_str += "background-position:-" + str(self.sprite_left) + "px -" + str(self.sprite_top) + "px;\""
+    out_str += "src=\"" + STATIC_URL + "img_trans.gif\""
+    out_str += "width=100 height=250" #></img>"
+    return out_str
+
+#    return self.name.substitute(' ', '') + ".jpg"
 
 
 # ----------------------------------------------------
@@ -54,6 +100,14 @@ class Player(models.Model):
 
 # ----------------------------------------------------
 # This represents one game, which may or may not be complete.
+# A game can be paused in the middle and its state will be
+# saved in the database.  To do this, we need to reconstruct:
+#
+#   (1) the players that are playing this game
+#   (2) the current score for those players
+#   (3) what they're doing (waiting for a deal? playing tiles?)
+#   (4) the tiles each player is looking at (if they're playing)
+#
 
 class Game(models.Model):
   
@@ -65,13 +119,20 @@ class Game(models.Model):
   start_date = models.DateTimeField('start date')
   finish_date = models.DateTimeField('start date')
   
-  # The current status of the game.
+  # A game can be paused in the middle, and we need to keep enough
+  # state that the next time the players log in, they can resume
+  # where they left off.  Games consiste of a number of "deals", where
+  # a deal is the distribution of tiles to each player after washing.
+  #
+  # Games can be in any of the following states (the two-letter codes
+  # are stored in the database, and the text descriptions are for viewing
+  # the state on a website or app).
   ABOUT_TO_DEAL =   'BD'   # between deals in an unfinished game; the
                            # game when created is this because it's about
                            # to deal.
   GAME_OVER =       'GO'   # the game is over
   PLAYING =         'PL'   # the players are playing the deal
-
+  
   GAME_STATE_CHOICES = (
     ( ABOUT_TO_DEAL, 'About to deal' ),
     ( PLAYING,       'Playing the tiles' ),
@@ -80,13 +141,22 @@ class Game(models.Model):
   game_state = models.CharField(max_length=2,
                         choices=GAME_STATE_CHOICES,
                         default=ABOUT_TO_DEAL)
-  
-  # in the case of PLAYING, this is the deal number.  Use the
-  # TilesInDeal through table to find the tiles for this deal.
+
+  # If the Game is in the middle of a deal when the players have to pause,
+  # then in order to resume we need to save enough information that they
+  # can get exactly the same tiles in the same order.  We could create a
+  # separate table for that, but if we assume that deals to players are
+  # always in the same order, then we can just save the original order of
+  # the deck and let it re-deal.
+  #
+  # The database saves every single deal (deck of tiles after washing) for
+  # every single game, so this game may have a number of deals in the database
+  # associated with it.  Each deal for a given game has a unique deal_index
+  # (a small number starting at 1) so we can find the specific deal that is
+  # currently being played.  This is that number.
   deal_number = models.PositiveSmallIntegerField()
   
-  # This will make the object return value print out as
-  # the name of the tile.
+  # This will make the object return value print out as the name of the game.
   def __unicode__(self):
     return self.name
 
@@ -111,13 +181,16 @@ class PlayerInGame(models.Model):
 
 
 # ----------------------------------------------------
-# This 'through' table represents one tile within a
-# given deal. Bleah.  By finding all the tiles in one
-# game we can figure out the ordering.
+# This 'join' table represents one tile within a
+# given deal  By finding all the tiles in one
+# game, for one deal_index, and looking at their
+# position in the deck, we can figure out the ordering
+# of the tiles and from there, using the same dealing
+# function, re-play that deal.
 
 class TileInDeal(models.Model):
   
-  # The through table of the deck after shuffling, before
+  # The 'join' table of the deck after shuffling, before
   # dealing.  We assume that a deal, for any given game
   # and set of players, can be replayed with exactly the
   # same results.  Therefore we only need the initial state
@@ -144,11 +217,3 @@ class TileInDeal(models.Model):
 
 
 
-# ----------------------------------------------------
-# This represents one deal within a game
-
-class Deal(models.Model):
-  
-  # The game this is in; that implies which players
-  # are in the game
-  game = models.ForeignKey(TileInDeal)

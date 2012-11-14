@@ -13,7 +13,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     #url(r'^admin/', include(admin.site.urls)),
 
-    url(r'^tiles$',
+    url(r'^tiles[/]*$',
         ListView.as_view(
             queryset=Tile.objects.order_by('-tile_rank'),
             context_object_name='tile_list',

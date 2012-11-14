@@ -6,7 +6,9 @@
 			"name": "gee joon 6",
 			"tile_rank": 0,
 			"pair_rank": 15,
-			"tile_value": 3
+			"tile_value": 3,
+			"sprite_left": 500,
+			"sprite_top": 500
 		}
 	},
 
@@ -17,7 +19,9 @@
 			"name": "gee joon 3",
 			"tile_rank": 0,
 			"pair_rank": 15,
-			"tile_value": 3
+			"tile_value": 3,
+			"sprite_left": 200,
+			"sprite_top": 0
 		}
 	},
 
@@ -28,7 +32,9 @@
 			"name": "teen",
 			"tile_rank": 15,
 			"pair_rank": 14,
-			"tile_value": 12
+			"tile_value": 12,
+			"sprite_left": 0,
+			"sprite_top": 250
 		}
 	},
 
@@ -39,7 +45,9 @@
 			"name": "teen",
 			"tile_rank": 15,
 			"pair_rank": 14,
-			"tile_value": 12
+			"tile_value": 12,
+			"sprite_left": 0,
+			"sprite_top": 250
 		}
 	},
 
@@ -50,7 +58,9 @@
 			"name": "day",
 			"tile_rank": 14,
 			"pair_rank": 13,
-			"tile_value": 2
+			"tile_value": 2,
+			"sprite_left": 500,
+			"sprite_top": 750
 		}
 	},
 
@@ -61,7 +71,9 @@
 			"name": "day",
 			"tile_rank": 14,
 			"pair_rank": 13,
-			"tile_value": 2
+			"tile_value": 2,
+			"sprite_left": 500,
+			"sprite_top": 750
 		}
 	},
 
@@ -72,7 +84,9 @@
 			"name": "high eight",
 			"tile_rank": 13,
 			"pair_rank": 12,
-			"tile_value": 8
+			"tile_value": 8,
+			"sprite_left": 200,
+			"sprite_top": 500
 		}
 	},
 
@@ -83,7 +97,9 @@
 			"name": "high eight",
 			"tile_rank": 13,
 			"pair_rank": 12,
-			"tile_value": 8
+			"tile_value": 8,
+			"sprite_left": 200,
+			"sprite_top": 500
 		}
 	},
 
@@ -94,7 +110,9 @@
 			"name": "harmony four",
 			"tile_rank": 12,
 			"pair_rank": 11,
-			"tile_value": 4
+			"tile_value": 4,
+			"sprite_left": 100,
+			"sprite_top": 750
 		}
 	},
 
@@ -105,7 +123,9 @@
 			"name": "harmony four",
 			"tile_rank": 12,
 			"pair_rank": 11,
-			"tile_value": 4
+			"tile_value": 4,
+			"sprite_left": 100,
+			"sprite_top": 750
 		}
 	},
 
@@ -116,7 +136,9 @@
 			"name": "high ten",
 			"tile_rank": 11,
 			"pair_rank": 10,
-			"tile_value": 10
+			"tile_value": 10,
+			"sprite_left": 100,
+			"sprite_top": 500
 		}
 	},
 
@@ -127,7 +149,9 @@
 			"name": "high ten",
 			"tile_rank": 11,
 			"pair_rank": 10,
-			"tile_value": 10
+			"tile_value": 10,
+			"sprite_left": 100,
+			"sprite_top": 500
 		}
 	},
 
@@ -138,7 +162,9 @@
 			"name": "long six",
 			"tile_rank": 10,
 			"pair_rank": 9,
-			"tile_value": 6
+			"tile_value": 6,
+			"sprite_left": 300,
+			"sprite_top": 750
 		}
 	},
 
@@ -149,7 +175,9 @@
 			"name": "long six",
 			"tile_rank": 10,
 			"pair_rank": 9,
-			"tile_value": 6
+			"tile_value": 6,
+			"sprite_left": 300,
+			"sprite_top": 750
 		}
 	},
 
@@ -160,7 +188,9 @@
 			"name": "low four",
 			"tile_rank": 9,
 			"pair_rank": 8,
-			"tile_value": 4
+			"tile_value": 4,
+			"sprite_left": 400,
+			"sprite_top": 750
 		}
 	},
 
@@ -171,7 +201,9 @@
 			"name": "low four",
 			"tile_rank": 9,
 			"pair_rank": 8,
-			"tile_value": 4
+			"tile_value": 4,
+			"sprite_left": 400,
+			"sprite_top": 750
 		}
 	},
 
@@ -182,7 +214,9 @@
 			"name": "eleven",
 			"tile_rank": 8,
 			"pair_rank": 7,
-			"tile_value": 11
+			"tile_value": 11,
+			"sprite_left": 300,
+			"sprite_top": 500
 		}
 	},
 
@@ -193,7 +227,9 @@
 			"name": "eleven",
 			"tile_rank": 8,
 			"pair_rank": 7,
-			"tile_value": 11
+			"tile_value": 11,
+			"sprite_left": 300,
+			"sprite_top": 500
 		}
 	},
 
@@ -204,7 +240,9 @@
 			"name": "low ten",
 			"tile_rank": 7,
 			"pair_rank": 6,
-			"tile_value": 10
+			"tile_value": 10,
+			"sprite_left": 200,
+			"sprite_top": 750
 		}
 	},
 
@@ -215,7 +253,9 @@
 			"name": "low ten",
 			"tile_rank": 7,
 			"pair_rank": 6,
-			"tile_value": 10
+			"tile_value": 10,
+			"sprite_left": 200,
+			"sprite_top": 750
 		}
 	},
 
@@ -226,7 +266,9 @@
 			"name": "high seven",
 			"tile_rank": 6,
 			"pair_rank": 5,
-			"tile_value": 7
+			"tile_value": 7,
+			"sprite_left": 500,
+			"sprite_top": 0
 		}
 	},
 
@@ -237,7 +279,9 @@
 			"name": "high seven",
 			"tile_rank": 6,
 			"pair_rank": 5,
-			"tile_value": 7
+			"tile_value": 7,
+			"sprite_left": 500,
+			"sprite_top": 0
 		}
 	},
 
@@ -248,7 +292,9 @@
 			"name": "low six",
 			"tile_rank": 5,
 			"pair_rank": 4,
-			"tile_value": 6
+			"tile_value": 6,
+			"sprite_left": 300,
+			"sprite_top": 0
 		}
 	},
 
@@ -259,7 +305,9 @@
 			"name": "low six",
 			"tile_rank": 5,
 			"pair_rank": 4,
-			"tile_value": 6
+			"tile_value": 6,
+			"sprite_left": 300,
+			"sprite_top": 0
 		}
 	},
 
@@ -270,7 +318,9 @@
 			"name": "mixed nine",
 			"tile_rank": 4,
 			"pair_rank": 3,
-			"tile_value": 9
+			"tile_value": 9,
+			"sprite_left": 100,
+			"sprite_top": 0
 		}
 	},
 
@@ -281,7 +331,9 @@
 			"name": "mixed nine",
 			"tile_rank": 4,
 			"pair_rank": 3,
-			"tile_value": 9
+			"tile_value": 9,
+			"sprite_left": 400,
+			"sprite_top": 0
 		}
 	},
 
@@ -292,7 +344,9 @@
 			"name": "mixed eight",
 			"tile_rank": 3,
 			"pair_rank": 2,
-			"tile_value": 8
+			"tile_value": 8,
+			"sprite_left": 100,
+			"sprite_top": 250
 		}
 	},
 
@@ -303,7 +357,9 @@
 			"name": "mixed eight",
 			"tile_rank": 3,
 			"pair_rank": 2,
-			"tile_value": 8
+			"tile_value": 8,
+			"sprite_left": 500,
+			"sprite_top": 250
 		}
 	},
 
@@ -314,7 +370,9 @@
 			"name": "mixed seven",
 			"tile_rank": 2,
 			"pair_rank": 1,
-			"tile_value": 7
+			"tile_value": 7,
+			"sprite_left": 200,
+			"sprite_top": 250
 		}
 	},
 
@@ -325,7 +383,9 @@
 			"name": "mixed seven",
 			"tile_rank": 2,
 			"pair_rank": 1,
-			"tile_value": 7
+			"tile_value": 7,
+			"sprite_left": 400,
+			"sprite_top": 250
 		}
 	},
 
@@ -336,7 +396,9 @@
 			"name": "mixed five",
 			"tile_rank": 1,
 			"pair_rank": 0,
-			"tile_value": 5
+			"tile_value": 5,
+			"sprite_left": 300,
+			"sprite_top": 250
 		}
 	},
 
@@ -347,7 +409,9 @@
 			"name": "mixed five",
 			"tile_rank": 1,
 			"pair_rank": 0,
-			"tile_value": 5
+			"tile_value": 5,
+			"sprite_left": 400,
+			"sprite_top": 500
 		}
 	}
 ]

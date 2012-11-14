@@ -1,3 +1,5 @@
+{% load paigow_extras %}
+
 <h1>{{ tile.name }}</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
@@ -5,4 +7,7 @@
 Numerical value: {{ tile.tile_value }}<BR>
 Rank of this tile: {{ tile.tile_rank }}  (15 is highest, 0 is lowest)<BR>
 Rank of this pair: {{ tile.pair_rank }}  (15 is highest, 0 is lowest)<BR>
+<BR>
+<img {{ tile|tile_html_string }}></img><BR>
+
 
