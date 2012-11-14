@@ -1,10 +1,25 @@
 from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+from mainsite.settings import STATIC_URL
+from paigow.tile import TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT
 
 register = template.Library()
 
+# Filter a tile and put this string inside an IMG object to get a tile image:
+#
+#        <img {{ tile|tile_html_string }}></img>.
+#
+# This will result in a 1x1 transparent GIF, scaled to the size of the tile
+# si
 @register.filter(needs_autoescape=True)
 def tile_html_string(value,autoescape=None):
-  return mark_safe(value.html_image())
+  out_str = " style=\""
+  out_str += "display:block;background-image:url('" + STATIC_URL + "tiles.jpg');"
+  out_str += "background-repeat:no-repeat;"
+  out_str += "width:" + TILE_IMAGE_WIDTH + "px;height:" + TILE_IMAGE_HEIGHT + "px;"
+  out_str += "background-position:-" + str(value.sprite_left) + "px -" + str(value.sprite_top) + "px;\""
+  out_str += "src=\"" + STATIC_URL + "img_trans.gif\""
+  out_str += "width=" + TILE_IMAGE_WIDTH + " height=" + TILE_IMAGE_HEIGHT
+  return mark_safe(out_str)
 

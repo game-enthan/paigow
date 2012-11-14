@@ -68,21 +68,6 @@ class Tile(models.Model):
   def __unicode__(self):
     return self.name
   
-  # This returns the file name of the image file
-  # TBD: this should not be in models, it should be in Views
-  # or in some sort of template that handles CSS Sprites.
-  def html_image(self):
-    #out_str = "<img style=\""
-    out_str = " style=\""
-    out_str += "display:block;background-image:url('" + STATIC_URL + "tiles.jpg');"
-    out_str += "background-repeat:no-repeat;"
-    out_str += "height:250px;width:100px;"
-    out_str += "background-position:-" + str(self.sprite_left) + "px -" + str(self.sprite_top) + "px;\""
-    out_str += "src=\"" + STATIC_URL + "img_trans.gif\""
-    out_str += "width=100 height=250" #></img>"
-    return out_str
-
-#    return self.name.substitute(' ', '') + ".jpg"
 
 
 # ----------------------------------------------------
