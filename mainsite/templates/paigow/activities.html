@@ -1,0 +1,9 @@
+<div class="activities">
+<table>
+  <tr>
+   {% for activity in activities %}
+   <td class="activity"><a href="{{activity.url}}">{{ activity.name }}</a></td>
+   {% endfor %}
+  </tr>
+</table>
+</div>

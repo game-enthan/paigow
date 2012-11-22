@@ -6,12 +6,16 @@ from paigow.tile import TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT
 
 register = template.Library()
 
+@register.simple_tag
+def title():
+  return "Pai Gow"
+
 # Filter a tile and put this string inside an IMG object to get a tile image:
 #
 #        <img {{ tile|tile_html_string }}></img>.
 #
 # This will result in a 1x1 transparent GIF, scaled to the size of the tile
-# si
+# 
 @register.filter(needs_autoescape=True)
 def tile_html_string(value,autoescape=None):
   out_str = " style=\""

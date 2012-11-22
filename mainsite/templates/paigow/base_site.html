@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n %}{% load paigow_extras %}
 
-{% block title %}{{ title }} | {% trans 'Paigow!' %}{% endblock %}
+{% block title %}{% title %}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name">{% trans 'PaiGow Main Page' %}</h1>
+<h1 id="site-name">{% trans 'Pai Gow by Rudi Sherry (and eventually Dave Wrubel)' %}</h1>
+
 {% endblock %}
 
 {% block nav-global %}{% endblock %}

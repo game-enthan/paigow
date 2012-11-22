@@ -1,12 +1,11 @@
-{% load admin_static %}{% load url from future %}<!DOCTYPE html>
+{% load static %}{% load paigow_extras %}{% load url from future %}<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
 <head>
-<title>{% block title %}{% endblock %}</title>
-<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
+<title>{% block title %}{% title %}{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "css/base.css" %}{% endblock %}" />
 {% block extrastyle %}{% endblock %}
-<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "admin/css/ie.css" %}{% endblock %}" /><![endif]-->
-{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
-<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="{% block stylesheet_ie %}{% static "css/ie.css"%}{% endblock %}" /><![endif]-->
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "css/rtl.css"%}{% endblock %}" />{% endif %}
 {% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
@@ -18,35 +17,27 @@
 <div id="container">
 
     {% if not is_popup %}
-    <!-- Header -->
-    <div id="header">
-        <div id="branding">
-        {% block branding %}{% endblock %}
+      <!-- Header -->
+      <div id="header">
+          <div id="branding">
+	        {% block branding %}{% endblock %}
+          </div>
+          {% block nav-global %}{% endblock %}
+      </div>
+      <!-- END Header -->
+      {% block breadcrumbs %}
+        <div class="breadcrumbs">
+          {% if title %} &rsaquo; {{ title }}{% endif %}
         </div>
-        {% if user.is_active and user.is_staff %}
-        <div id="user-tools">
-            {% trans 'Welcome,' %}
-            <strong>{% filter force_escape %}{% firstof user.first_name user.username %}{% endfilter %}</strong>.
-            {% block userlinks %}
-                {% url 'django-admindocs-docroot' as docsroot %}
-                {% if docsroot %}
-                    <a href="{{ docsroot }}">{% trans 'Documentation' %}</a> /
-                {% endif %}
-                <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
-                <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
-            {% endblock %}
-        </div>
-        {% endif %}
-        {% block nav-global %}{% endblock %}
-    </div>
-    <!-- END Header -->
-    {% block breadcrumbs %}
-    <div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-    {% if title %} &rsaquo; {{ title }}{% endif %}
-    </div>
-    {% endblock %}
+      {% endblock %}
     {% endif %}
+
+    {% block activities %}
+      <!-- load activities.py, which defines show_activities() -->
+      {% load activities %}
+      <!-- call show_activities() which includes 'activities.html' inline -->
+      {% show_activities %}
+    {% endblock activities %}
 
     {% block messages %}
         {% if messages %}

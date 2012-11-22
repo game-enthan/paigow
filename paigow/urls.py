@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import DetailView, ListView, TemplateView
 from paigow.models import Tile
+from paigow.views import PaiGowView
 
 urlpatterns = patterns('',
     # Examples:
@@ -14,8 +15,9 @@ urlpatterns = patterns('',
     #url(r'^admin/', include(admin.site.urls)),
     
     url(r'^$',
-        TemplateView.as_view(
-            template_name='paigow.html')),
+        PaiGowView.as_view(
+            template_name='paigow/base_site.html',
+            )),
 
     url(r'^tiles[/]*$',
         ListView.as_view(

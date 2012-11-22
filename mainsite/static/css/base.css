@@ -793,7 +793,7 @@ table#change-history tbody th {
 
 #branding h1 {
     padding: 0 10px;
-    font-size: 18px;
+    font-size: 24px;
     margin: 8px 0;
     font-weight: normal;
     color: #f4f379;
@@ -831,5 +831,23 @@ table#change-history tbody th {
 #content-related .module h2 {
     background: #eee url(../img/nav-bg.gif) bottom left repeat-x;
     color: #666;
+}
+
+.activity {
+    background: #eee;
+}
+
+.activity a {
+    font-size: 16px;
+    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+}
+
+.activities {
+    background: #77cccc;
+}
+
+.activities td {
+    border: 1px;
+    background: #77cccc;
 }
 
