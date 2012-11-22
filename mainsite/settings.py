@@ -14,7 +14,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
+#DATABASES['default'] =  dj_database_url.config()
+
+if bool(os.environ.get('LOCAL_DEV', False)): 
+  DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': PROJECT_PATH + '/database/paigow.sqlite',
@@ -23,7 +26,11 @@ DATABASES = {
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
-}
+  }
+else:
+  import dj_database_url
+  DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -159,3 +166,4 @@ LOGGING = {
         },
     }
 }
+
