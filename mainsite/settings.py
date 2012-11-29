@@ -16,7 +16,7 @@ MANAGERS = ADMINS
 
 import dj_database_url
 if bool(os.environ.get('LOCAL_DEV', False)):
-  adgaga adsfasdfad agdasd
+  print "why is LOCAL_DEV defined!?"
   DATABASES = {
     'default': {
       'ENGINE': 'django.db.backends.postgresql_psycopg2',
