@@ -18,7 +18,7 @@ MANAGERS = ADMINS
 print "Got here before!\n"
 try:
   import dj_database_url
-  DATABASES['default'] =  dj_database_url.config(default='postgres://localhost')
+  DATABASES = { 'default': dj_database_url.config(default='postgres://localhost') }
 except:
   print "Unexpected error:", sys.exc_info()
 print "After!\n"
