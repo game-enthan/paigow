@@ -14,23 +14,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'paigow',
-    'USER': '', # not needed since I'm local, always trusted
-    'PASSWORD': '',
-    'HOST': '',
-  }
-}
-
 import dj_database_url
-#if not bool(os.environ.get('LOCAL_DEV', False)):
-  # Parse database configuration from $DATABASE_URL
-  # this is *exactly* what heroku wants.
 DATABASES['default'] =  dj_database_url.config()
-  # this required saying 'heroku addons:add heroku-postgresql:dev' on my machine
-  #DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
 
 
 # Local time zone for this installation. Choices can be found here:
