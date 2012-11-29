@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import DetailView, ListView, TemplateView
-from paigow.models import Tile
+from paigow.models import PGTile
 from paigow.views import PaiGowView
 
 urlpatterns = patterns('',
@@ -21,13 +21,13 @@ urlpatterns = patterns('',
 
     url(r'^tiles[/]*$',
         ListView.as_view(
-            queryset=Tile.objects.order_by('-tile_rank'),
+            queryset=PGTile.objects.order_by('-tile_rank'),
             context_object_name='tile_list',
-            #template_name='tile_list.html'
+            template_name='paigow/tile_list.html'
             )),
 
     url(r'^tiles/(?P<pk>\d+)/$',
         DetailView.as_view(
-            model=Tile)),
+            model=PGTile)),
 )
 

@@ -2,7 +2,7 @@ from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from mainsite.settings import STATIC_URL
-from paigow.tile import TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT
+from paigow.models.pgtile import TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT
 
 register = template.Library()
 
