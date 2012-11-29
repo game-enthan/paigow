@@ -17,7 +17,10 @@ MANAGERS = ADMINS
 print "Got here before!\n"
 
 import dj_database_url
-DATABASES['default'] =  dj_database_url.config()
+
+print "Got here middle!\n"
+
+DATABASES['default'] =  dj_database_url.config(default='postgres://localhost')
 
 print "Got here after!\n"
 
