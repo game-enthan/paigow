@@ -15,14 +15,13 @@ ADMINS = (
 MANAGERS = ADMINS
 
 print "Got here before!\n"
-
-import dj_database_url
-
-print "Got here middle!\n"
-
-DATABASES['default'] =  dj_database_url.config(default='postgres://localhost')
-
-print "Got here after!\n"
+try:
+  import dj_database_url
+  DATABASES['default'] =  dj_database_url.config(default='postgres://localhost')
+except:
+  print "Unexpected error:", sys.exc_info()
+print "After!\n"
+print DATABASES
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
