@@ -4,6 +4,17 @@
 
 from django.db import models
 
+# since we are in a 'models' directory with __init.py__ also
+# in that directory, python treats us as if we were all in a
+# class called 'models'.  This causes the django DB infra-
+# structure to automatically prepend "models_" to the database
+# table; that causes a lot of issues.  Meta:app_label is the
+# variable within the class that django's DB stuff looks at,
+# so we override it with our app's name without 'model' in it.
+# This is why this is in each model:
+#    class Meta:
+#      app_label = 'paigow'
+
 # TBD: these should be in some views class: model shouldn't
 # know about how big the images are.
 
@@ -16,7 +27,16 @@ TILE_IMAGE_HEIGHT = "250"
 # the name ("high four"), they are precalculated for
 # speed.
 
-class Tile(models.Model):
+class PGTile(models.Model):
+
+  # since we are in a 'models' directory with __init.py__ also
+  # in that directory, python treats us as if we were all in a
+  # class called 'models'.  This causes the django DB infra-
+  # structure to automatically prepend "models_" to the database
+  # table; that causes a lot of issues.  Meta:app_label is the
+  # variable to 
+  class Meta:
+    app_label = 'paigow'
 
   # ----------------------------------------------------------
   # database columns
@@ -41,8 +61,8 @@ class Tile(models.Model):
   # tiles: this is the x, y of the top-left of the sprite
   # in pixels.  Note we negate this to move the background
   # into position.
-  sprite_left = models.PositiveSmallIntegerField()
-  sprite_top = models.PositiveSmallIntegerField()
+  sprite_left = models.PositiveSmallIntegerField(default = 0)
+  sprite_top = models.PositiveSmallIntegerField(default = 0)
   
   
   # ----------------------------------------------------------

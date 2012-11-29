@@ -3,11 +3,6 @@
 # gets them defined for the database and allows python methods
 # to work with the database.
 
-# These statements allow this file to know what certain classes
-# for subclassing.
-#import datetime
-#from django.utils import timezone
-
 from mainsite.settings import STATIC_URL
 
 from django.db import models
@@ -33,13 +28,29 @@ from django.db import models
 
 # these imports don't actually do anything but it's nice to
 # know where the various tables are defined
-from paigow.tile import Tile
+from pgtile import PGTile
+
+# Since we are in a 'models' directory with __init.py__ also
+# in that directory, python treats us as if we were all in a
+# class called 'models'.  This causes the django DB infra-
+# structure to automatically prepend "models_" to the database
+# table; that causes a lot of issues.  Meta:app_label is the
+# variable within the class that django's DB stuff looks at,
+# so we override it with our app's name without 'model' in it.
+# This is why this is in each model:
+#    class Meta:
+#      app_label = 'paigow'
 
 
 # ----------------------------------------------------
 # This represents one player, there can be any number
 
-class Player(models.Model):
+class PGPlayer(models.Model):
+
+  # make sure the DB table name is what we want
+  class Meta:
+    app_label = 'paigow'
+
   name = models.CharField(max_length=50)
   
   # This will make the object return value print out as
@@ -60,8 +71,12 @@ class Player(models.Model):
 #   (4) the tiles each player is looking at (if they're playing)
 #
 
-class Game(models.Model):
+class PGGame(models.Model):
   
+  # make sure the DB table name is what we want
+  class Meta:
+    app_label = 'paigow'
+
   # name of the game (there may be different types of games)
   name = models.CharField(max_length=100)
   
@@ -117,12 +132,16 @@ class Game(models.Model):
 # This 'through' table represents the player's status
 # in any game (s)he's played in or is still playing in.
 
-class PlayerInGame(models.Model):
+class PGPlayerInGame(models.Model):
   
+  # make sure the DB table name is what we want
+  class Meta:
+    app_label = 'paigow'
+
   # The 'through' fields, so we can find, from a game,
   # all the players in a game.
-  player = models.ForeignKey(Player)
-  game = models.ForeignKey(Game)
+  player_id = models.ForeignKey(PGPlayer)
+  game_id = models.ForeignKey(PGGame)
   
   # The current status in that game: the score could'
   # have been a PositiveIntegerField but let's allow
@@ -139,8 +158,12 @@ class PlayerInGame(models.Model):
 # of the tiles and from there, using the same dealing
 # function, re-play that deal.
 
-class TileInDeal(models.Model):
+class PGTileInDeal(models.Model):
   
+  # make sure the DB table name is what we want
+  class Meta:
+    app_label = 'paigow'
+
   # The 'join' table of the deck after shuffling, before
   # dealing.  We assume that a deal, for any given game
   # and set of players, can be replayed with exactly the
@@ -153,8 +176,8 @@ class TileInDeal(models.Model):
   # 263,130,836,933,693,530,167,218,012,160,000,000
   # different possibilities; a quick calculation shows we
   # need 82 bits to represent that.  Not worth doing.
-  tile = models.ForeignKey(Tile)
-  game = models.ForeignKey(Game)
+  tile_id = models.ForeignKey(PGTile)
+  game_id = models.ForeignKey(PGGame)
   
   # Which deal this is for, in that game.  By enumerating
   # through this table for a given game, and getting each

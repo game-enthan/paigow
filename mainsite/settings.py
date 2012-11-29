@@ -9,27 +9,29 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Rudi Sherry', 'rsherry@adobe.com'),
+    # ('Rudi Sherry', 'rudisherry666@gmail.com'),
 )
 
 MANAGERS = ADMINS
 
-#DATABASES['default'] =  dj_database_url.config()
-
-if bool(os.environ.get('LOCAL_DEV', False)): 
+import dj_database_url
+if bool(os.environ.get('LOCAL_DEV', False)):
+  adgaga adsfasdfad agdasd
   DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': PROJECT_PATH + '/database/paigow.sqlite',
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+      'ENGINE': 'django.db.backends.postgresql_psycopg2',
+      'NAME': 'paigow',
+      'USER': '', # not needed since I'm local, always trusted
+      'PASSWORD': '',
+      'HOST': '',
     }
   }
 else:
-  import dj_database_url
-  DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
+  # Parse database configuration from $DATABASE_URL
+  # this is *exactly* what heroku wants.
+  DATABASES['default'] =  dj_database_url.config()
+  # this required saying 'heroku addons:add heroku-postgresql:dev' on my machine
+  #DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -81,8 +83,6 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
     PROJECT_PATH + "/static/",
 )
-
-print STATICFILES_DIRS
 
 # List of finder classes that know how to find static files in
 # various locations.
