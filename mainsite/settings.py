@@ -25,10 +25,10 @@ DATABASES = {
 }
 
 import dj_database_url
-if not bool(os.environ.get('LOCAL_DEV', False)):
+#if not bool(os.environ.get('LOCAL_DEV', False)):
   # Parse database configuration from $DATABASE_URL
   # this is *exactly* what heroku wants.
-  DATABASES['default'] =  dj_database_url.config()
+DATABASES['default'] =  dj_database_url.config()
   # this required saying 'heroku addons:add heroku-postgresql:dev' on my machine
   #DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
 
