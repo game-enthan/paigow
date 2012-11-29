@@ -21,7 +21,7 @@ try:
   DATABASES = { 'default': dj_database_url.config(default='postgres://localhost') }
 except:
   print "Unexpected error:", sys.exc_info()
-print "After!\n"
+
 print DATABASES
 
 # Local time zone for this installation. Choices can be found here:
