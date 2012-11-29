@@ -14,19 +14,18 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-import dj_database_url
-if bool(os.environ.get('LOCAL_DEV', False)):
-  print "why is LOCAL_DEV defined!?"
-  DATABASES = {
-    'default': {
-      'ENGINE': 'django.db.backends.postgresql_psycopg2',
-      'NAME': 'paigow',
-      'USER': '', # not needed since I'm local, always trusted
-      'PASSWORD': '',
-      'HOST': '',
-    }
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': 'paigow',
+    'USER': '', # not needed since I'm local, always trusted
+    'PASSWORD': '',
+    'HOST': '',
   }
-else:
+}
+
+import dj_database_url
+if not bool(os.environ.get('LOCAL_DEV', False)):
   # Parse database configuration from $DATABASE_URL
   # this is *exactly* what heroku wants.
   DATABASES['default'] =  dj_database_url.config()

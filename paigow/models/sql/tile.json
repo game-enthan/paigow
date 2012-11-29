@@ -1,6 +1,6 @@
 [
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 1,
 		"fields": {
 			"name": "gee joon 6",
@@ -13,7 +13,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 2,
 		"fields": {
 			"name": "gee joon 3",
@@ -26,7 +26,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 3,
 		"fields": {
 			"name": "teen",
@@ -39,7 +39,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 4,
 		"fields": {
 			"name": "teen",
@@ -52,7 +52,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 5,
 		"fields": {
 			"name": "day",
@@ -65,7 +65,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 6,
 		"fields": {
 			"name": "day",
@@ -78,7 +78,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 7,
 		"fields": {
 			"name": "high eight",
@@ -91,7 +91,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 8,
 		"fields": {
 			"name": "high eight",
@@ -104,7 +104,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 9,
 		"fields": {
 			"name": "harmony four",
@@ -117,7 +117,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 10,
 		"fields": {
 			"name": "harmony four",
@@ -130,7 +130,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 11,
 		"fields": {
 			"name": "high ten",
@@ -143,7 +143,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 12,
 		"fields": {
 			"name": "high ten",
@@ -156,7 +156,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 13,
 		"fields": {
 			"name": "long six",
@@ -169,7 +169,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 14,
 		"fields": {
 			"name": "long six",
@@ -182,7 +182,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 15,
 		"fields": {
 			"name": "low four",
@@ -195,7 +195,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 16,
 		"fields": {
 			"name": "low four",
@@ -208,7 +208,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 17,
 		"fields": {
 			"name": "eleven",
@@ -221,7 +221,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 18,
 		"fields": {
 			"name": "eleven",
@@ -234,7 +234,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 19,
 		"fields": {
 			"name": "low ten",
@@ -247,7 +247,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 20,
 		"fields": {
 			"name": "low ten",
@@ -260,7 +260,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 21,
 		"fields": {
 			"name": "high seven",
@@ -273,7 +273,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 22,
 		"fields": {
 			"name": "high seven",
@@ -286,7 +286,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 23,
 		"fields": {
 			"name": "low six",
@@ -299,7 +299,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 24,
 		"fields": {
 			"name": "low six",
@@ -312,7 +312,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 25,
 		"fields": {
 			"name": "mixed nine",
@@ -325,7 +325,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 26,
 		"fields": {
 			"name": "mixed nine",
@@ -338,7 +338,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 27,
 		"fields": {
 			"name": "mixed eight",
@@ -351,7 +351,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 28,
 		"fields": {
 			"name": "mixed eight",
@@ -364,7 +364,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 29,
 		"fields": {
 			"name": "mixed seven",
@@ -377,7 +377,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 30,
 		"fields": {
 			"name": "mixed seven",
@@ -390,7 +390,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 31,
 		"fields": {
 			"name": "mixed five",
@@ -403,7 +403,7 @@
 	},
 
 	{
-		"model" : "paigow.tile",
+		"model" : "paigow.pgtile",
 		"pk": 32,
 		"fields": {
 			"name": "mixed five",
