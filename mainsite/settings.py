@@ -15,10 +15,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-print "About to set DATABASES\n"
-
+# set up the database.  For local development it's easiest to
+# use sqlite3, so we do that, and we depend on the developer having
+# set up an environment variable on their machine called "LOCAL_DEV"
+# which is set to 'true'.
 try:
-  import dj_database_url
   if (bool(os.environ.get('LOCAL_DEV', False))):
     DATABASES = {
       'default': {
@@ -30,14 +31,22 @@ try:
       }
     }
   else:
+    # In heroku (where we deploy on the web), we use postgres; existence
+    # of the postgres database is set up by previous commands to heroku
+    # (TBD: make that some sort of automatic script), and the connection
+    # to it from python is set up by the file 'requirements.txt' which
+    # includes psycopg2 (the python extension for postgres).
+    #
+    # dj_database_url is an egg that uses DATABASE_URL to find the
+    # correct database, and that is also set up by previous heroku
+    # commands.
+    import dj_database_url
     DATABASES = {
       'default': dj_database_url.config(default='postgres://localhost')
     }
 except:
+  # uh-oh, something went wrong but we don't know what.
   print "Unexpected error creating DATABASES:", sys.exc_info()
-
-print "DATABASES: "
-print DATABASES
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
