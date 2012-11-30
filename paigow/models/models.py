@@ -28,8 +28,9 @@ from django.db import models
 
 # these imports don't actually do anything but it's nice to
 # know where the various tables are defined
-from pgtile import PGTile
-from pggame import PGGame
+from pgtile   import PGTile
+from pggame   import PGGame
+from pgplayer import PGPlayer
 
 # Since we are in a 'models' directory with __init.py__ also
 # in that directory, python treats us as if we were all in a
@@ -41,25 +42,6 @@ from pggame import PGGame
 # This is why this is in each model:
 #    class Meta:
 #      app_label = 'paigow'
-
-
-# ----------------------------------------------------
-# This represents one player, there can be any number
-
-class PGPlayer(models.Model):
-
-  # make sure the DB table name is what we want
-  class Meta:
-    app_label = 'paigow'
-
-  name = models.CharField(max_length=50)
-  
-  # This will make the object return value print out as
-  # the name of the tile.
-  def __unicode__(self):
-    return self.name
-
-
 
 
 
