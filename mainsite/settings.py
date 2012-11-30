@@ -15,13 +15,28 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-print "Got here before!\n"
+print "About to set DATABASES\n"
+
 try:
   import dj_database_url
-  DATABASES = { 'default': dj_database_url.config(default='postgres://localhost') }
+  if (bool(os.environ.get('LOCAL_DEV', False))):
+    DATABASES = {
+      'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': PROJECT_PATH + '/database/paigow.sqlite',
+        'USER': '', # not needed since we're local, default is always trusted
+        'PASSWORD': '',
+        'HOST': '',
+      }
+    }
+  else:
+    DATABASES = {
+      'default': dj_database_url.config(default='postgres://localhost')
+    }
 except:
-  print "Unexpected error:", sys.exc_info()
+  print "Unexpected error creating DATABASES:", sys.exc_info()
 
+print "DATABASES: "
 print DATABASES
 
 # Local time zone for this installation. Choices can be found here:
