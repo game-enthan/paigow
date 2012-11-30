@@ -70,5 +70,12 @@ class PGGame(models.Model):
   def __unicode__(self):
     return self.name
 
+  # Return the all the players for this single game.
+  def players(self):
+    from models import PGPlayerInGame
+    return PGPlayerInGame.objects.get(game_id=id)
 
-
+  # Add a player to this game
+  def add_player(self, player_id):
+    from pgplayer import PGPlayer
+    player = PGPlayerInGame(player_id=player_id, game_id=id)
