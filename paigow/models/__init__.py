@@ -10,6 +10,7 @@
 # from the various other files in this directory.
 
 from pgtile import PGTile
+from pggame import PGGame
 
 # eventually we want to split this out into individual models
 from models import *
