@@ -13,4 +13,4 @@ from pgtile import PGTile
 from pggame import PGGame
 
 # eventually we want to split this out into individual models
-from models import *
+from models import PGPlayerInGame, PGTileInDeal
