@@ -27,7 +27,7 @@ TILE_IMAGE_HEIGHT = "250"
 # the name ("high four"), they are precalculated for
 # speed.
 
-class PGTile(models.Model):
+class PGTile( models.Model ):
 
   # since we are in a 'models' directory with __init.py__ also
   # in that directory, python treats us as if we were all in a
@@ -37,13 +37,13 @@ class PGTile(models.Model):
   # variable to 
   class Meta:
     app_label = 'paigow'
-
+  
   # ----------------------------------------------------------
   # database columns
   
   # Be nice to have a picture too: probably an image
   # whose file name matches this name.
-  name = models.CharField(max_length=30)
+  name = models.CharField( max_length = 30 )
   
   # Rank of the tile and its pair: 15:highest, 0:lowest;
   # I think it's save to assume that POSITIVE SMALL INTEGER
@@ -61,16 +61,42 @@ class PGTile(models.Model):
   # tiles: this is the x, y of the top-left of the sprite
   # in pixels.  Note we negate this to move the background
   # into position.
-  sprite_left = models.PositiveSmallIntegerField(default = 0)
-  sprite_top = models.PositiveSmallIntegerField(default = 0)
+  sprite_left = models.PositiveSmallIntegerField( default = 0 )
+  sprite_top = models.PositiveSmallIntegerField( default = 0 )
   
   
   # ----------------------------------------------------------
   # methods
   
+  @classmethod
+  def get_shuffled_tiles( self ):
+    import random
+    all_tiles = list(PGTile.objects.all())
+    random.shuffle( all_tiles )
+    random.shuffle( all_tiles )
+    random.shuffle( all_tiles )
+    return all_tiles
+  
   
   # This will make the object return value print out as
   # the name of the tile.
-  def __unicode__(self):
+  def __unicode__( self ):
     return self.name
   
+# ----------------------------------------------------
+# Test PGTile class
+
+from django.test import TestCase
+
+class PGTileTest(TestCase):
+
+  fixtures = [ 'pgtile.json', ]
+
+  def test_fixtures( self ):
+    self.assertEquals( PGTile.objects.all().count(), 32 )
+
+  def test_shuffle( self ):
+    shuffled_tiles = PGTile.get_shuffled_tiles();
+    self.assertEqual( len( shuffled_tiles ), 32 );
+
+

@@ -32,6 +32,10 @@ from pgtile   import PGTile
 from pggame   import PGGame
 from pgplayer import PGPlayer
 
+from pgtile   import PGTileTest
+from pggame   import PGGameTest
+from pgplayer import PGPlayerTest
+
 # Since we are in a 'models' directory with __init.py__ also
 # in that directory, python treats us as if we were all in a
 # class called 'models'.  This causes the django DB infra-
@@ -55,10 +59,18 @@ class PGPlayerInGame(models.Model):
   class Meta:
     app_label = 'paigow'
 
+  # allow creation with default fields
+  @classmethod
+  def create( cls, game, player ):
+    return cls( 
+      game = game,
+      player = player,
+      score = 0 )
+
   # The 'through' fields, so we can find, from a game,
   # all the players in a game.
-  player_id = models.ForeignKey(PGPlayer)
-  game_id = models.ForeignKey(PGGame)
+  player = models.ForeignKey(PGPlayer)
+  game = models.ForeignKey(PGGame)
   
   # The current status in that game: the score could'
   # have been a PositiveIntegerField but let's allow
@@ -81,6 +93,15 @@ class PGTileInDeal(models.Model):
   class Meta:
     app_label = 'paigow'
 
+  # allow easy creation
+  @classmethod
+  def create( cls, game, tile, position, deal_number ):
+    return cls( 
+      game = game,
+      tile = tile,
+      position = position,
+      deal_number = deal_number )
+
   # The 'join' table of the deck after shuffling, before
   # dealing.  We assume that a deal, for any given game
   # and set of players, can be replayed with exactly the
@@ -93,8 +114,8 @@ class PGTileInDeal(models.Model):
   # 263,130,836,933,693,530,167,218,012,160,000,000
   # different possibilities; a quick calculation shows we
   # need 82 bits to represent that.  Not worth doing.
-  tile_id = models.ForeignKey(PGTile)
-  game_id = models.ForeignKey(PGGame)
+  game = models.ForeignKey(PGGame)
+  tile = models.ForeignKey(PGTile)
   
   # Which deal this is for, in that game.  By enumerating
   # through this table for a given game, and getting each

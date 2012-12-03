@@ -1,10 +1,14 @@
 # Django settings for paigow project.
 
-#PROJECT_PATH = '/Users/rsherry/Documents/Personal/projects/paigow_app/mainsite'
 import os
 import sys
 
-PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+# The project starts at mainsite/ rather than top-level at the application,
+# but we use a lot of things from the paigow/ folder.  Create a global for
+# the paigow folder as well.
+PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))   # mainsite/
+(PAIGOW_APP_PATH, DUMMY) = os.path.split(os.path.dirname(__file__))
+PAIGOW_PATH = PAIGOW_APP_PATH + "/paigow"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -101,9 +105,9 @@ STATICFILES_DIRS = (
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+  'django.contrib.staticfiles.finders.FileSystemFinder',
+  'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+  # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -111,19 +115,19 @@ SECRET_KEY = 's1upu83yei)f#39&amp;1473$atc63=80*q==jv*c%n#f03crfm68r'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+  'django.template.loaders.filesystem.Loader',
+  'django.template.loaders.app_directories.Loader',
+  # 'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+  'django.middleware.common.CommonMiddleware',
+  'django.contrib.sessions.middleware.SessionMiddleware',
+  'django.middleware.csrf.CsrfViewMiddleware',
+  'django.contrib.auth.middleware.AuthenticationMiddleware',
+  'django.contrib.messages.middleware.MessageMiddleware',
+  # Uncomment the next line for simple clickjacking protection:
+  # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'mainsite.urls'
@@ -132,24 +136,29 @@ ROOT_URLCONF = 'mainsite.urls'
 WSGI_APPLICATION = 'paigow.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-	PROJECT_PATH + '/templates/',
+  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+  # Always use forward slashes, even on Windows.
+  # Don't forget to use absolute paths, not relative paths.
+  PROJECT_PATH + '/templates/',
 )
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
-     'paigow',
+  'django.contrib.auth',
+  'django.contrib.contenttypes',
+  'django.contrib.sessions',
+  'django.contrib.sites',
+  'django.contrib.messages',
+  'django.contrib.staticfiles',
+  # Uncomment the next line to enable the admin:
+  # 'django.contrib.admin',
+  # Uncomment the next line to enable admin documentation:
+  # 'django.contrib.admindocs',
+  'paigow',
+)
+
+# For testing we get fixtures from here
+FIXTURE_DIRS = (
+  PAIGOW_PATH + '/fixtures/',
 )
 
 # A sample logging configuration. The only tangible logging
