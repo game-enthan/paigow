@@ -1,0 +1,47 @@
+# This file defines the PGPlayer object that represents a single
+# player who can play in any number of games.
+
+# See 'models.py' for documentation on this line
+from django.db import models
+
+# ----------------------------------------------------
+# This represents one player, there can be any number
+
+class PGPlayer( models.Model ):
+
+  # make sure the DB table name is what we want
+  class Meta:
+    app_label = 'paigow'
+
+  name = models.CharField( max_length = 50 )
+  
+  # This will make the object return value print out as
+  # the name of the tile.
+  def __unicode__( self ):
+    return self.name
+
+# ----------------------------------------------------
+# Test PGPlayer class
+
+from django.test import TestCase
+
+class PGPlayerTest( TestCase ):
+
+  def setUp( self ):
+    self.test_player = PGPlayer.objects.create( name = 'Rudi' )
+    self.test_player.save()
+
+#   def tearDown( self ):
+#     <do something here if necessary>
+
+  def test_name_is_correct( self ):
+    '''Name from our instance object database matches what we put in'''
+    self.assertEqual( self.test_player.name, 'Rudi' )
+
+# run the test in the correct situation; this is boilerplat
+# for all modules that have tests, don't try to figure it out.
+if __name__ ==  '__main__':
+  print "testing!\n"
+  unittest.main()
+
+
