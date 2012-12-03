@@ -121,8 +121,6 @@ class PGGame( models.Model ):
 # Test PGGame class
 
 from django.test import TestCase
-from pgplayer import PGPlayer
-import traceback
 
 class PGGameTest( TestCase ):
 
@@ -139,6 +137,7 @@ class PGGameTest( TestCase ):
 
   def test_add_player( self ):
     '''Adding two players results in a game with 2 players'''
+    from pgplayer import PGPlayer
     player_1 = PGPlayer.objects.create( name = 'Rudi' )
     player_2 = PGPlayer.objects.create( name = 'Dave' )
     self.test_game.add_player( player_1 )
