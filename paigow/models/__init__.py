@@ -9,8 +9,13 @@
 # now the app's responsibility to import all the actualy models (== SQL tables)
 # from the various other files in this directory.
 
-from pgtile import PGTile
-from pggame import PGGame
+from pgtile   import PGTile
+from pggame   import PGGame
+from pgplayer import PGPlayer
+
+from pgtile   import PGTileTest
+from pggame   import PGGameTest
+from pgplayer import PGPlayerTest
 
 # eventually we want to split this out into individual models
 from models import PGPlayerInGame, PGTileInDeal

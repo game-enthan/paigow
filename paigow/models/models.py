@@ -26,15 +26,9 @@ from django.db import models
 #  means that the database has a table named 'Thing', and that
 # table has a single CHAR column named 'name'.
 
-# these imports don't actually do anything but it's nice to
-# know where the various tables are defined
 from pgtile   import PGTile
 from pggame   import PGGame
 from pgplayer import PGPlayer
-
-from pgtile   import PGTileTest
-from pggame   import PGGameTest
-from pgplayer import PGPlayerTest
 
 # Since we are in a 'models' directory with __init.py__ also
 # in that directory, python treats us as if we were all in a
