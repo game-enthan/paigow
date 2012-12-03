@@ -6,8 +6,8 @@
 # instead of 'models.py' will be import.
 #
 # When a directory is imported, __init__.py is run from that directory; it is
-# now the app's responsibility to import all the actualy models (== SQL tables)
-# from the various other files in this directory.
+# now the app's responsibility to import all the models (== SQL tables)
+# from the various other files in this directory; it is not done automatically.
 
 from pgtile   import PGTile
 from pggame   import PGGame

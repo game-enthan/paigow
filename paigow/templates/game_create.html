@@ -1,0 +1,17 @@
+{% extends "paigow/base_site.html" %}
+{% load paigow_extras %}
+
+<!-- 'content' block is placed in base_site.html; override it here to show this content. -->
+
+{% block content %}
+  <h1>Create Game</h1>
+  <br>
+  <form action="/game_create" method="post">
+    {% csrf_token %}
+    Game name: <input type="text" name="name" maxlength="30" value="{{ game.name}}"/><br>
+    <input type="submit" name="create" value="Create"></input>
+  </form>
+  <br>
+  <input type="button" name="add_player" value=Add Player"></input>
+  <br>
+{% endblock %}

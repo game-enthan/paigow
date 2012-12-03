@@ -9,7 +9,7 @@ register = template.Library()
 @register.inclusion_tag('paigow/activities.html')
 def show_activities():
     activities = (
-      { 'name': "New Game", 'url': 'paigow/game/new.html' },
-      { 'name': "Continue Game", 'url': 'paigow/game/continue.html'} )
+      { 'name': "New Game", 'url': 'game' },
+      { 'name': "Continue Game", 'url': 'game/continue.html'} )
     return { 'activities' : activities }
 

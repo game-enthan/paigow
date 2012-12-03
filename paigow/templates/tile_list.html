@@ -1,0 +1,16 @@
+{% extends "paigow/base_site.html" %}
+{% load paigow_extras %}
+
+<!-- 'content' block is placed in base_site.html; override it here to show this content. -->
+
+{% block content %}
+  {% if tile_list %}
+      <ul>
+      {% for tile in tile_list %}
+          <li><a href="tiles/{{ tile.id }}/">{{ tile.name }}</a>&nbsp;<img {{ tile|tile_html_string }}></img></li>
+      {% endfor %}
+      </ul>
+  {% else %}
+      <p>No tiles are available.</p>
+  {% endif %}
+{% endblock %}

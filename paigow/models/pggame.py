@@ -81,7 +81,7 @@ class PGGame( models.Model ):
   # This will make the object return value print out as the name of the game.
   def __unicode__( self ):
     return self.name
-
+  
   # Return the all the players for this single game.
   def players( self ):
     from models import PGPlayerInGame
