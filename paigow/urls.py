@@ -15,7 +15,7 @@ urlpatterns = patterns('',
   #url(r'^admin/', include(admin.site.urls)),
   
   url(r'^$',
-    PaiGowView.as_view(
+    TemplateView.as_view(
         template_name='paigow/base_site.html',
         )),
   
@@ -34,10 +34,6 @@ urlpatterns = patterns('',
   
   # /game : create new game
   url(r'^game$', 'paigow.views.create_game' ),
-#   
-#     PaiGowView.as_view(
-#         template_name='paigow/game_create.html',
-#         )),
   
 )
 
