@@ -1,9 +1,4 @@
-<div class="activities">
-<table>
-  <tr>
+<!-- inclusion for any site that wants to show activities -->
    {% for activity in activities %}
-   <td class="activity"><a href="{{activity.url}}">{{ activity.name }}</a></td>
+     <LI><A HREF="{{activity.url}}">{{ activity.name }}</a></LI>
    {% endfor %}
-  </tr>
-</table>
-</div>
