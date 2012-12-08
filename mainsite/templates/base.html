@@ -1,59 +1,59 @@
 {% load static %}{% load paigow_extras %}{% load url from future %}
 <!DOCTYPE html>
-<HTML LANG="{{ LANGUAGE_CODE|default:"EN-US" }}" {% if LANGUAGE_BIDI %}DIR="rtl"{% endif %}>
-<HEAD>
-<META CHARSET="utf-8">
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if language_bidi %}dir="rtl"{% endif %}>
+<head>
+<meta charset="utf-8">
 
-  <TITLE>{% block title %}{% title %}{% endblock %}</TITLE>
+  <title>{% block title %}{% title %}{% endblock %}</title>
 
-  <META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
-  <META NAME="description" CONTENT="">
-  <META NAME="author" CONTENT="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
 
   <!-- Le styles, within 'block stylesheet' so it can be overriden -->
   {% block stylesheet %}
-  <LINK REL="stylesheet" TYPE="text/css" HREF="{% static "bootstrap/css/bootstrap.css" %}" />
-  <LINK REL="stylesheet" TYPE="text/css" HREF="{% static "bootstrap/css/bootstrap-responsive.css" %}" />
-  <LINK REL="stylesheet" TYPE="text/css" HREF="{% static "bootstrap/css/docs.css" %}" />
-  <LINK REL="stylesheet" TYPE="text/css" HREF="{% static "bootstrap/js/google-code-prettify/prettify.css" %}" />
-  <STYLE>
+  <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap-responsive.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/docs.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "bootstrap/js/google-code-prettify/prettify.css" %}" />
+  <style>
     body {
       padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
     }
-  </STYLE>
+  </style>
   {% endblock %}
   
   <!-- Any extra headers for pages that extend this one -->
   {% block extrahead %}{% endblock %}
 
   <!-- Don't want search engines to find us! ... inside a block so it can be overriden -->
-  {% block blockbots %}<META NAME="robots" CONTENT="NONE,NOARCHIVE" />{% endblock %}
+  {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
     <!-- Fav and touch icons -->
-    <LINK REL="shortcut icon" HREF="/static/bootstrap/ico/favicon.ico">
-    <LINK REL="apple-touch-icon-precomposed" SIZES="144x144" HREF="/static/bootstrap/ico/apple-touch-icon-144-precomposed.png">
-    <LINK REL="apple-touch-icon-precomposed" SIZES="114x114" HREF="/static/bootstrap/ico/apple-touch-icon-114-precomposed.png">
-    <LINK REL="apple-touch-icon-precomposed" SIZES="72x72" HREF="/static/bootstrap/ico/apple-touch-icon-72-precomposed.png">
-    <LINK REL="apple-touch-icon-precomposed" HREF="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
 
-</HEAD>
+</head>
 {% load i18n %}
 
-  <BODY CLASS="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+  <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 
     <!-- Nav bar -->  
-    <DIV CLASS="navbar navbar-inverse navbar-fixed-top">
-      <DIV CLASS="navbar-inner">
-        <DIV CLASS="container">
-          <A CLASS="btn btn-navbar" DATA-TOGGLE="collapse" DATA-TARGET=".nav-collapse">
-            <SPAN CLASS="icon-bar"></SPAN>
-            <SPAN CLASS="icon-bar"></SPAN>
-            <SPAN CLASS="icon-bar"></SPAN>
-          </A>
-          <DIV CLASS="nav-collapse collapse">
-            <UL CLASS="nav">
-              <LI><A CLASS="brand" HREF="/paigow">{% block branding %}{% endblock %}</A></LI>
-              <LI CLASS="active"><A HREF="#">Home</A></LI>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a class="brand" href="/paigow">{% block branding %}{% endblock %}</a></li>
+              <li class="active"><a href="#">Home</a></li>
               {% block activities %}
                 {% load activities %} <!-- load activities.py, which defines show_activities() -->
                 {% show_activities %} <!-- call show_activities() which includes 'activities.html' inline -->
@@ -61,87 +61,72 @@
               {% block nav-global %}{% endblock %}
               <!-- <LI><A HREF="#about">About</A></LI> -->
               <!-- <LI><A HREF="#contact">Contact</A></LI> -->
-            </UL>
-          </DIV><!--/.nav-collapse -->
-        </DIV>
-      </DIV>
-    </DIV>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
   
     <!-- Container -->
-    <DIV CLASS="container" ID="container">
-    
-      {% if not is_popup %}
-        <!-- Header -->
-        <!-- END Header -->
-        {% block breadcrumbs %}
-          <DIV CLASS="breadcrumbs">
-            {% if title %} &rsaquo; {{ title }}{% endif %}
-          </DIV>
-        {% endblock %}
-      {% endif %}
+    <div class="container" id="container">
     
       {% block messages %}
           {% if messages %}
-          <UL CLASS="messagelist">{% for message in messages %}
-            <LI{% if MESSAGE.TAGS %} CLASS="{{ message.tags }}"{% endif %}>{{ message }}</LI>
-          {% endfor %}</UL>
+          <ul class="messagelist">{% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}</ul>
           {% endif %}
       {% endblock messages %}
     
+      <!-- Page Header -->
+      <div class="page-header">
+        {% block pretitle %}{% endblock %}
+        {% block content_title %}<h1>PaiGow 321 Home</h1>{% endblock %}
+      </div>
+
       <!-- Content -->
-      <DIV ID="content" CLASS="{% block coltype %}colM{% endblock %}">
-          {% block pretitle %}{% endblock %}
-          {% block content_title %}{% if title %}<H1>{{ title }}</H1>{% endif %}{% endblock %}
+      <div id="content" class="{% block coltype %}colM{% endblock %}">
           {% block content %}
           {% block object-tools %}{% endblock %}
           {{ content }}
           {% endblock %}
           {% block sidebar %}{% endblock %}
-          <BR CLASS="clear" />
-      </DIV>
+          <br class="clear" />
+      </div>
       <!-- END Content -->
-    
-      {% block footer %}<DIV ID="footer"></DIV>{% endblock %}
-    
-    </DIV> <!-- /container -->
+
+    </div> <!-- /container -->
 
     <!-- Footer
     ================================================== -->
-    <FOOTER CLASS="footer">
-      <DIV CLASS="container">
-        <P CLASS="pull-right"><A HREF="#">Back to top</A></P>
-        Designed and built by Rudi Sherry and Dave Wrubel<BR>
-        Pages based on Twitter-Bootstrap by <A HREF="http://twitter.com/mdo" TARGET="_blank">@mdo</A> and <A HREF="http://twitter.com/fat" TARGET="_blank">@fat</A>.<BR>
-        Code licensed under <A HREF="http://www.apache.org/licenses/LICENSE-2.0" TARGET="_blank">Apache License v2.0</A>, documentation under <A HREF="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</A>.<BR>
-        If you see glyphs, they from <A HREF="http://glyphicons.com">Glyphicons Free</A> licensed under <A HREF="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</A>.<BR>
-        <!--
-          <UL CLASS="footer-links">
-            <LI><A HREF="http://blog.getbootstrap.com">Blog</A></LI>
-            <LI CLASS="muted">&middot;</LI>
-            <LI><A HREF="https://github.com/twitter/bootstrap/issues?state=open">Issues</A></LI>
-            <LI CLASS="muted">&middot;</LI>
-            <LI><A HREF="https://github.com/twitter/bootstrap/wiki">Roadmap and changelog</A></LI>
-          </UL>
-        -->
-      </DIV>
-    </FOOTER>
+    {% block footer %}
+      <footer class="footer">
+        <div class="container">
+          <p class="pull-right"><a href="#">Back to top</a></p>
+          Designed and built by Rudi Sherry and Dave Wrubel<br>
+          Pages based on Twitter-Bootstrap by <a href="http://twitter.com/mdo" target="_blank">@mdo</a> and <a href="http://twitter.com/fat" target="_blank">@fat</a>.<br>
+          Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.<br>
+          If you see glyphs, they from <a href="http://glyphicons.com">Glyphicons Free</a> licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.<br>
+        </div>
+      </footer>
+    {% endblock %}
 
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <SCRIPT SRC="../../mainsite/static/js/jquery.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-transition.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-alert.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-modal.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-dropdown.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-scrollspy.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-tab.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-tooltip.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-popover.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-button.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-collapse.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-carousel.js"></SCRIPT>
-    <SCRIPT SRC="../../mainsite/static/js/bootstrap-typeahead.js"></SCRIPT>
+    <script src="/static/js/jquery.js"></script>
+    <script src="/static/js/bootstrap-transition.js"></script>
+    <script src="/static/js/bootstrap-alert.js"></script>
+    <script src="/static/js/bootstrap-modal.js"></script>
+    <script src="/static/js/bootstrap-dropdown.js"></script>
+    <script src="/static/js/bootstrap-scrollspy.js"></script>
+    <script src="/static/js/bootstrap-tab.js"></script>
+    <script src="/static/js/bootstrap-tooltip.js"></script>
+    <script src="/static/js/bootstrap-popover.js"></script>
+    <script src="/static/js/bootstrap-button.js"></script>
+    <script src="/static/js/bootstrap-collapse.js"></script>
+    <script src="/static/js/bootstrap-carousel.js"></script>
+    <script src="/static/js/bootstrap-typeahead.js"></script>
 
-  </BODY>
-</HTML>
+  </body>
+</html>

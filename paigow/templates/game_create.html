@@ -3,15 +3,27 @@
 
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->
 
+{% block content_title %}<h1>New Game</h1>{% endblock %}
+
 {% block content %}
-  <h1>New Game</h1>
-  <br>
-  <form action="/game_create" method="post">
+  <form class="form-horizontal" action="/game_create" method="post">
     {% csrf_token %}
-    Game name: <input type="text" name="name" maxlength="30" value="{{ game.name}}"/><br>
-    <input type="submit" name="create" value="Create"></input>
+    <div class="control-group">
+      <div class="controls">
+        <p class="lead">Please enter the game settings for the new game</p>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputUsername">Name of game</label>
+      <div class="controls">
+        <input type="text" id="inputGamename" placeholder="Game name">
+      </div>
+    </div>
+    <br>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" class="btn">Start New Game</button>
+      </div>
+    </div>
   </form>
-  <br>
-  <input type="button" name="add_player" value=Add Player"></input>
-  <br>
 {% endblock %}

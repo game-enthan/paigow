@@ -5,9 +5,16 @@ from models.pggame import PGGame
 
 # Send a page to create a new game
 def create_game( request ):
-  new_game = PGGame.create('enter name')
-  new_game.save()
-  return render_to_response('game_create.html', {'game': new_game})
+  # test if the user is logged in
+  if (not request.session.get('user', False)):
+    return render_to_response( 'user_login.html', { 'next_page' : 'create_game' } )
+  else:
+    new_game = PGGame.create( 'enter name' )
+    new_game.save()
+    return render_to_response( 'game_create.html',
+      { 'game': new_game,
+        'title': 'New Game'
+      } )
 
 
 # Wrapper view for Templates, may be needed for debugging

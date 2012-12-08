@@ -38,7 +38,7 @@ class PGGame( models.Model ):
   # keep track of when the game was started and when it finished;
   # if the finish date is <TBD> then the game is not over
   start_date = models.DateTimeField( 'start date' )
-  finish_date = models.DateTimeField( 'start date', null = True )
+  finish_date = models.DateTimeField( 'finish date', null = True )
   
   # A game can be paused in the middle, and we need to keep enough
   # state that the next time the players log in, they can resume
