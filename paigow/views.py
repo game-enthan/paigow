@@ -12,6 +12,12 @@ from models.pgplayer import PGPlayer
 # so the middleware infrastructure like 'messages' works.
 def request_context( request, params ):
   params.update( csrf( request ) )
+  if ( request.session['player_id'] ):
+    player = PGPlayer.objects.filter( id = request.session['player_id'] )
+    if ( not player ):
+      request.session['player_id'] = None
+    else:
+      params['playername'] = player[0].name
   return RequestContext( request, params )
 
 # home page: if they're not logged in, allow them to log in or register.
@@ -22,7 +28,7 @@ def home( request ):
     messages.add_message( request, messages.INFO, "You are not logged in." )
     return render_to_response( 'user_login.html', request_context( request, params ) )
   else:
-    return render_to_response( 'base_site.html', request_context( request, params ) )
+    return render_to_response( 'paigow/base_site.html', request_context( request, params ) )
 
 
 
@@ -59,6 +65,8 @@ def register( request ):
   
   # we are good, add this to the players!
   player = PGPlayer.create( username, email, password )
+  player.save()
+  request.session['player_id'] = player.id
   return render_to_response( 'user_login.html', request_context( request, params ) )
 
 # the user clicked the 'Register' button on the login page
@@ -76,14 +84,21 @@ def login( request ):
     params['username'] = username
     return render_to_response( 'user_login.html', request_context( request, params ) )
   
-  if m.password != request.POST['login_password']:
+  password = request.POST['login_password']
+  if password != request.POST['login_password']:
     messages.add_message(request, messages.ERROR, "Your username and/or password didn't match.")
     return render_to_response( 'user_login.html', request_context( request, params ) )
 
   # remember this player id in the session and send them to the home page.
-  request.session['player_id'] = player.id
-  return render_to_response( 'base_site.html', request_context( request, params ) )
+  request.session['player_id'] = player[0].id
+  return render_to_response( 'user_login.html', request_context( request, params ) )
 
+
+# log out
+def logout( request ):
+  params = {}
+  request.session['player_id'] = None
+  return render_to_response( 'user_login.html', request_context( request, params ) )
 
 
 # Send a page to create a new game

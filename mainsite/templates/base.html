@@ -59,10 +59,19 @@
                 {% show_activities %} <!-- call show_activities() which includes 'activities.html' inline -->
               {% endblock activities %}
               {% block nav-global %}{% endblock %}
-              <!-- <LI><A HREF="#about">About</A></LI> -->
-              <!-- <LI><A HREF="#contact">Contact</A></LI> -->
             </ul>
-          </div><!--/.nav-collapse -->
+            {% if request.session.player_id %}
+              <ul class="nav pull-right">
+                <li id="fat-menu" class="dropdown">
+                  <a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown">{{ playername }}<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
+                    <li><a tabindex="-1" href="logout">Log Out</a></li>
+                    <li class="divider"></li>
+                  </ul>
+                </li>
+              </ul>
+            {% endif %}
+            </div><!--/.nav-collapse -->
         </div>
       </div>
     </div>
