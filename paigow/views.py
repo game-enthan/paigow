@@ -22,13 +22,12 @@ def request_context( request, params ):
 
 # home page: if they're not logged in, allow them to log in or register.
 # if they are logged in, show them the home page (TBD).
-def home( request ):
-  params = {}
+def home( request, params = {} ):
   if (not request.session.get('player_id', False)):
     messages.add_message( request, messages.INFO, "You are not logged in." )
     return render_to_response( 'user_login.html', request_context( request, params ) )
   else:
-    return render_to_response( 'paigow/base_site.html', request_context( request, params ) )
+    return render_to_response( 'home.html', request_context( request, params ) )
 
 
 
@@ -91,14 +90,13 @@ def login( request ):
 
   # remember this player id in the session and send them to the home page.
   request.session['player_id'] = player[0].id
-  return render_to_response( 'user_login.html', request_context( request, params ) )
+  return home( request, params )
 
 
 # log out
 def logout( request ):
-  params = {}
   request.session['player_id'] = None
-  return render_to_response( 'user_login.html', request_context( request, params ) )
+  return home( request )
 
 
 # Send a page to create a new game
