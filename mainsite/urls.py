@@ -5,6 +5,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 #admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^$', 'paigow.views.home' ),
+    url(r'login', 'paigow.views.login' ),
     url(r'^paigow/', include('paigow.urls')),
     #url(r'^admin/', include(admin.site.urls)),
 )

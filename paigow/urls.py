@@ -14,10 +14,17 @@ urlpatterns = patterns('',
   # Uncomment the next line to enable the admin:
   #url(r'^admin/', include(admin.site.urls)),
   
-  url(r'^$',
+  url(r'^$', 'paigow.views.home'
+#     TemplateView.as_view(
+#       template_name = 'paigow/base_site.html',
+#     )
+  ),
+  
+  url(r'^login',
     TemplateView.as_view(
-        template_name='paigow/base_site.html',
-        )),
+      template_name = 'user_login.html',
+    )
+  ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',

@@ -10,7 +10,8 @@
   <table>
     <tr>
       <td valign="top">
-        <form class="form-horizontal">
+        <form class="form-horizontal" method="POST" action="login">
+          {% csrf_token %}
           <div class="control-group">
             <div class="controls">
               <p class="lead">Returning users please login here</p>
@@ -19,19 +20,19 @@
           <div class="control-group">
             <label class="control-label" for="inputUsername">Username</label>
             <div class="controls">
-              <input type="text" id="inputUsername" placeholder="Username">
+              <input type="text" name="username" id="inputUsername" placeholder="Username">
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="inputPassword">Password</label>
             <div class="controls">
-              <input type="password" id="inputPassword" placeholder="Password">
+              <input type="password" name="password" id="inputPassword" placeholder="Password">
             </div>
           </div>
           <div class="control-group">
             <div class="controls">
               <label class="checkbox">
-              <input type="checkbox"> Remember me
+              <input type="checkbox" name="remember-me"> Remember me
               </label>
               <br>
               <button type="submit" class="btn">Sign in</button>
@@ -41,6 +42,7 @@
       </td>
       <td valign="top">
         <form class="form-horizontal">
+          {% csrf_token %}
           <div class="control-group">
             <div class="controls">
               <p class="lead">New users please register here</p>
@@ -49,25 +51,25 @@
           <div class="control-group">
             <label class="control-label" for="inputEmail">Email</label>
             <div class="controls">
-              <input type="text" id="inputEmail" placeholder="Email">
+              <input type="text" id="email" placeholder="Email">
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="inputUsername">Username</label>
             <div class="controls">
-              <input type="text" id="inputUsername" placeholder="Username">
+              <input type="text" id="username" placeholder="Username">
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="inputPassword">Password</label>
             <div class="controls">
-              <input type="password" id="inputPassword" placeholder="Password">
+              <input type="password" id="password" placeholder="Password">
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="inputPassword">Confirm Password</label>
             <div class="controls">
-              <input type="password" id="inputConfirmPassword" placeholder="Password">
+              <input type="password" id="confirmPassword" placeholder="Password">
             </div>
           </div>
           <div class="control-group">

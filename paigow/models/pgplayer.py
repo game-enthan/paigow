@@ -14,6 +14,8 @@ class PGPlayer( models.Model ):
     app_label = 'paigow'
 
   name = models.CharField( max_length = 50 )
+  email = models.CharField( max_length = 100 )
+  password_hash = models.CharField( max_length = 100 )
   
   # This will make the object return value print out as
   # the name of the tile.
