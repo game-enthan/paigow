@@ -15,8 +15,16 @@ class PGPlayer( models.Model ):
 
   name = models.CharField( max_length = 50 )
   email = models.CharField( max_length = 100 )
-  password_hash = models.CharField( max_length = 100 )
+  password = models.CharField( max_length = 100 )
   
+  # convenience to create so we don't have to create a dictionary
+  @classmethod
+  def create( cls, name, email, password ):
+    return cls( 
+      name = name,
+      email = email,
+      password = password )
+
   # This will make the object return value print out as
   # the name of the tile.
   def __unicode__( self ):

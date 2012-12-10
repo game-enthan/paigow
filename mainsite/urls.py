@@ -7,6 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = patterns('',
     url(r'^$', 'paigow.views.home' ),
     url(r'login', 'paigow.views.login' ),
+    url(r'register', 'paigow.views.register' ),
     url(r'^paigow/', include('paigow.urls')),
     #url(r'^admin/', include(admin.site.urls)),
 )

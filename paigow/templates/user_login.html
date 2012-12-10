@@ -3,14 +3,97 @@
 
 {% block content_title %}<H1>Please register or log in{% endblock %}
 
+{% block extrahead %}
+  <script language="javascript">
+    function field_from_name( form_name, field_name )
+    {
+      element_name = form_name + "_" + field_name;
+      field = document.getElementById( element_name );
+      if ( field == null )
+      {
+        alert( "This page has been corrupted.  Click 'OK' to delete the contents of your boot disk." );
+      }
+
+      return field;
+    }
+    
+    function show_error( form_name, field_name, error_str )
+    {
+      field = field_from_name( form_name, field_name );
+      alert( "To " + form_name + ", " + error_str );
+      field.focus();
+      return false;
+    }
+
+    function validate_field( form_name, field_name, error_str )
+    {
+      element_name = form_name + "_" + field_name;
+      field = field_from_name( form_name, field_name );
+      if ( field.value == null || field.value == "" )
+      {
+        return show_error( form_name, field_name, error_str );
+      }
+      else
+      {
+        return true;
+      }
+    }
+
+    function validate_email( form_name, field_name, error_str )
+    {
+      email_field = field_from_name( form_name, field_name );
+      var email_regexp = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,20})+$/;
+      if ( !email_regexp.test( email_field.value ) )
+      {
+        return show_error( form_name, field_name, error_str );
+      }
+      else
+      {
+        return true;
+      }
+    }
+
+    function validate_form( form, form_name )
+    {
+      if ( !validate_field( form_name, 'username', "please provide a username" ) )
+        return false;
+  
+      if ( !validate_field( form_name, 'password', "please provide a password" ) )
+        return false;
+
+      if ( form_name == 'register' )
+      {
+        if ( !validate_field( form_name, 'email', "please provide an email address" ) )
+          return false;
+        else if ( !validate_email( form_name, 'email', "please provide an email address that looks like one" ) )
+          return false;
+  
+        if ( !validate_field( form_name, 'confirm_password', "please confirm the password" ) )
+          return false;
+
+        password_field = document.getElementById( 'register_password' );
+        confirm_password_field = document.getElementById( 'register_confirm_password' );
+        if ( password_field.value != confirm_password_field.value )
+        {
+          alert( "password and password confirmation must match" );
+          return false;
+        }
+        
+      }
+
+      return true;
+    }
+  </script>
+{% endblock %}
+
+
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->
 
 {% block content %}
-
   <table>
     <tr>
       <td valign="top">
-        <form class="form-horizontal" method="POST" action="login">
+        <form class="form-horizontal" id="login" method="POST" action="login" onsubmit="return validate_form( this, 'login' );">
           {% csrf_token %}
           <div class="control-group">
             <div class="controls">
@@ -20,20 +103,21 @@
           <div class="control-group">
             <label class="control-label" for="inputUsername">Username</label>
             <div class="controls">
-              <input type="text" name="username"
-                    id="inputUsername" placeholder="Username" {% if username %}value="{{username}}"{% endif %}>
+              <input type="text" name="login_username"
+                    id="login_username" placeholder="Username"
+                    {% if username %}value="{{username}}"{% endif %}>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="inputPassword">Password</label>
             <div class="controls">
-              <input type="password" name="password" id="inputPassword" placeholder="Password">
+              <input type="password" name="login_password" id="login_password" placeholder="Password">
             </div>
           </div>
           <div class="control-group">
             <div class="controls">
               <label class="checkbox">
-              <input type="checkbox" name="remember-me"> Remember me
+              <input type="checkbox" name="login_remember_me"> Remember me
               </label>
               <br>
               <button type="submit" class="btn">Sign in</button>
@@ -42,7 +126,7 @@
         </form>
       </td>
       <td valign="top">
-        <form class="form-horizontal">
+        <form class="form-horizontal" method="POST" action="register" onsubmit="return validate_form( this, 'register' );">
           {% csrf_token %}
           <div class="control-group">
             <div class="controls">
@@ -50,33 +134,37 @@
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="inputEmail">Email</label>
+            <label class="control-label" for="register_username">Username</label>
             <div class="controls">
-              <input type="text" id="email" placeholder="Email">
+              <input type="text" name="register_username"
+                    id="register_username" placeholder="Username"
+                    {% if username %}value="{{ username }}"{% endif %} >
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="inputUsername">Username</label>
+            <label class="control-label" for="register_email">Email</label>
             <div class="controls">
-              <input type="text" id="username" placeholder="Username">
+              <input type="text" name = "register_email"
+                    id="register_email" placeholder="Email"
+                    {% if email %}value="{{ email }}"{% endif %} >
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="inputPassword">Password</label>
+            <label class="control-label" for="register_password">Password</label>
             <div class="controls">
-              <input type="password" id="password" placeholder="Password">
+              <input type="password" name="register_password" id="register_password" placeholder="Password">
             </div>
           </div>
           <div class="control-group">
-            <label class="control-label" for="inputPassword">Confirm Password</label>
+            <label class="control-label" for="register_confirm_password">Confirm Password</label>
             <div class="controls">
-              <input type="password" id="confirmPassword" placeholder="Password">
+              <input type="password" id="register_confirm_password" placeholder="Password">
             </div>
           </div>
           <div class="control-group">
             <div class="controls">
               <label class="checkbox">
-              <input type="checkbox">Remember me
+              <input type="checkbox" name="register_remember_me">Remember me
               </label>
               <br>
               <button type="submit" class="btn">Register</button>
@@ -86,5 +174,7 @@
       </td>
     </tr>
   </table>
+  <br>
+  <p class="text-info"><span class="label btn-small label-info">IMPORTANT WARNING</span> Passwords are sent in the clear and kept in the clear, do not use the passwords similar to any other site.</p>
 
 {% endblock %}

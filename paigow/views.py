@@ -28,14 +28,45 @@ def home( request ):
 
 # the user clicked the 'Register' button on the login page
 def register( request ):
-    params = {}
+  params = {}
+  username = request.POST['register_username']
+  email = request.POST['register_email']
+  params = { 'username' : username, 'email' : email }
+  
+  # check for the parameters we need to register.
+  is_good_so_far = True
+  if ( not username ):
+    messages.add_message(request, messages.ERROR, "A username is required to register.")
+    is_good_so_far = False
+  else:
+    existing_player = PGPlayer.objects.filter( name = username )
+    if ( existing_player ):
+      messages.add_message(request, messages.ERROR, "There is already a player with that username.")
+      is_good_so_far = False
+  
+  if ( not email ):
+    messages.add_message(request, messages.ERROR, "Email is required to register.")
+    is_good_so_far = False
+  
+  password = request.POST['register_password']
+  if ( not password ):
+    messages.add_message(request, messages.ERROR, "A password is required to register.")
+    is_good_so_far = False
+  
+  # did it pass muster?
+  if ( not is_good_so_far ):  
     return render_to_response( 'user_login.html', request_context( request, params ) )
+  
+  # we are good, add this to the players!
+  player = PGPlayer.create( username, email, password )
+  return render_to_response( 'user_login.html', request_context( request, params ) )
 
 # the user clicked the 'Register' button on the login page
 def login( request ):
   params = {}
-  username = request.POST['username']
+  username = request.POST['login_username']
   if ( not username ):
+    params['username'] = username
     messages.add_message(request, messages.ERROR, "Please provide a username.")
     return render_to_response( 'user_login.html', request_context( request, params ) )
   
@@ -45,7 +76,7 @@ def login( request ):
     params['username'] = username
     return render_to_response( 'user_login.html', request_context( request, params ) )
   
-  if m.password != request.POST['password']:
+  if m.password != request.POST['login_password']:
     messages.add_message(request, messages.ERROR, "Your username and/or password didn't match.")
     return render_to_response( 'user_login.html', request_context( request, params ) )
 
