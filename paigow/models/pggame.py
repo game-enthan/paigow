@@ -94,12 +94,15 @@ class PGGame( models.Model ):
   # Return the all the players for this single game.
   def players( self ):
     from models import PGPlayerInGame
-    return PGPlayerInGame.objects.filter( game = self )
+    pigs = PGPlayerInGame.objects.filter( game = self )
+    for pig in pigs:
+      yield pig.player
 
   # Add a player to this game
   def add_player( self, player ):
     from pgplayer import PGPlayer
     from models import PGPlayerInGame
+    print "adding player with id " + str(player.id) + "to game " + self.name + "\n"
     player = PGPlayerInGame.create( self, player )
     player.save()
   

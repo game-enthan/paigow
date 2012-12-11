@@ -36,6 +36,16 @@ class PGPlayer( models.Model ):
   # convenience to get all players except this id (i.e. all possible opponents)
   def all_possible_opponents( self ):
     return PGPlayer.objects.exclude( id = self.id )
+    
+  # return the opponent for this game
+  def opponent_in_game( self, game ):
+    opponents = []
+    players = game.players()
+    for player in players:
+      if ( player != self ):
+        opponents.append( player )
+    return opponents
+  
   
   # return all the games that this player is part of (this returns
   # a generator, which will get evaluated when the caller calls

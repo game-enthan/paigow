@@ -20,6 +20,15 @@ def session_player( request ):
   else:
     return None
 
+#-------------------------------------------------------------------
+# convenience
+# return the PGPlayer with the POSTed player ID value
+def posted_player_from_id_field( request, field_name ):
+  if field_name in request.POST:
+    return PGPlayer.with_id( request.POST[field_name] )
+  else:
+    return None
+
 
 #-------------------------------------------------------------------
 # convenience
@@ -43,7 +52,6 @@ def request_context( request, params ):
     params['playername'] = player.name
     params['opponents'] = player.all_possible_opponents()
   params['player'] = player
-  print "Setting params 'player' to " + str(player) + "\n"
 
   return RequestContext( request, params )
 
@@ -173,10 +181,18 @@ def add_game( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
     return goto_home( request )
-  
+
+  #   
   game = PGGame.create( request.POST['game_name'] )
   game.save() # must be done before adding player, so we have an ID
+  
+  print "game opponent id: " + request.POST['game_opponent'] + "\n"
+  
+  # add ourselves and the opponent (which automatically saves)
   game.add_player( session_player( request ) )
+  game.add_player( posted_player_from_id_field( request, 'game_opponent' ) )
+  
+  messages.add_message( request, messages.INFO, "Game " + game.name + " created." )
   
   return goto_home ( request, params )
 

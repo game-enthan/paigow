@@ -27,3 +27,16 @@ def tile_html_string(value,autoescape=None):
   out_str += "width=" + TILE_IMAGE_WIDTH + " height=" + TILE_IMAGE_HEIGHT
   return mark_safe(out_str)
 
+
+@register.filter(needs_autoescape=True)
+def opponent_for_game( value, arg, autoescape = None ):
+  player = arg
+  print "Getting player with name " + player.name
+  game = value
+  print "Getting game with name " + game.name
+  opponents = player.opponent_in_game( game )
+  if ( opponents ):
+    opponent = opponents[0]
+    print "Opponent has name " + opponent.name
+    return mark_safe( opponent.name )
+  return "n/a"

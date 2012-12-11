@@ -23,7 +23,7 @@
       {% for game in games %}
         <tr>
           <td><a href="game/{{game.id}}">{{ game.name }}</a></td>
-          <td>n/a</td>
+          <td>{{ game|opponent_for_game:player }}</td>
           <td>{{ game.start_date }}</td>
           <td>TBD</td>
           <td>{{ game.finish_date}}</td>
