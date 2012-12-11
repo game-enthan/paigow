@@ -76,7 +76,7 @@ class PGGame( models.Model ):
   # associated with it.  Each deal for a given game has a unique deal_index
   # ( a small number starting at 1 ) so we can find the specific deal that is
   # currently being played.  This is that number.
-  deal_number = models.PositiveSmallIntegerField()
+  current_deal_number = models.PositiveSmallIntegerField()
   
   # convenience
   @classmethod
@@ -103,11 +103,20 @@ class PGGame( models.Model ):
     player = PGPlayerInGame.create( self, player )
     player.save()
   
+  # Get the deal given the deal number
+  def deal( self, deal_number ):
+    from pgdeal import PGDeal
+    deals = PGDeal.objects.filter( game = self, deal_number = deal_number )
+    
+  # Get the current deal
+  def current_deal( self ):
+    return self.deal( current_deal_number )
+    
+  
   # shuffle the deck and save it as the current deal
   def deal( self ):
 
     from pgtile import PGTile
-    from models import PGTileInDeal
 
     # We had better be about to deal
     if ( self.game_state != PGGame.ABOUT_TO_DEAL ):
@@ -119,12 +128,9 @@ class PGGame( models.Model ):
     # it's a new deal number
     self.deal_number += 1
 
-    # remember this deal: each tile position gets saved
-    position = 0
-    for tile in tiles:
-      tile_in_deal = PGTileInDeal.create( self, tile, position, self.deal_number )
-      tile_in_deal.save()
-      position += 1
+    # remember this deal
+    deal = PGDeal.create( tiles, self, deal_number )
+    deal.save()
 
 # ----------------------------------------------------
 # Test PGGame class

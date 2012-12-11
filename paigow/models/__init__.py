@@ -12,10 +12,11 @@
 from pgtile   import PGTile
 from pggame   import PGGame
 from pgplayer import PGPlayer
+from pgdeal   import PGDeal
 
 from pgtile   import PGTileTest
 from pggame   import PGGameTest
 from pgplayer import PGPlayerTest
 
 # eventually we want to split this out into individual models
-from models import PGPlayerInGame, PGTileInDeal
+from models import PGPlayerInGame
