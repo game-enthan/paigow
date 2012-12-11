@@ -38,7 +38,8 @@ class PGDeal( models.Model ):
   # The deal shows as the ordering
   def __unicode__( self ):
     return self.tiles
-
+  
+  
   # Create it with an array of tiles and the game/deal#
   @classmethod
   def create( cls, tiles, game, deal_number ):
@@ -48,4 +49,24 @@ class PGDeal( models.Model ):
       char = "0123456789ABCDEF"[tile.tile_rank]
       deck_vals += char
     return cls( deck = deck_vals, game = game, deal_number = deal_number )
+  
+  
+  # return the tile for any given offset
+  def tile( offset ):
+    
+    # sanity check
+    if ( offset < 0 or offset > 31 ):
+      return None
+    
+    # get the char and we'll index it into tiles... but
+    # we want to decide if it's the first or second
+    tile_rank_char = self.deck[offset]
+    
+    # loop to check if it's the first or not    
+    offset_check = 0
+    is_first = (self.deck.index( tile_rank_char ) == offset)
+    
+    # return the appropriate
+    return PGTile.with_rank( ord(tile_rank_char), is_first )
+
 

@@ -77,6 +77,17 @@ class PGTile( models.Model ):
     random.shuffle( all_tiles )
     return all_tiles
   
+  # return the tile with the given rank, taking into account whether
+  # or not it's the first one.
+  def with_rank( rank, is_first ):
+    tiles = PGTile.objects.filter( tile_rank = rank )
+    if not tiles:
+      return None
+    if is_first:
+      return tiles[0]
+    else:
+      return tiles[1]
+  
   
   # This will make the object return value print out as
   # the name of the tile.
