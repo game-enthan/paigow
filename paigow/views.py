@@ -15,7 +15,10 @@ from models.pgplayer import PGPlayer
 # convenience
 # return the PGPlayer with the current request session id
 def session_player( request ):
-  return PGPlayer.with_id( request.session['player_id'] )
+  if 'player_id' in request.session:
+    return PGPlayer.with_id( request.session['player_id'] )
+  else:
+    return None
 
 
 #-------------------------------------------------------------------
@@ -39,7 +42,6 @@ def request_context( request, params ):
 def home( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
-    messages.add_message( request, messages.INFO, "You are not logged in." )
     return render_to_response( 'user_login.html', request_context( request, params ) )
   else:
     params['games'] = session_player( request ).games()

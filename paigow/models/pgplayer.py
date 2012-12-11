@@ -27,9 +27,11 @@ class PGPlayer( models.Model ):
   
   # convenience to get the player with this id
   @classmethod
-  def with_id( cls, id ):
-    return PGPlayer.objects.get( id = id )
-  
+  def with_id( cls, player_id ):
+    if ( player_id ):
+      return PGPlayer.objects.get( id = player_id )
+    else:
+      return None
   
   # return all the games that this player is part of (this returns
   # a generator, which will get evaluated when the caller calls
