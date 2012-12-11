@@ -15,6 +15,9 @@ urlpatterns = patterns('',
   
   url(r'^$', 'paigow.views.home' ),
   url(r'^home$', 'paigow.views.home' ),
+  url(r'^register$', 'paigow.views.register' ),
+  url(r'^login$', 'paigow.views.login' ),
+  url(r'^logout$', 'paigow.views.logout' ),
   url(r'^game/new$', 'paigow.views.new_game' ),
   url(r'^game/add$', 'paigow.views.add_game' ),
   

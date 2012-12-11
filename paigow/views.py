@@ -37,6 +37,12 @@ def request_context( request, params ):
 
 
 #-------------------------------------------------------------------
+# make sure we are redirected to the right place
+def goto_home( request, params = {} ):
+  return redirect( '/paigow/home', request, params )
+
+
+#-------------------------------------------------------------------
 # home page: if they're not logged in, allow them to log in or register.
 # if they are logged in, show them the home page (TBD).
 def home( request, params = {} ):
@@ -99,7 +105,7 @@ def register( request, params = {} ):
   player.save()
   add_player_to_session( request, player, 'register' )
   
-  return redirect( 'home', params )
+  return goto_home( request, params )
 
 
 #-------------------------------------------------------------------
@@ -124,8 +130,8 @@ def login( request, params = {} ):
     return render_to_response( 'user_login.html', request_context( request, params ) )
   
   add_player_to_session( request, players[0], 'login' )
-  
-  return redirect( 'home', params )
+
+  return goto_home ( request, params )
 
 
 #-------------------------------------------------------------------
@@ -133,7 +139,7 @@ def login( request, params = {} ):
 def logout( request, params = {} ):
   
   request.session['player_id'] = None
-  return redirect( 'home', params )
+  return goto_home ( request, params )
 
 
 #-------------------------------------------------------------------
@@ -158,8 +164,6 @@ def add_game( request, params = {} ):
     game.save() # must be done before adding player, so we have an ID
     game.add_player( session_player( request ) )
     
-    # redirect back home, but since we're under 'game/add', we have to go up one level,
-    # and so far I can't figure out how to make "../home" work without errors.
-    return redirect( '/paigow/home', params )
+    return goto_home ( request, params )
 
 
