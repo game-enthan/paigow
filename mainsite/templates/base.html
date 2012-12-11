@@ -75,11 +75,13 @@
   {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
     <!-- Fav and touch icons -->
-    <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/bootstrap/ico/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/bootstrap/ico/apple-touch-icon-114-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/bootstrap/ico/apple-touch-icon-72-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" href="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+    <!--
+      <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.ico">
+      <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/bootstrap/ico/apple-touch-icon-144-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/bootstrap/ico/apple-touch-icon-114-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/bootstrap/ico/apple-touch-icon-72-precomposed.png">
+      <link rel="apple-touch-icon-precomposed" href="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+    -->
 
 </head>
 {% load i18n %}
@@ -90,15 +92,17 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <!-- <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <!--  if the window gets too narrow, this puts three horizontal bars on the right
+                edge of the navbar that will open up a menu with the options when clicked. -->
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-          </a> -->
+          </a>
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li><a class="brand" href="/paigow">{% block branding %}{% endblock %}</a></li>
-              <li class="active"><a href="#">Home</a></li>
+              <li class="active"><a href="{{ home_url }}">Home</a></li>
               {% block activities %}
                 {% load activities %} <!-- load activities.py, which defines show_activities() -->
                 {% show_activities %} <!-- call show_activities() which includes 'activities.html' inline -->
@@ -110,7 +114,7 @@
                 <li id="fat-menu" class="dropdown">
                   <a href="#" id="user-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown">{{ playername }}&nbsp;<b class="caret"></b></a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="user-dropdown">
-                    <li><a tabindex="-1" href="logout">Logout</a></li>
+                    <li><a tabindex="-1" href="{{ logout_url }}">Logout</a></li>
                   </ul>
                 </li>
               </ul>
@@ -182,6 +186,7 @@
     <script src="{% static "bootstrap/js/bootstrap-collapse.js" %}"></script>
     <script src="{% static "bootstrap/js/bootstrap-carousel.js" %}"></script>
     <script src="{% static "bootstrap/js/bootstrap-typeahead.js" %}"></script>
+    <script src="{% static "bootstrap/js/bootstrap-affix.js" %}"></script>
 
   </body>
 </html>

@@ -23,16 +23,28 @@ def session_player( request ):
 
 #-------------------------------------------------------------------
 # convenience
-# protect against cross-site request forgery, and put it into a RequestContext
-# so the middleware infrastructure like 'messages' works.
+# final setup of the params with stuff common to all views
 def request_context( request, params ):
-
+  
+  # protect against cross-site request forgery
   params.update( csrf( request ) )
+  
+  # set up the URLs for the app-wide menus
+  params['logout_url'] = '/paigow/logout'
+  params['home_url'] = '/paigow/home'
+  
+  # setup players and possible opponents
   player = session_player( request )
   if ( not player ):
     request.session['player_id'] = None
+    params['playername'] = None
+    params['opponents'] = None
   else:
     params['playername'] = player.name
+    params['opponents'] = player.all_possible_opponents()
+  params['player'] = player
+  print "Setting params 'player' to " + str(player) + "\n"
+
   return RequestContext( request, params )
 
 
@@ -49,9 +61,9 @@ def home( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
     return render_to_response( 'user_login.html', request_context( request, params ) )
-  else:
-    params['games'] = session_player( request ).games()
-    return render_to_response( 'home.html', request_context( request, params ) )
+
+  params['games'] = session_player( request ).games()
+  return render_to_response( 'home.html', request_context( request, params ) )
 
 
 #-------------------------------------------------------------------
@@ -104,6 +116,7 @@ def register( request, params = {} ):
   player = PGPlayer.create( username, email, password )
   player.save()
   add_player_to_session( request, player, 'register' )
+  messages.add_message(request, messages.INFO, username + " is now registered and logged in." )
   
   return goto_home( request, params )
 
@@ -130,7 +143,8 @@ def login( request, params = {} ):
     return render_to_response( 'user_login.html', request_context( request, params ) )
   
   add_player_to_session( request, players[0], 'login' )
-
+  messages.add_message(request, messages.INFO, username + " is now logged in." )
+  
   return goto_home ( request, params )
 
 
@@ -147,9 +161,9 @@ def logout( request, params = {} ):
 def new_game( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
-    return redirect( '/paigow/login', request, params )
-  else:
-    return render_to_response( 'game_create.html', request_context( request, params ) )
+    return goto_home( request )
+  
+  return render_to_response( 'game_create.html', request_context( request, params ) )
 
 
 #-------------------------------------------------------------------
@@ -158,13 +172,13 @@ def new_game( request, params = {} ):
 def add_game( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
-    return redirect( '/paigow/login', request, params )
-  else:
-    game = PGGame.create( request.POST['game_name'] )
-    game.save() # must be done before adding player, so we have an ID
-    game.add_player( session_player( request ) )
-    
-    return goto_home ( request, params )
+    return goto_home( request )
+  
+  game = PGGame.create( request.POST['game_name'] )
+  game.save() # must be done before adding player, so we have an ID
+  game.add_player( session_player( request ) )
+  
+  return goto_home ( request, params )
 
 
 #-------------------------------------------------------------------
@@ -172,12 +186,14 @@ def add_game( request, params = {} ):
 def play_game( request, game_id ):
   
   if (not request.session.get('player_id', False)):
-    return redirect( '/paigow/login', request, params )
-  else:
-    game = PGGame.with_id( game_id )
-    if ( not game ):
-      messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
-      return goto_home( request )
+    return goto_home( request )
+  
+  game = PGGame.with_id( game_id )
+  if ( not game ):
+    messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
+    return goto_home( request )
+  
+  #TBD: play it
   return goto_home( request )
 
 
