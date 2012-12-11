@@ -1,0 +1,20 @@
+{% extends "paigow/base_site.html" %}
+{% load paigow_extras %}
+
+<!-- 'content' block is placed in base_site.html; override it here to show this content. -->
+
+{% block content_title %}<h1>Home</h1>{% endblock %}
+
+{% block content %}
+<!-- The user is logged in (or they wouldn't be at this page) so show games -->
+  {% if games %}
+      <ul>
+      {% for game in games %}
+          <li>{{ game.name }}</li>
+      {% endfor %}
+      </ul>
+  {% else %}
+      <p class='info-warning'>No games include this player</p>
+  {% endif %}
+
+{% endblock %}
