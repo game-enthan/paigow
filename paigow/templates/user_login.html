@@ -3,41 +3,9 @@
 
 {% block content_title %}<H1>Please register or log in{% endblock %}
 
-{% block extrahead %}
+{% block form_validation %}
+
   <script language="javascript">
-    function field_from_name( form_name, field_name )
-    {
-      element_name = form_name + "_" + field_name;
-      field = document.getElementById( element_name );
-      if ( field == null )
-      {
-        alert( "This page has been corrupted.  Click 'OK' to delete the contents of your boot disk." );
-      }
-
-      return field;
-    }
-    
-    function show_error( form_name, field_name, error_str )
-    {
-      field = field_from_name( form_name, field_name );
-      alert( "To " + form_name + ", " + error_str );
-      field.focus();
-      return false;
-    }
-
-    function validate_field( form_name, field_name, error_str )
-    {
-      element_name = form_name + "_" + field_name;
-      field = field_from_name( form_name, field_name );
-      if ( field.value == null || field.value == "" )
-      {
-        return show_error( form_name, field_name, error_str );
-      }
-      else
-      {
-        return true;
-      }
-    }
 
     function validate_email( form_name, field_name, error_str )
     {
@@ -84,6 +52,7 @@
       return true;
     }
   </script>
+
 {% endblock %}
 
 
@@ -164,7 +133,7 @@
           <div class="control-group">
             <div class="controls">
               <label class="checkbox">
-              <input type="checkbox" name="register_remember_me">Remember me
+              <input type="checkbox" id="register_remember_me" name="register_remember_me">Remember me
               </label>
               <br>
               <button type="submit" class="btn">Register</button>

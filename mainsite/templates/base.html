@@ -23,8 +23,53 @@
   </style>
   {% endblock %}
   
-  <!-- Any extra headers for pages that extend this one, usually for page-specific javascript -->
+  <!-- Any extra headers for pages that extend this one -->
   {% block extrahead %}{% endblock %}
+  
+  <!-- Form validation utilities for anything that needs to; pages that don't can override this block -->
+  {% block form_validation_utilities %}
+
+    <script language="javascript">
+  
+      function field_from_name( form_name, field_name )
+      {
+        element_name = form_name + "_" + field_name;
+        field = document.getElementById( element_name );
+        if ( field == null )
+        {
+          alert( "This page has been corrupted.  Click 'OK' to delete the contents of your boot disk." );
+        }
+  
+        return field;
+      }
+      
+      function show_error( form_name, field_name, error_str )
+      {
+        field = field_from_name( form_name, field_name );
+        alert( "To " + form_name + ", " + error_str );
+        field.focus();
+        return false;
+      }
+  
+      function validate_field( form_name, field_name, error_str )
+      {
+        element_name = form_name + "_" + field_name;
+        field = field_from_name( form_name, field_name );
+        if ( field.value == null || field.value == "" )
+        {
+          return show_error( form_name, field_name, error_str );
+        }
+        else
+        {
+          return true;
+        }
+      }
+    
+    </script>
+  {% endblock %}
+
+  <!-- add form validation overrides to this block -->
+  {% block form_validation %}{% endblock %}
 
   <!-- Don't want search engines to find us! ... inside a block so it can be overriden -->
   {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}

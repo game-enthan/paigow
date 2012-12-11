@@ -1,7 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic import DetailView, ListView, TemplateView
 from paigow.models import PGTile, PGGame
-from paigow.views import PaiGowView
 
 urlpatterns = patterns('',
   # Examples:
@@ -14,17 +13,10 @@ urlpatterns = patterns('',
   # Uncomment the next line to enable the admin:
   #url(r'^admin/', include(admin.site.urls)),
   
-  url(r'^$', 'paigow.views.home'
-#     TemplateView.as_view(
-#       template_name = 'paigow/base_site.html',
-#     )
-  ),
-  
-  url(r'^login',
-    TemplateView.as_view(
-      template_name = 'user_login.html',
-    )
-  ),
+  url(r'^$', 'paigow.views.home' ),
+  url(r'^home$', 'paigow.views.home' ),
+  url(r'^game/new$', 'paigow.views.new_game' ),
+  url(r'^game/add$', 'paigow.views.add_game' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',
@@ -38,9 +30,6 @@ urlpatterns = patterns('',
   url(r'^tiles/(?P<pk>\d+)/$',
     DetailView.as_view(
         model=PGTile)),
-  
-  # /game : create new game
-  url(r'^game$', 'paigow.views.create_game' ),
   
 )
 

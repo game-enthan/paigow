@@ -24,6 +24,22 @@ class PGPlayer( models.Model ):
       name = name,
       email = email,
       password = password )
+  
+  # convenience to get the player with this id
+  @classmethod
+  def with_id( cls, id ):
+    return PGPlayer.objects.get( id = id )
+  
+  
+  # return all the games that this player is part of (this returns
+  # a generator, which will get evaluated when the caller calls
+  # something that needs these values.
+  def games( self ):
+    from paigow.models import PGPlayerInGame
+    pgpigs = PGPlayerInGame.objects.filter( player = self )
+    for pgpig in pgpigs:
+      yield pgpig.game
+
 
   # This will make the object return value print out as
   # the name of the tile.

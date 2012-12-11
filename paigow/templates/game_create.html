@@ -3,10 +3,24 @@
 
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->
 
-{% block content_title %}<h1>New Game</h1>{% endblock %}
+{% block form_validation %}
+
+  <script language="javascript">
+
+    function validate_form( form, form_name )
+    {
+      if ( !validate_field( form_name, 'name', "please provide a name for the game" ) )
+        return false;
+
+      return true;
+    }
+  
+  </script>
+
+{% endblock %}
 
 {% block content %}
-  <form class="form-horizontal" action="/game_create" method="post">
+  <form class="form-horizontal" method="POST" action="add" onsubmit="return validate_form( this, 'game')" >
     {% csrf_token %}
     <div class="control-group">
       <div class="controls">
@@ -14,15 +28,15 @@
       </div>
     </div>
     <div class="control-group">
-      <label class="control-label" for="inputUsername">Name of game</label>
+      <label class="control-label" for="game_name">Name</label>
       <div class="controls">
-        <input type="text" id="inputGamename" placeholder="Game name">
+        <input type="text" id="game_name" name="game_name" placeholder="Game name">
       </div>
     </div>
     <br>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn">Start New Game</button>
+        <button type="submit" class="btn">Create Game</button>
       </div>
     </div>
   </form>
