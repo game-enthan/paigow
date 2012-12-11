@@ -40,11 +40,12 @@ class PGDeal( models.Model ):
     return self.tiles
 
   # Create it with an array of tiles and the game/deal#
+  @classmethod
   def create( cls, tiles, game, deal_number ):
-    from models.pgtile import PGTile
+    from pgtile import PGTile
     deck_vals = ""
     for tile in tiles:
-      char = "0123456789ABCDEF"[tile.rank]
+      char = "0123456789ABCDEF"[tile.tile_rank]
       deck_vals += char
     return cls( deck = deck_vals, game = game, deal_number = deal_number )
 

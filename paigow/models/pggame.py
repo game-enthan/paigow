@@ -30,7 +30,7 @@ class PGGame( models.Model ):
       name = name,
       start_date = timezone.now(),
       game_state = PGGame.ABOUT_TO_DEAL,
-      deal_number = 0 )
+      current_deal_number = 0 )
 
   # name of the game ( there may be different types of games )
   name = models.CharField( max_length=100 )
@@ -114,9 +114,10 @@ class PGGame( models.Model ):
     
   
   # shuffle the deck and save it as the current deal
-  def deal( self ):
+  def create_deal( self ):
 
     from pgtile import PGTile
+    from pgdeal import PGDeal
 
     # We had better be about to deal
     if ( self.game_state != PGGame.ABOUT_TO_DEAL ):
@@ -126,10 +127,10 @@ class PGGame( models.Model ):
     tiles = PGTile.get_shuffled_tiles()
 
     # it's a new deal number
-    self.deal_number += 1
+    self.current_deal_number += 1
 
     # remember this deal
-    deal = PGDeal.create( tiles, self, deal_number )
+    deal = PGDeal.create( tiles, self, self.current_deal_number )
     deal.save()
 
 # ----------------------------------------------------
@@ -160,12 +161,12 @@ class PGGameTest( TestCase ):
     self.assertEqual( self.test_game.players().count(), 2 )
 
   def test_deal_x( self ):
-    from models import PGTileInDeal
-    self.assertEqual( self.test_game.deal_number, 0 )
-    self.test_game.deal();
-    self.assertEqual( self.test_game.deal_number, 1 )
-    tiles_in_deal = PGTileInDeal.objects.filter( game = self.test_game, deal_number = 1 )
-    self.assertEqual( tiles_in_deal.count(), 32 )
+    from pgdeal import PGDeal
+    self.assertEqual( self.test_game.current_deal_number, 0 )
+    self.test_game.create_deal();
+    self.assertEqual( self.test_game.current_deal_number, 1 )
+    tiles_in_deal = PGDeal.objects.filter( game = self.test_game, deal_number = 1 )
+    self.assertEqual( tiles_in_deal.count(), 1 )
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

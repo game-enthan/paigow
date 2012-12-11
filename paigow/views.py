@@ -147,7 +147,7 @@ def logout( request, params = {} ):
 def new_game( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
-    return render_to_response( 'user_login.html', request_context( request, params ) )
+    return redirect( '/paigow/login', request, params )
   else:
     return render_to_response( 'game_create.html', request_context( request, params ) )
 
@@ -158,7 +158,7 @@ def new_game( request, params = {} ):
 def add_game( request, params = {} ):
   
   if (not request.session.get('player_id', False)):
-    return render_to_response( 'user_login.html', request_context( request, params ) )
+    return redirect( '/paigow/login', request, params )
   else:
     game = PGGame.create( request.POST['game_name'] )
     game.save() # must be done before adding player, so we have an ID
@@ -172,7 +172,7 @@ def add_game( request, params = {} ):
 def play_game( request, game_id ):
   
   if (not request.session.get('player_id', False)):
-    return render_to_response( 'user_login.html', request_context( request, params ) )
+    return redirect( '/paigow/login', request, params )
   else:
     game = PGGame.with_id( game_id )
     if ( not game ):
