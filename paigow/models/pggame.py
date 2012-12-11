@@ -78,6 +78,15 @@ class PGGame( models.Model ):
   # currently being played.  This is that number.
   deal_number = models.PositiveSmallIntegerField()
   
+  # convenience
+  @classmethod
+  def with_id( cls, game_id ):
+    if ( game_id ):
+      games = PGGame.objects.filter( id = game_id )
+      if ( games.count() > 0 ):
+        return games[0]
+    return None
+  
   # This will make the object return value print out as the name of the game.
   def __unicode__( self ):
     return self.name

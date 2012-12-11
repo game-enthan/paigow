@@ -22,7 +22,7 @@
   {% if games %}
       {% for game in games %}
         <tr>
-          <td>{{ game.name }}</td>
+          <td><a href="game/{{game.id}}">{{ game.name }}</a></td>
           <td>n/a</td>
           <td>{{ game.start_date }}</td>
           <td>TBD</td>

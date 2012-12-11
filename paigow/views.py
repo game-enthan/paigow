@@ -167,3 +167,17 @@ def add_game( request, params = {} ):
     return goto_home ( request, params )
 
 
+#-------------------------------------------------------------------
+# User clicked a URL that corresponds to a game.
+def play_game( request, game_id ):
+  
+  if (not request.session.get('player_id', False)):
+    return render_to_response( 'user_login.html', request_context( request, params ) )
+  else:
+    game = PGGame.with_id( game_id )
+    if ( not game ):
+      messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
+      return goto_home( request )
+  return goto_home( request )
+
+
