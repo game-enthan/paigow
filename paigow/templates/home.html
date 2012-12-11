@@ -6,15 +6,30 @@
 {% block content_title %}<h1>Home</h1>{% endblock %}
 
 {% block content %}
-<!-- The user is logged in (or they wouldn't be at this page) so show games -->
+
+  <p class="lead">You are a player in the following games:</p>
+  <!-- The user is logged in (or they wouldn't be at this page) so show games -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Name</td>
+        <td>Opponent</td>
+        <td>Start date</td>
+        <td>Score</td>
+        <td>Finish date</td>
+      </tr>
+    </thead>
   {% if games %}
-      <ul>
       {% for game in games %}
-          <li>{{ game.name }}</li>
+        <tr>
+          <td>{{ game.name }}</td>
+          <td>n/a</td>
+          <td>{{ game.start_date }}</td>
+          <td>TBD</td>
+          <td>{{ game.finish_date}}</td>
+        </tr>
       {% endfor %}
-      </ul>
-  {% else %}
-      <p class='info-warning'>No games include this player</p>
   {% endif %}
+  </table>
 
 {% endblock %}

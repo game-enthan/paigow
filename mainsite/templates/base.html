@@ -18,7 +18,7 @@
   <link rel="stylesheet" type="text/css" href="{% static "bootstrap/js/google-code-prettify/prettify.css" %}" />
   <style>
     body {
-      padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      padding-top: 40px; /* 60px to make the container go all the way to the bottom of the topbar */
     }
   </style>
   {% endblock %}
@@ -90,11 +90,11 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <!-- <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-          </a>
+          </a> -->
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li><a class="brand" href="/paigow">{% block branding %}{% endblock %}</a></li>
@@ -108,8 +108,8 @@
             {% if request.session.player_id %}
               <ul class="nav pull-right">
                 <li id="fat-menu" class="dropdown">
-                  <a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown">{{ playername }}&nbsp;<b class="caret"></b></a>
-                  <ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
+                  <a href="#" id="user-dropdown" role="button" class="dropdown-toggle" data-toggle="dropdown">{{ playername }}&nbsp;<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="user-dropdown">
                     <li><a tabindex="-1" href="logout">Logout</a></li>
                   </ul>
                 </li>
