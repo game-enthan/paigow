@@ -38,7 +38,7 @@ class PGPlayer( models.Model ):
     return PGPlayer.objects.exclude( id = self.id )
     
   # return the opponent for this game
-  def opponents_in_game( self, game ):
+  def opponents_for_game( self, game ):
     opponents = []
     players = game.players()
     for player in players:
@@ -110,14 +110,14 @@ class PGPlayerTest( TestCase ):
     test_game = PGGame.create( "New Game" )
     test_game.save()
     test_game.add_player( self.test_player )
-    self.assertEqual( len(self.test_player.opponents_in_game( test_game )), 0 )
+    self.assertEqual( len(self.test_player.opponents_for_game( test_game )), 0 )
     other_guy = PGPlayer.create( "other_guy", "foo@bar.com", "xxx" )
     other_guy.save()
     test_game.add_player( other_guy )
-    self.assertEqual( len(self.test_player.opponents_in_game( test_game )), 1 )
-    self.assertEqual( self.test_player.opponents_in_game( test_game )[0], other_guy )
-    self.assertEqual( len(other_guy.opponents_in_game( test_game )), 1 )
-    self.assertEqual( other_guy.opponents_in_game( test_game )[0], self.test_player )
+    self.assertEqual( len(self.test_player.opponents_for_game( test_game )), 1 )
+    self.assertEqual( self.test_player.opponents_for_game( test_game )[0], other_guy )
+    self.assertEqual( len(other_guy.opponents_for_game( test_game )), 1 )
+    self.assertEqual( other_guy.opponents_for_game( test_game )[0], self.test_player )
 
 # run the test in the correct situation; this is boilerplat
 # for all modules that have tests, don't try to figure it out.
