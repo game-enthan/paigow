@@ -199,7 +199,7 @@ def add_game( request, params = {} ):
 
 #-------------------------------------------------------------------
 # User clicked a URL that corresponds to a game.
-def play_game( request, game_id ):
+def play_game( request, game_id, params = {} ):
   
   if (not request.session.get('player_id', False)):
     return goto_home( request )
@@ -209,7 +209,8 @@ def play_game( request, game_id ):
     messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
     return goto_home( request )
   
-  #TBD: play it
-  return goto_home( request )
+  params['game'] = game
+  params['opponent'] = session_player( request ).opponents_for_game( game )[0]
+  return render_to_response( 'game_play.html', request_context( request, params ) )
 
 
