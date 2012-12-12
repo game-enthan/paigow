@@ -37,7 +37,6 @@
       <label class="control-label" for="game_name">Opponent</label>
       <div class="controls">
         <select id="game_opponent" name="game_opponent">
-          <option value="-1">dealer</option>
           {% if opponents %}
             {% for opponent in opponents %}
               <option value="{{ opponent.id }}">{{ opponent }}</option>

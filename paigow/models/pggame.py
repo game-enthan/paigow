@@ -93,16 +93,17 @@ class PGGame( models.Model ):
   
   # Return the all the players for this single game.
   def players( self ):
+    players = []
     from models import PGPlayerInGame
     pigs = PGPlayerInGame.objects.filter( game = self )
     for pig in pigs:
-      yield pig.player
+      players.append( pig.player )
+    return players
 
   # Add a player to this game
   def add_player( self, player ):
     from pgplayer import PGPlayer
     from models import PGPlayerInGame
-    print "adding player with id " + str(player.id) + "to game " + self.name + "\n"
     player = PGPlayerInGame.create( self, player )
     player.save()
   
@@ -161,7 +162,9 @@ class PGGameTest( TestCase ):
     player_2 = PGPlayer.objects.create( name = 'Dave' )
     self.test_game.add_player( player_1 )
     self.test_game.add_player( player_2 )
-    self.assertEqual( self.test_game.players().count(), 2 )
+    self.assertEqual( len(self.test_game.players()), 2 )
+    self.assertIn( player_1, self.test_game.players() )
+    self.assertIn( player_2, self.test_game.players() )
 
   def test_deal_x( self ):
     from pgdeal import PGDeal
@@ -170,6 +173,8 @@ class PGGameTest( TestCase ):
     self.assertEqual( self.test_game.current_deal_number, 1 )
     tiles_in_deal = PGDeal.objects.filter( game = self.test_game, deal_number = 1 )
     self.assertEqual( tiles_in_deal.count(), 1 )
+  
+
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

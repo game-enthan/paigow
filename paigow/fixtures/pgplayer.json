@@ -1,0 +1,11 @@
+[
+	{
+		"model" : "paigow.pgplayer",
+		"pk": 1,
+		"fields": {
+			"name": "computer",
+			"email": "computer@paigow-rudisherry.com",
+			"password": "3yeNhJgzxQ"
+		}
+	}
+]
