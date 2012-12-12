@@ -1,0 +1,15 @@
+<!-- inclusion for any site shows tiles -->
+<img class="tile tile-{{ tile_style }}"
+    style="background-position:-{{tile.sprite_left}}px -{{tile.sprite_top}}px;"></img>
+
+<!--
+def tile_html_string(value,autoescape=None):
+  out_str = " style=\""
+  out_str += "
+  out_str += "background-repeat:no-repeat;"
+  out_str += "width:" + TILE_IMAGE_WIDTH + "px;height:" + TILE_IMAGE_HEIGHT + "px;"
+  out_str += "background-position:-" + str(value.sprite_left) + "px -" + str(value.sprite_top) + "px;\""
+  out_str += "src=\"" + STATIC_URL + "img_trans.gif\""
+  out_str += "width=" + TILE_IMAGE_WIDTH + " height=" + TILE_IMAGE_HEIGHT
+  return mark_safe(out_str)
+-->

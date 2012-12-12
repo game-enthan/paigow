@@ -10,24 +10,6 @@ register = template.Library()
 def title():
   return "Pai Gow"
 
-# Filter a tile and put this string inside an IMG object to get a tile image:
-#
-#        <img {{ tile|tile_html_string }}></img>.
-#
-# This will result in a 1x1 transparent GIF, scaled to the size of the tile
-# 
-@register.filter(needs_autoescape=True)
-def tile_html_string(value,autoescape=None):
-  out_str = " style=\""
-  out_str += "display:block;background-image:url('" + STATIC_URL + "tiles.jpg');"
-  out_str += "background-repeat:no-repeat;"
-  out_str += "width:" + TILE_IMAGE_WIDTH + "px;height:" + TILE_IMAGE_HEIGHT + "px;"
-  out_str += "background-position:-" + str(value.sprite_left) + "px -" + str(value.sprite_top) + "px;\""
-  out_str += "src=\"" + STATIC_URL + "img_trans.gif\""
-  out_str += "width=" + TILE_IMAGE_WIDTH + " height=" + TILE_IMAGE_HEIGHT
-  return mark_safe(out_str)
-
-
 @register.filter(needs_autoescape=True)
 def opponent_for_game( value, arg, autoescape = None ):
   player = arg
@@ -37,3 +19,8 @@ def opponent_for_game( value, arg, autoescape = None ):
     opponent = opponents[0]
     return mark_safe( opponent.name )
   return "computer"
+
+@register.inclusion_tag("tile.html", takes_context=True)
+def tile_image( context, tile, tile_style ):
+  return { 'tile': tile, 'tile_style': tile_style }
+

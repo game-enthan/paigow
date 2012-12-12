@@ -201,6 +201,8 @@ def add_game( request, params = {} ):
 # User clicked a URL that corresponds to a game.
 def play_game( request, game_id, params = {} ):
   
+  from models.pgtile import PGTile
+  
   if (not request.session.get('player_id', False)):
     return goto_home( request )
   
@@ -211,6 +213,7 @@ def play_game( request, game_id, params = {} ):
   
   params['game'] = game
   params['opponent'] = session_player( request ).opponents_for_game( game )[0]
+  params['tile'] = PGTile.objects.get( id = 4 )
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
 
