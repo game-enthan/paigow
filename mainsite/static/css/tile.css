@@ -1,0 +1,26 @@
+/* Styles for tile sprites */
+
+.tile {
+  display:block;
+  background-image:url('/static/tiles.jpg');
+  src:url('/static/img_trans.gif');
+}
+
+.tile-large {
+  height: 250px;
+  width: 100px;
+  background-size:600%;
+}
+
+.tile-medium {
+  height: 125px;
+  width: 50px;
+  background-size:600%;
+}
+
+.tile-small {
+  height: 63px;
+  width: 25px;
+  background-size:600%;
+}
+

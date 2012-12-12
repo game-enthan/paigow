@@ -1,11 +1,33 @@
 {% extends "paigow/base_site.html" %}
-{% load paigow_extras %}
+{% load static %}{% load paigow_extras %}
+
+{% block extra-stylesheet %}
+  <link rel="stylesheet" type="text/css" href="{% static "css/tile.css" %}" />
+{% endblock %}
 
 {% block content_title %}<h1>{{ game.name }}</h1>{% endblock %}
 
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->
 
 {% block content %}
+  <!-- Info about the game -->
   <p class="lead">Playing against <strong>{{ game|opponent_for_game:player }}</strong>
   <font class="lead pull-right">Score: <strong>10 - 6</strong></font>
+
+  <br><br>
+  
+  <!-- Commands in the game -->
+  <div class="btn-toolbar">
+    <button class="btn btn-small btn-primary" type="button">Deal</button>
+    <button class="btn btn-small btn-primary" type="button">Pause</button>
+  </div>
+  
+  <!-- Test: show a tile -->
+  <img class="tile tile-large" style="background-position:-500px -500px;"></img>
+  <br>
+  <img class="tile tile-medium" style="background-position:-250px -250px;"></img>
+  <br>
+  <img class="tile tile-small" style="background-position:-125px -125px;"></img>
+  <br>
+
 {% endblock %}

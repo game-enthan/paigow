@@ -6,7 +6,7 @@ from django import template
 
 register = template.Library()
 
-@register.inclusion_tag('paigow/activities.html')
+@register.inclusion_tag('activities.html')
 def show_activities():
     activities = (
       { 'name': "Start New Game", 'url': 'game/new' },
