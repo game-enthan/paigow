@@ -192,7 +192,7 @@ def add_game( request, params = {} ):
   game.add_player( session_player( request ) )
   game.add_player( posted_player_from_id_field( request, 'game_opponent' ) )
   
-  messages.add_message( request, messages.INFO, "Game " + game.name + " created." )
+  messages.add_message( request, messages.INFO, "Game \"" + game.name + "\" created." )
   
   return goto_home ( request, params )
 

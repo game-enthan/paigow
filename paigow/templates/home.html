@@ -9,14 +9,14 @@
 
   <p class="lead">You are a player in the following games:</p>
   <!-- The user is logged in (or they wouldn't be at this page) so show games -->
-  <table class="table table-striped">
+  <table class="table table-striped table-condensed">
     <thead>
       <tr>
-        <td>Name</td>
-        <td>Opponent</td>
-        <td>Start date</td>
-        <td>Score</td>
-        <td>Finish date</td>
+        <th>Name</th>
+        <th>Opponent</th>
+        <th>Score</th>
+        <th>Start date</th>
+        <th>Finish date</th>
       </tr>
     </thead>
   {% if games %}
@@ -24,8 +24,8 @@
         <tr>
           <td><a href="game/{{game.id}}">{{ game.name }}</a></td>
           <td>{{ game|opponent_for_game:player }}</td>
-          <td>{{ game.start_date }}</td>
           <td>TBD</td>
+          <td>{{ game.start_date }}</td>
           <td>{{ game.finish_date}}</td>
         </tr>
       {% endfor %}
