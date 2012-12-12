@@ -32,7 +32,7 @@ def tile_html_string(value,autoescape=None):
 def opponent_for_game( value, arg, autoescape = None ):
   player = arg
   game = value
-  opponents = player.opponents_in_game( game )
+  opponents = player.opponents_for_game( game )
   if ( opponents ):
     opponent = opponents[0]
     return mark_safe( opponent.name )
