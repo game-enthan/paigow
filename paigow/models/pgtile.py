@@ -1,4 +1,4 @@
-# This file defines the Tile python class, derived from the
+# This file defines the PGTile python class, derived from the
 # django 'models.Model' class that relates python classes to
 # relational database tables.
 
@@ -77,16 +77,73 @@ class PGTile( models.Model ):
     random.shuffle( all_tiles )
     return all_tiles
   
-  # return the tile with the given rank, taking into account whether
-  # or not it's the first one.
-  def with_rank( rank, is_first ):
-    tiles = PGTile.objects.filter( tile_rank = rank )
+  # internal function to return a given filter
+  @classmethod
+  def get_tiles_matching( cls, filter, is_first = True ):
+
+    print "Get matching " + str(filter)
+    # get the tile
+    tiles = PGTile.objects.filter( **filter )
+    
+    print "returns " + str(tiles)
+
+    # sanity check(s)
     if not tiles:
       return None
+    if ( len(tiles) != 2 ):
+      return None
+    
+    # there are two of every rank, client can specify which    
     if is_first:
       return tiles[0]
     else:
       return tiles[1]
+  
+  # return the tile with the given rank, taking into account whether
+  # or not it's the first one.
+  @classmethod
+  def with_rank( cls, rank, is_first = True ):
+    return cls.get_tiles_matching( { tile_rank: rank }, is_first )
+# 
+#     # get the tile
+#     tiles = PGTile.objects.filter( tile_rank = rank )
+#     
+#     # sanity check(s)
+#     if not tiles:
+#       return None
+#     if ( len(tiles) != 2 ):
+#       return None
+#     
+#     # there are two of every rank, client can specify which    
+#     if is_first:
+#       return tiles[0]
+#     else:
+#       return tiles[1]
+  
+  # overload the math when comparing tiles
+  def __lt__( self, other ):
+    return self.tile_rank < other.tile_rank
+  def __le__( self, other ):
+    return self.tile_rank <= other.tile_rank
+  def __eq__( self, other ):
+    return self.tile_rank == other.tile_rank
+  def __ne__( self, other ):
+    return self.tile_rank != other.tile_rank
+  def __ge__( self, other ):
+    return self.tile_rank >= other.tile_rank
+  def __gt__( self, other ):
+    return self.tile_rank > other.tile_rank
+  
+  # convenience to allow creation of tiles by name.
+  # * double-underscore means that what follows is an
+  #   adjustment of the field, so below it will query
+  #   based on the 'name' field.
+  # * 'exact' is the adjustment that does the query by
+  #   full string matching rather than substring match
+  # * 'i' prefix means case-insensitive
+  @classmethod
+  def create_by_name( cls, name, is_first = True ):
+    return cls.get_tiles_matching( { 'name': name }, is_first )
   
   
   # This will make the object return value print out as

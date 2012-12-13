@@ -1,5 +1,5 @@
-INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'gee joon 6', 0, 15, 3, 500, 500 );
-INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'gee joon 3', 0, 15, 3, 200, 0 );
+INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'gee joon', 0, 15, 3, 500, 500 );
+INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'gee joon', 0, 15, 3, 200, 0 );
 INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'teen', 15, 14, 12, 0, 250 );
 INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'teen', 15, 14, 12, 0, 250 );
 INSERT INTO paigow_pgtile (name, tile_rank, pair_rank, tile_value, sprite_left, sprite_top) VALUES ( 'day', 14, 13, 2, 500, 750 );

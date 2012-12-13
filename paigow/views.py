@@ -202,6 +202,7 @@ def add_game( request, params = {} ):
 def play_game( request, game_id, params = {} ):
   
   from models.pgtile import PGTile
+  from pghand import PGHand
   
   if (not request.session.get('player_id', False)):
     return goto_home( request )
@@ -213,7 +214,8 @@ def play_game( request, game_id, params = {} ):
   
   params['game'] = game
   params['opponent'] = session_player( request ).opponents_for_game( game )[0]
-  params['tile'] = PGTile.objects.get( id = 4 )
+  #params['hand'] = PGHand.create( PGTile.objects.get( id = 13 ), PGTile.objects.get( id = 4 ) )
+  params['hand'] = PGHand.create( PGTile.create_by_name( "harmony four" ), PGTile.create_by_name( "gee joon" ) )
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
 

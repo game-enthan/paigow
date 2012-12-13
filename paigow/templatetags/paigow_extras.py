@@ -24,3 +24,7 @@ def opponent_for_game( value, arg, autoescape = None ):
 def tile_image( context, tile, tile_style ):
   return { 'tile': tile, 'tile_style': tile_style }
 
+@register.inclusion_tag("hand.html", takes_context=True)
+def show_hand( context, hand, tile_style ):
+  return { 'hand': hand, 'tile_style': tile_style }
+

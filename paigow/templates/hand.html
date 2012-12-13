@@ -1,0 +1,19 @@
+<!-- inclusion for any site shows two tiles as a hand -->
+<!-- inside bracket/percent: show_hand hand [large|medium|small] -->
+<!-- show_hand is a registered tag (currently in paigow_extras) -->
+{% load paigow_extras %}
+
+<table>
+  <tr>
+    <td align="centr">
+      {% tile_image hand.high_tile tile_style %}
+      {% tile_image hand.low_tile tile_style %}
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <p class=strong>{{ hand }}</p>
+    </td>
+  </tr>
+</table>
+

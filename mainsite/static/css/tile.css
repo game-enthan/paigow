@@ -1,7 +1,8 @@
 /* Styles for tile sprites */
 
 .tile {
-  display:block;
+  float:left;
+  margin-left:0;
   background-image:url('/static/tiles.jpg');
   src:url('/static/img_trans.gif');
 }

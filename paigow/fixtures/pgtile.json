@@ -3,7 +3,7 @@
 		"model" : "paigow.pgtile",
 		"pk": 1,
 		"fields": {
-			"name": "gee joon 6",
+			"name": "gee joon",
 			"tile_rank": 0,
 			"pair_rank": 15,
 			"tile_value": 3,
@@ -16,7 +16,7 @@
 		"model" : "paigow.pgtile",
 		"pk": 2,
 		"fields": {
-			"name": "gee joon 3",
+			"name": "gee joon",
 			"tile_rank": 0,
 			"pair_rank": 15,
 			"tile_value": 3,
