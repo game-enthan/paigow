@@ -1,0 +1,21 @@
+<!-- inclusion for any site shows two tiles as a hand -->
+<!-- inside bracket/percent: show_set set [large|medium|small] -->
+<!-- show_set is a registered tag (currently in paigow_extras) -->
+{% load paigow_extras %}
+
+<table>
+  <tr>
+    <td align="centr">
+      {% tile_image set.tiles.0 tile_style %}&nbsp;
+      {% tile_image set.tiles.1 tile_style %}&nbsp;&nbsp;&nbsp;
+      {% tile_image set.tiles.2 tile_style %}&nbsp;
+      {% tile_image set.tiles.3 tile_style %}
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <p class=strong>Sort 'em!</p>
+    </td>
+  </tr>
+</table>
+

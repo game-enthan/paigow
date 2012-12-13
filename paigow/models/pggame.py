@@ -112,33 +112,69 @@ class PGGame( models.Model ):
   def deal( self, deal_number ):
     from pgdeal import PGDeal
     deals = PGDeal.objects.filter( game = self, deal_number = deal_number )
+    print str(deals)
+    # sanity check: better have only one thing returned
+    # TBD: throw exception, resulting in error on page
+    if deals and (len(deals) >= 1):
+      return deals[0]
+    else:
+      return None
     
   # Get the current deal
   def current_deal( self ):
-    return self.deal( current_deal_number )
+    return self.deal( self.current_deal_number )
     
   
   # shuffle the deck and save it as the current deal
   def deal_tiles( self ):
-
+    
     from pgtile import PGTile
     from pgdeal import PGDeal
-
+    
     # We had better be about to deal
     if ( self.game_state != PGGame.ABOUT_TO_DEAL ):
       raise Exception( 'Trying to deal in wrong state!' )
-
+    
     # get a shuffled set of tiles
     tiles = PGTile.get_shuffled_tiles()
-
+    
     # it's a new deal number
     self.current_deal_number += 1
-
+    
     # remember this deal
     deal = PGDeal.create( tiles, self, self.current_deal_number )
     deal.save()
   
-
+  
+  def sets_for_player( self, player ):
+    
+    from paigow.pgset import PGSet
+    
+    players = self.players()
+    
+    # TBD: remove assumption that there are only two players.  This
+    # decides whether this player gets the first set of tiles or the
+    # second set of tiles.
+    index = 0
+    if ( player != players[0] ):
+      index = 1
+    
+    # Create the hands and fill them.
+    deal = self.current_deal()
+    sets = []
+    for i in range(3):
+      set = PGSet.create( ( deal.tile( index ),
+                            deal.tile( index + 2 ),
+                            deal.tile( index + 4 ),
+                            deal.tile( index + 6 ),
+                          )
+                        )
+      sets.append( set )
+      index += 8
+  
+    return sets
+  
+  
 # ----------------------------------------------------
 # Test PGGame class
 
@@ -147,12 +183,17 @@ from django.test import TestCase
 class PGGameTest( TestCase ):
 
   fixtures = [ 'pgtile.json' ]
-
+  
   def setUp( self ):
     # TBD: don't use database, since that makes this an integratino test
     # rather than a unit test.  That may take re-architecting things.
+    from pgplayer import PGPlayer
     self.test_game = PGGame.create( 'paigow321' )
     self.test_game.save()
+    self.player1 = PGPlayer.objects.create( name = 'Rudi' )
+    self.player2 = PGPlayer.objects.create( name = 'Dave' )
+    self.test_game.add_player( self.player1 )
+    self.test_game.add_player( self.player2 )
 
 #   def tearDown( self ):
 #     <do something here if necessary>
@@ -160,26 +201,18 @@ class PGGameTest( TestCase ):
   def test_add_player( self ):
     '''Adding two players results in a game with 2 players'''
     from pgplayer import PGPlayer
-    player_1 = PGPlayer.objects.create( name = 'Rudi' )
-    player_2 = PGPlayer.objects.create( name = 'Dave' )
-    self.test_game.add_player( player_1 )
-    self.test_game.add_player( player_2 )
     self.assertEqual( len(self.test_game.players()), 2 )
-    self.assertIn( player_1, self.test_game.players() )
-    self.assertIn( player_2, self.test_game.players() )
+    self.assertIn( self.player1, self.test_game.players() )
+    self.assertIn( self.player2, self.test_game.players() )
 
   def test_order_player( self ):
     '''Adding two players in any order always returns them in the same order'''
     from pgplayer import PGPlayer
-    player_1 = PGPlayer.objects.create( name = 'Rudi' )
-    player_2 = PGPlayer.objects.create( name = 'Dave' )
-    self.test_game.add_player( player_1 )
-    self.test_game.add_player( player_2 )
     players1 = self.test_game.players()
-    game2 = PGGame.create( 'paigow321 2' )
+    game2 = PGGame.create( 'paigow321_2' )
     game2.save()
-    game2.add_player( player_2 )
-    game2.add_player( player_1 )
+    game2.add_player( self.player2 )
+    game2.add_player( self.player1 )
     players2 = game2.players()
     self.assertEqual( players1[0], players2[0] )
     self.assertEqual( players1[1], players2[1] )
@@ -192,6 +225,14 @@ class PGGameTest( TestCase ):
     tiles_in_deal = PGDeal.objects.filter( game = self.test_game, deal_number = 1 )
     self.assertEqual( tiles_in_deal.count(), 1 )
   
+  def test_sets_for_player( self ):
+    from paigow.pgset import PGSet
+    from pgplayer import PGPlayer
+    self.test_game.deal_tiles()
+    sets = self.test_game.sets_for_player( self.player1 )
+    self.assertEqual( len(sets), 3 )
+    sets = self.test_game.sets_for_player( self.player2 )
+    self.assertEqual( len(sets), 3 )
 
 
 # run the test when invoked as a test (this is boilerplate

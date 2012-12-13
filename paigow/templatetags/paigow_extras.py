@@ -28,3 +28,7 @@ def tile_image( context, tile, tile_style ):
 def show_hand( context, hand, tile_style ):
   return { 'hand': hand, 'tile_style': tile_style }
 
+@register.inclusion_tag("set.html", takes_context=True)
+def show_set( context, set, tile_style ):
+  return { 'set': set, 'tile_style': tile_style }
+

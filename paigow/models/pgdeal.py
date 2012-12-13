@@ -38,7 +38,7 @@ class PGDeal( models.Model ):
   
   # The deal shows as the ordering
   def __unicode__( self ):
-    return self.tiles
+    return self.deck
   
   
   # Create it with an array of tiles and the game/deal#
@@ -90,6 +90,34 @@ class PGDealTest( TestCase ):
     for i in range(32):
       self.assertIsNotNone( deal.tile( i ) )
     self.assertIsNone( deal.tile( 32 ) )
+  
+  def test_save_get( self ):
+    
+    from pggame import PGGame
+    from pgtile import PGTile
+    
+    game = PGGame.create( 'test for deal' )
+    game.save()
+    tiles = PGTile.objects.all()
+    deal = PGDeal.create( tiles, game, 1 )
+    deal.save()
+    deal = PGDeal.objects.filter( game = game, deal_number = 1 )
+    self.assertIsNotNone( deal )
+
+  def test_get_tiles( self ):
+    
+    from pggame import PGGame
+    from pgtile import PGTile
+    
+    game = PGGame.create( 'test for deal' )
+    game.save()
+    tiles = PGTile.objects.all()
+    deal = PGDeal.create( tiles, game, 1 )
+    deal.save()
+    deals = PGDeal.objects.filter( game = game, deal_number = 1 )
+    self.assertEqual( len(deals), 1 )
+    for i in range(32):
+      self.assertIsNotNone( deals[0].tile(i) )
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

@@ -3,3 +3,4 @@
 # already handled in __init__.py in that directory.
 
 from pghand import PGHandTest
+from pgset import PGSetTest
