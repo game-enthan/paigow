@@ -91,11 +91,12 @@ class PGGame( models.Model ):
   def __unicode__( self ):
     return self.name
   
-  # Return the all the players for this single game.
+  # Return the all the players for this single game.  Always order them by
+  # player IDs to make sure the list is already returned in the same order.
   def players( self ):
     players = []
     from models import PGPlayerInGame
-    pigs = PGPlayerInGame.objects.filter( game = self )
+    pigs = PGPlayerInGame.objects.filter( game = self ).order_by( 'player__id' )
     for pig in pigs:
       players.append( pig.player )
     return players
@@ -118,7 +119,7 @@ class PGGame( models.Model ):
     
   
   # shuffle the deck and save it as the current deal
-  def create_deal( self ):
+  def deal_tiles( self ):
 
     from pgtile import PGTile
     from pgdeal import PGDeal
@@ -136,6 +137,7 @@ class PGGame( models.Model ):
     # remember this deal
     deal = PGDeal.create( tiles, self, self.current_deal_number )
     deal.save()
+  
 
 # ----------------------------------------------------
 # Test PGGame class
@@ -166,10 +168,26 @@ class PGGameTest( TestCase ):
     self.assertIn( player_1, self.test_game.players() )
     self.assertIn( player_2, self.test_game.players() )
 
+  def test_order_player( self ):
+    '''Adding two players in any order always returns them in the same order'''
+    from pgplayer import PGPlayer
+    player_1 = PGPlayer.objects.create( name = 'Rudi' )
+    player_2 = PGPlayer.objects.create( name = 'Dave' )
+    self.test_game.add_player( player_1 )
+    self.test_game.add_player( player_2 )
+    players1 = self.test_game.players()
+    game2 = PGGame.create( 'paigow321 2' )
+    game2.save()
+    game2.add_player( player_2 )
+    game2.add_player( player_1 )
+    players2 = game2.players()
+    self.assertEqual( players1[0], players2[0] )
+    self.assertEqual( players1[1], players2[1] )
+
   def test_deal_x( self ):
     from pgdeal import PGDeal
     self.assertEqual( self.test_game.current_deal_number, 0 )
-    self.test_game.create_deal();
+    self.test_game.deal_tiles();
     self.assertEqual( self.test_game.current_deal_number, 1 )
     tiles_in_deal = PGDeal.objects.filter( game = self.test_game, deal_number = 1 )
     self.assertEqual( tiles_in_deal.count(), 1 )

@@ -8,14 +8,19 @@ from django.db import models
 # This represents one player, there can be any number
 
 class PGPlayer( models.Model ):
-
+  
   # make sure the DB table name is what we want
   class Meta:
     app_label = 'paigow'
-
+  
   name = models.CharField( max_length = 50 )
   email = models.CharField( max_length = 100 )
   password = models.CharField( max_length = 100 )
+  
+  # This will make the object return value print out as
+  # the name of the tile.
+  def __unicode__( self ):
+    return self.name
   
   # convenience to create so we don't have to create a dictionary
   @classmethod
@@ -32,7 +37,7 @@ class PGPlayer( models.Model ):
       return PGPlayer.objects.get( id = player_id )
     else:
       return None
-
+  
   # convenience to get all players except this id (i.e. all possible opponents).
   def all_possible_opponents( self ):
     return PGPlayer.objects.exclude( id = self.id )
@@ -55,11 +60,6 @@ class PGPlayer( models.Model ):
     for pgpig in pgpigs:
       yield pgpig.game
 
-
-  # This will make the object return value print out as
-  # the name of the tile.
-  def __unicode__( self ):
-    return self.name
 
 # ----------------------------------------------------
 # Test PGPlayer class

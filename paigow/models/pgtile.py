@@ -106,6 +106,8 @@ class PGTile( models.Model ):
   def with_name( cls, name, is_first = True ):
     return cls.get_tiles_matching( { 'name__iexact': name }, is_first )
   
+  def is_teen_or_day( self ):
+    return self.name == "teen" or self.name == "day"
   
   # overload the math when comparing tiles
   def __lt__( self, other ):
@@ -171,7 +173,16 @@ class PGTileTest(TestCase):
   def test_shuffle( self ):
     shuffled_tiles = PGTile.get_shuffled_tiles()
     self.assertEqual( len(shuffled_tiles), 32 )
-    
+  
+  def test_is_teen_or_day( self ):
+    tile = PGTile.with_name( "harmony four" )
+    self.assertFalse( tile.is_teen_or_day() )
+    tile = PGTile.with_name( "teen" )
+    self.assertTrue( tile.is_teen_or_day() )
+    tile = PGTile.with_name( "day" )
+    self.assertTrue( tile.is_teen_or_day() )
+  
+
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit
 # tests in it).

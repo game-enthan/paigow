@@ -205,15 +205,23 @@ def play_game( request, game_id, params = {} ):
   if (not request.session.get('player_id', False)):
     return goto_home( request )
   
+  # create the game
   game = PGGame.with_id( game_id )
   if ( not game ):
     messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
     return goto_home( request )
-  
   params['game'] = game
+  
+  # deal if it's not already dealt
+  if ( game.game_state == PGGame.ABOUT_TO_DEAL ):
+    game.deal_tiles()
+  
+  # create the hands for this player
+  # params['hands'] = game.hands_for_player( session_player( request ) )
+  
+  # set up the opponent for the template
   params['opponent'] = session_player( request ).opponents_for_game( game )[0]
-  #params['hand'] = PGHand.create( PGTile.objects.get( id = 13 ), PGTile.objects.get( id = 4 ) )
-  params['hand'] = PGHand.create( PGTile.with_name( "harmony four" ), PGTile.with_name( "gee joon" ) )
+  
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
 

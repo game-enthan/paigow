@@ -16,6 +16,12 @@ class PGHand:
   low_tile = PGTile()
   high_tile = PGTile()
   
+  # so printout shows the hand.
+  def __unicode__( self ):
+    return str( self.high_tile ) + " / " + str( self.low_tile )
+
+  # when given two tiles, make sure we put them in order.  This makes
+  # later comparisons easy.
   def __init__(self, tile1, tile2 ):
     if ( tile1 > tile2 ):
       self.high_tile = tile1
@@ -29,10 +35,13 @@ class PGHand:
   def create( cls, tile1, tile2 ):
     return cls( tile1 = tile1, tile2 = tile2 )
   
-  # so printout shows the hand.
-  def __unicode__( self ):
-    return str( self.high_tile ) + " / " + str( self.low_tile )
-
+  # convenience functions for  naming and comparisons.
+  def is_pair( self ):
+    return high_tile == low_tile
+  
+  def is_wong( self ):
+    return high_tile.is_teen_or_day() and (low_tile.tile_value == 9)
+  
 # ----------------------------------------------------
 # Test PGHand class
 
