@@ -68,31 +68,21 @@ class PGTile( models.Model ):
   # ----------------------------------------------------------
   # methods
   
-  @classmethod
-  def get_shuffled_tiles( self ):
-    import random
-    all_tiles = list(PGTile.objects.all())
-    random.shuffle( all_tiles )
-    random.shuffle( all_tiles )
-    random.shuffle( all_tiles )
-    return all_tiles
+  # This will make the object return value print out as
+  # the name of the tile.
+  def __unicode__( self ):
+    return self.name
   
   # internal function to return a given filter
   @classmethod
   def get_tiles_matching( cls, filter, is_first = True ):
-
-    print "Get matching " + str(filter)
     # get the tile
     tiles = PGTile.objects.filter( **filter )
-    
-    print "returns " + str(tiles)
-
     # sanity check(s)
     if not tiles:
       return None
     if ( len(tiles) != 2 ):
       return None
-    
     # there are two of every rank, client can specify which    
     if is_first:
       return tiles[0]
@@ -103,22 +93,19 @@ class PGTile( models.Model ):
   # or not it's the first one.
   @classmethod
   def with_rank( cls, rank, is_first = True ):
-    return cls.get_tiles_matching( { tile_rank: rank }, is_first )
-# 
-#     # get the tile
-#     tiles = PGTile.objects.filter( tile_rank = rank )
-#     
-#     # sanity check(s)
-#     if not tiles:
-#       return None
-#     if ( len(tiles) != 2 ):
-#       return None
-#     
-#     # there are two of every rank, client can specify which    
-#     if is_first:
-#       return tiles[0]
-#     else:
-#       return tiles[1]
+    return cls.get_tiles_matching( { 'tile_rank': rank }, is_first )
+  
+  # convenience to allow creation of tiles by name.
+  # * double-underscore means that what follows is an
+  #   adjustment of the field, so below it will query
+  #   based on the 'name' field.
+  # * 'exact' is the adjustment that does the query by
+  #   full string matching rather than substring match
+  # * 'i' prefix means case-insensitive
+  @classmethod
+  def with_name( cls, name, is_first = True ):
+    return cls.get_tiles_matching( { 'name__iexact': name }, is_first )
+  
   
   # overload the math when comparing tiles
   def __lt__( self, other ):
@@ -134,22 +121,16 @@ class PGTile( models.Model ):
   def __gt__( self, other ):
     return self.tile_rank > other.tile_rank
   
-  # convenience to allow creation of tiles by name.
-  # * double-underscore means that what follows is an
-  #   adjustment of the field, so below it will query
-  #   based on the 'name' field.
-  # * 'exact' is the adjustment that does the query by
-  #   full string matching rather than substring match
-  # * 'i' prefix means case-insensitive
+  
   @classmethod
-  def create_by_name( cls, name, is_first = True ):
-    return cls.get_tiles_matching( { 'name': name }, is_first )
+  def get_shuffled_tiles( self ):
+    import random
+    all_tiles = list(PGTile.objects.all())
+    random.shuffle( all_tiles )
+    random.shuffle( all_tiles )
+    random.shuffle( all_tiles )
+    return all_tiles
   
-  
-  # This will make the object return value print out as
-  # the name of the tile.
-  def __unicode__( self ):
-    return self.name
   
 # ----------------------------------------------------
 # Test PGTile class
@@ -167,4 +148,32 @@ class PGTileTest(TestCase):
     shuffled_tiles = PGTile.get_shuffled_tiles();
     self.assertEqual( len( shuffled_tiles ), 32 );
 
-
+  def test_with_rank( self ):
+    tile1 = PGTile.with_rank( 5, True )
+    tile2 = PGTile.with_rank( 5, False )
+    self.assertEqual( tile1, tile2 )
+    tile2 = PGTile.with_rank( 6, True )
+    self.assertNotEqual( tile1, tile2 )
+    tile2 = PGTile.with_rank( -1 )
+    self.assertIsNone( tile2 )
+    
+  def test_with_name( self ):
+    tile1 = PGTile.with_name( "mixed seven", True )
+    self.assertIsNotNone( tile1 )
+    tile2 = PGTile.with_name( "Mixed Seven", False )
+    self.assertIsNotNone( tile2 )
+    self.assertEqual( tile1, tile2 )
+    tile2 = PGTile.with_name( "high ten", True )
+    self.assertNotEqual( tile1, tile2 )
+    tile2 = PGTile.with_name( "whatever" )
+    self.assertIsNone( tile2 )
+  
+  def test_shuffle( self ):
+    shuffled_tiles = PGTile.get_shuffled_tiles()
+    self.assertEqual( len(shuffled_tiles), 32 )
+    
+# run the test when invoked as a test (this is boilerplate
+# code at the bottom of every python file that has unit
+# tests in it).
+if __name__ == '__main__':
+  unittest.main()

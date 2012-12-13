@@ -186,8 +186,6 @@ def add_game( request, params = {} ):
   game = PGGame.create( request.POST['game_name'] )
   game.save() # must be done before adding player, so we have an ID
   
-  print "game opponent id: " + request.POST['game_opponent'] + "\n"
-  
   # add ourselves and the opponent (which automatically saves)
   game.add_player( session_player( request ) )
   game.add_player( posted_player_from_id_field( request, 'game_opponent' ) )
@@ -215,7 +213,7 @@ def play_game( request, game_id, params = {} ):
   params['game'] = game
   params['opponent'] = session_player( request ).opponents_for_game( game )[0]
   #params['hand'] = PGHand.create( PGTile.objects.get( id = 13 ), PGTile.objects.get( id = 4 ) )
-  params['hand'] = PGHand.create( PGTile.create_by_name( "harmony four" ), PGTile.create_by_name( "gee joon" ) )
+  params['hand'] = PGHand.create( PGTile.with_name( "harmony four" ), PGTile.with_name( "gee joon" ) )
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
 

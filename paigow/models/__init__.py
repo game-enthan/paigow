@@ -17,6 +17,7 @@ from pgdeal   import PGDeal
 from pgtile   import PGTileTest
 from pggame   import PGGameTest
 from pgplayer import PGPlayerTest
+from pgdeal   import PGDealTest
 
 # eventually we want to split this out into individual models
 from models import PGPlayerInGame

@@ -6,6 +6,13 @@ from models.pgtile import PGTile
 
 class PGHand:
   
+  # make sure the application name is what we want so any command that
+  # applies to the 'paigow' application also applies to us, and any
+  # configuration that uses the app-name (like database table generation)
+  # uses 'paigow'
+  class Meta:
+    app_label = 'paigow'
+  
   low_tile = PGTile()
   high_tile = PGTile()
   
@@ -31,8 +38,27 @@ class PGHand:
 
 from django.test import TestCase
 
-class PGGameTest( TestCase ):
-  
+class PGHandTest( TestCase ):
+
   # we need the set of tiles in the test database
   fixtures = [ 'pgtile.json' ]
   
+  # test that it correct sets high and low tiles
+  def test_tile_ranking( self ):
+    '''Test that the tile ranking is correctly parsed on creation'''
+    gee_joon = PGTile.with_name( "gee joon" )
+    low_four = PGTile.with_name( "low four" )
+    hand1 = PGHand.create( gee_joon, low_four )
+    self.assertEqual( hand1.low_tile, gee_joon )
+    self.assertEqual( hand1.high_tile, low_four )
+    hand2 = PGHand.create( low_four, gee_joon )
+    self.assertEqual( hand2.low_tile, gee_joon )
+    self.assertEqual( hand2.high_tile, low_four )
+
+
+# run the test when invoked as a test (this is boilerplate
+# code at the bottom of every python file that has unit
+# tests in it).
+if __name__ == '__main__':
+  unittest.main()
+

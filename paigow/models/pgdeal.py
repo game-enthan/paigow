@@ -21,6 +21,7 @@
 from django.db import models
 
 from paigow.models import PGGame
+from pgtile import PGTile
 
 class PGDeal( models.Model ):
   
@@ -52,7 +53,7 @@ class PGDeal( models.Model ):
   
   
   # return the tile for any given offset
-  def tile( offset ):
+  def tile( self, offset ):
     
     # sanity check
     if ( offset < 0 or offset > 31 ):
@@ -66,7 +67,34 @@ class PGDeal( models.Model ):
     offset_check = 0
     is_first = (self.deck.index( tile_rank_char ) == offset)
     
-    # return the appropriate
-    return PGTile.with_rank( ord(tile_rank_char), is_first )
+    # return the appropriate number
+    return PGTile.with_rank( int(str(tile_rank_char), 16), is_first )
+
+
+# ----------------------------------------------------
+# Test PGDeal class
+
+from django.test import TestCase
+
+class PGDealTest( TestCase ):
+  
+  fixtures = [ 'pgtile.json' ]
+  
+  def test_basic( self ):
+    from pggame import PGGame
+    
+    tiles = PGTile.objects.all()
+    game = PGGame.create( "Test for PGDeal" )
+    deal = PGDeal.create( tiles, game, 0 )
+    self.assertIsNone( deal.tile( -1 ) )
+    for i in range(32):
+      self.assertIsNotNone( deal.tile( i ) )
+    self.assertIsNone( deal.tile( 32 ) )
+
+# run the test when invoked as a test (this is boilerplate
+# code at the bottom of every python file that has unit
+# tests in it).
+if __name__ == '__main__':
+  unittest.main()
 
 

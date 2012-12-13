@@ -85,7 +85,6 @@ class PGPlayerTest( TestCase ):
     self.assertEqual( PGPlayer.with_id( self.test_player.id ), self.test_player )
   
   def test_all_possible_opponents( self ):
-    print len(PGPlayer.objects.all())
     self.assertEqual( len(self.test_player.all_possible_opponents()), 1 ) # computer should be there
     other_guy = PGPlayer.create( "other_guy", "foo@bar.com", "xxx" )
     other_guy.save()
@@ -122,7 +121,5 @@ class PGPlayerTest( TestCase ):
 # run the test in the correct situation; this is boilerplat
 # for all modules that have tests, don't try to figure it out.
 if __name__ ==  '__main__':
-  print "testing!\n"
   unittest.main()
-
 
