@@ -112,7 +112,6 @@ class PGGame( models.Model ):
   def deal( self, deal_number ):
     from pgdeal import PGDeal
     deals = PGDeal.objects.filter( game = self, deal_number = deal_number )
-    print str(deals)
     # sanity check: better have only one thing returned
     # TBD: throw exception, resulting in error on page
     if deals and (len(deals) >= 1):

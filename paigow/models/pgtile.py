@@ -149,6 +149,21 @@ class PGTileTest(TestCase):
   def test_shuffle( self ):
     shuffled_tiles = PGTile.get_shuffled_tiles();
     self.assertEqual( len( shuffled_tiles ), 32 );
+  
+  def test_math( self ):
+    tile_high = PGTile.with_name( "high ten" )
+    tile_low = PGTile.with_name( "mixed nine", True )
+    tile_test = PGTile.with_name( "mixed nine", False )
+    self.assertTrue( tile_high > tile_low )
+    self.assertTrue( tile_high >= tile_low )
+    self.assertFalse( tile_high == tile_low )
+    self.assertFalse( tile_high < tile_low )
+    self.assertFalse( tile_high <= tile_low )
+    self.assertFalse( tile_low > tile_test )
+    self.assertTrue( tile_low >= tile_test )
+    self.assertTrue( tile_low == tile_test )
+    self.assertTrue( tile_low <= tile_test )
+    self.assertFalse( tile_low < tile_test )
 
   def test_with_rank( self ):
     tile1 = PGTile.with_rank( 5, True )
