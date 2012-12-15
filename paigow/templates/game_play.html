@@ -2,10 +2,40 @@
 {% load static %}{% load paigow_extras %}
 
 {% block extra-stylesheet %}
-  <link rel="stylesheet" type="text/css" href="{% static "css/tile.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "css/pgtile.css" %}" />
 {% endblock %}
 
 {% block content_title %}<h1>{{ game.name }}</h1>{% endblock %}
+
+{% block jquery-doc-ready %}
+    //  Fade the sets in, in order
+    $("#set_span_1").fadeIn( 500);
+    $("#set_span_2").fadeIn(1000);
+    $("#set_span_3").fadeIn(1500);
+    
+    //  The tiles are draggable
+    //  TBD: put this in pgtile.html, how to do that while including it several times
+    $(".pgtile").draggable();
+    
+    //  The spans holding the hands are draggable
+    //  TBD: put this in hand.html, how to do that while including it several times
+    $(".pgset").droppable(
+        { 
+          revert: 'invalid',
+          drop: function(event, ui) { alert("dropped"); } }
+      );
+
+    //  Given a tile that's being dragged and a set it's being dragged over, only
+    //  allow tiles to be dragged into sets that already contain them.  The tile id
+    //  should start with the set id.
+    function set_can_take_tile( drop_set, drag_tile )
+    {
+      set_id = drop_set.id;
+      tile_id = drag_tile.id;
+      return ( tile_id.substr( 0, set_id.length() == set_id ) );
+    }
+
+{% endblock %}
 
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->
 
@@ -23,7 +53,7 @@
   </div>
   
   <!-- Test: show the tile parameter in all the sizes -->
-  {% show_set sets.0 "medium" %}<br>
-  {% show_set sets.1 "medium" %}<br>
-  {% show_set sets.2 "medium" %}<br>
+  <div><span id="set_span_1" class="pgset" style="display:none">{% show_set sets.0 "0" "medium" %}</span></div><br>
+  <div><span id="set_span_2" class="pgset" style="display:none">{% show_set sets.1 "1" "medium" %}</span></div><br>
+  <div><span id="set_span_3" class="pgset" style="display:none">{% show_set sets.2 "2" "medium" %}</span></div><br>
 {% endblock %}

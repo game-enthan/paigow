@@ -68,7 +68,7 @@
     
     </script>
   {% endblock %}
-
+  
   <!-- add form validation overrides to this block -->
   {% block form_validation %}{% endblock %}
 
@@ -174,20 +174,38 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{% static "bootstrap/js/jquery.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-transition.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-alert.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-modal.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-dropdown.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-scrollspy.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-tab.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-tooltip.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-popover.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-button.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-collapse.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-carousel.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-typeahead.js" %}"></script>
-    <script src="{% static "bootstrap/js/bootstrap-affix.js" %}"></script>
+    {% block jquery-utilities %}
+      <script src="{% static "jquery-ui-1.9.2/js/jquery-1.8.3.js" %}"></script>
+      <script src="{% static "jquery-ui-1.9.2/js/jquery-ui-1.9.2.custom.min.js" %}"></script>
+  
+      <script language="javascript">
+
+        // Execute this when the document is ready, prepare all the objects
+        $(document).ready(
+          function()
+          {
+          {% block jquery-doc-ready %}{% endblock %}
+          }
+        );
+
+      </script>
+    {% endblock %}
+    
+    {% block bootstrap-utilities %}
+      <script src="{% static "bootstrap/js/bootstrap-transition.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-alert.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-modal.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-dropdown.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-scrollspy.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-tab.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-tooltip.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-popover.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-button.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-collapse.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-carousel.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-typeahead.js" %}"></script>
+      <script src="{% static "bootstrap/js/bootstrap-affix.js" %}"></script>
+    {% endblock %}
 
   </body>
 </html>

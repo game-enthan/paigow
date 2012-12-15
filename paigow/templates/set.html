@@ -5,11 +5,11 @@
 
 <table>
   <tr>
-    <td align="centr">
-      {% tile_image set.tiles.0 tile_style %}&nbsp;
-      {% tile_image set.tiles.1 tile_style %}&nbsp;&nbsp;&nbsp;
-      {% tile_image set.tiles.2 tile_style %}&nbsp;
-      {% tile_image set.tiles.3 tile_style %}
+    <td align="center">
+      {% tile_image set.tiles.0 tile_style set_id|add:"_0" %}
+      {% tile_image set.tiles.1 tile_style set_id|add:"_1" %}
+      {% tile_image set.tiles.2 tile_style set_id|add:"_2" %}
+      {% tile_image set.tiles.3 tile_style set_id|add:"_3" %}
     </td>
   </tr>
   <tr>

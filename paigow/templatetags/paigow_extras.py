@@ -20,15 +20,15 @@ def opponent_for_game( value, arg, autoescape = None ):
     return mark_safe( opponent.name )
   return "computer"
 
-@register.inclusion_tag("tile.html", takes_context=True)
-def tile_image( context, tile, tile_style ):
-  return { 'tile': tile, 'tile_style': tile_style }
+@register.inclusion_tag("pgtile.html", takes_context=True)
+def tile_image( context, tile, tile_style, drag_id ):
+  return { 'tile': tile, 'tile_style': tile_style, 'drag_id': drag_id }
 
 @register.inclusion_tag("hand.html", takes_context=True)
 def show_hand( context, hand, tile_style ):
   return { 'hand': hand, 'tile_style': tile_style }
 
 @register.inclusion_tag("set.html", takes_context=True)
-def show_set( context, set, tile_style ):
-  return { 'set': set, 'tile_style': tile_style }
+def show_set( context, set, set_id, tile_style ):
+  return { 'set': set, 'set_id': set_id, 'tile_style': tile_style }
 

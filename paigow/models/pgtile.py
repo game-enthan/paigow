@@ -164,7 +164,7 @@ class PGTileTest(TestCase):
     self.assertTrue( tile_low == tile_test )
     self.assertTrue( tile_low <= tile_test )
     self.assertFalse( tile_low < tile_test )
-
+  
   def test_with_rank( self ):
     tile1 = PGTile.with_rank( 5, True )
     tile2 = PGTile.with_rank( 5, False )

@@ -1,25 +1,25 @@
 /* Styles for tile sprites */
 
-.tile {
+.pgtile {
   float:left;
-  margin-left:0;
-  background-image:url('/static/tiles.jpg');
+  margin-right:5px;
+  background-image:url('/static/pgtiles.jpg');
   src:url('/static/img_trans.gif');
 }
 
-.tile-large {
+.pgtile-large {
   height: 250px;
   width: 100px;
   background-size:600%;
 }
 
-.tile-medium {
+.pgtile-medium {
   height: 125px;
   width: 50px;
   background-size:600%;
 }
 
-.tile-small {
+.pgtile-small {
   height: 63px;
   width: 25px;
   background-size:600%;
