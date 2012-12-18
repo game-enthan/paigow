@@ -9,9 +9,9 @@
 
 {% block jquery-doc-ready %}
     //  Fade the sets in, in order
-    $("#set_span_1").fadeIn( 500);
-    $("#set_span_2").fadeIn(1000);
-    $("#set_span_3").fadeIn(1500);
+    $(".set-1").fadeIn( 500);
+    $(".set-2").fadeIn(1000);
+    $(".set-3").fadeIn(1500);
     
     //  The tiles are draggable
     //  TBD: put this in pgtile.html, how to do that while including it several times
@@ -52,8 +52,10 @@
     <button class="btn btn-small btn-primary" type="button">Pause</button>
   </div>
   
-  <!-- Test: show the tile parameter in all the sizes -->
-  <div><span id="set_span_1" class="pgset" style="display:none">{% show_set sets.0 "0" "medium" %}</span></div><br>
-  <div><span id="set_span_2" class="pgset" style="display:none">{% show_set sets.1 "1" "medium" %}</span></div><br>
-  <div><span id="set_span_3" class="pgset" style="display:none">{% show_set sets.2 "2" "medium" %}</span></div><br>
+  <!-- This div shows the 3-set deal -->
+	<div id="paigow321-deal" class="paigow321-deal">
+		<div id="pgset-div-1" class="pgset set-1 pgset-medium" style="display:none">{% show_pgset pgsets.0 "0" "medium" %}</div>
+		<div id="pgset-div-2" class="pgset set-2 pgset-medium" style="display:none">{% show_pgset pgsets.1 "1" "medium" %}</div>
+		<div id="pgset-div-3" class="pgset set-3 pgset-medium" style="display:none">{% show_pgset pgsets.2 "2" "medium" %}</div>
+	</div>
 {% endblock %}

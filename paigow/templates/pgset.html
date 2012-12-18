@@ -1,0 +1,10 @@
+<!-- inclusion for any site shows two tiles as a hand -->
+<!-- inside bracket/percent: show_set set [large|medium|small] -->
+<!-- show_set is a registered tag (currently in paigow_extras) -->
+{% load paigow_extras %}
+
+<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.0 tile_style pgset_id|add:"_0" %}</div>
+<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.1 tile_style pgset_id|add:"_1" %}</div>
+<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.2 tile_style pgset_id|add:"_2" %}</div>
+<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.3 tile_style pgset_id|add:"_3" %}</div>
+

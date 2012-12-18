@@ -220,7 +220,7 @@ def play_game( request, game_id, params = {} ):
     game.deal_tiles()
   
   # create the hands for this player
-  params['sets'] = game.sets_for_player( session_player( request ) )
+  params['pgsets'] = game.sets_for_player( session_player( request ) )
   
   # set up the opponent for the template
   params['opponent'] = session_player( request ).opponents_for_game( game )[0]

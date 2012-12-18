@@ -28,7 +28,7 @@ def tile_image( context, tile, tile_style, drag_id ):
 def show_hand( context, hand, tile_style ):
   return { 'hand': hand, 'tile_style': tile_style }
 
-@register.inclusion_tag("set.html", takes_context=True)
-def show_set( context, set, set_id, tile_style ):
-  return { 'set': set, 'set_id': set_id, 'tile_style': tile_style }
+@register.inclusion_tag("pgset.html", takes_context=True)
+def show_pgset( context, pgset, pgset_id, tile_style ):
+  return { 'pgset': pgset, 'pgset_id': pgset_id, 'tile_style': tile_style }
 
