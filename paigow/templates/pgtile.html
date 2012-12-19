@@ -1,11 +1,4 @@
-<!-- inclusion for any site shows tiles -->
-<!-- inside bracket/percent: tile_image tile [large|medium|small] drag_id -->
-<!-- tile_image is a registered tag (currently in paigow_extras) -->
-
-<!-- The background location has to be adjusted for the large/medium/small -->
-<!-- Misuse 'widthratio' to do the math, as is suggested by stackoverflow -->
-
-<img id="{{drag_id}}_tile" class="pgtile pgtile-{{ tile_style }}" style="background-position:
-{% if tile_style == "small" %}-{% widthratio tile.sprite_left 4 1 %}px -{% widthratio tile.sprite_top 4 1 %}px;{% endif %}
-{% if tile_style == "medium" %}-{% widthratio tile.sprite_left 2 1 %}px -{% widthratio tile.sprite_top 2 1 %}px;{% endif %}
-{% if tile_style == "large" %}-{{tile.sprite_left}}px -{{tile.sprite_top}}px;{% endif %}"></img>
+<img id="{{drag_id}}_tile" class="pgtile pgtile-{{ tile_size }}" style="background-position:
+{% if tile_size == "small" %}-{% widthratio tile.sprite_left 4 1 %}px -{% widthratio tile.sprite_top 4 1 %}px;{% endif %}
+{% if tile_size == "medium" %}-{% widthratio tile.sprite_left 2 1 %}px -{% widthratio tile.sprite_top 2 1 %}px;{% endif %}
+{% if tile_size == "large" %}-{{tile.sprite_left}}px -{{tile.sprite_top}}px;{% endif %}"></img>

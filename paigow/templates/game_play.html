@@ -11,10 +11,8 @@
 	<script language="javascript">
 
 		//	Convenience functions for getting ids etc.
-		function set_num( pgtile )
-		{
-			return pgtile.id.substring(0, 1);
-		}
+		function set_num( pgtile )  { return parseInt(pgtile.id.substring(0, 1)); }			// first char
+		function tile_num( pgtile ) { return parseInt(pgtile.id.substring(2, 3)); }			// third char
 
 		function drag_start( pgtile, event, ui )
 		{
@@ -22,6 +20,16 @@
 			var pgset_id = "pgset-div-" + set_num( pgtile );
 			var jq_set = $( "#" + pgset_id );
 			jq_set.droppable( "option", "disabled", false );
+			var foo = $(pgtile).position();
+			jq_set.data( "orig", $(pgtile).position() );
+
+			//	Add to the droppable the data of the topleft of each of the tiles.
+			//	Checking for i<4 is paranoia
+			var lefts = new Array(4);
+			jq_set.find(".pgtile").each( function( i ) {
+					if ( i < 4 ) lefts[i] = $(this).position().left;
+				} );
+			jq_set.data( "lefts", lefts );
 		}
 		
 		function drag_stop( pgtile, event, ui )
@@ -29,27 +37,55 @@
 			//	Get the set number from the tile, and undo setting it droppable
 			var jq_set = $( "#pgset-div-" + set_num( pgtile ) );
 			jq_set.droppable( "option", "disabled", true );
-		}
-		
-		//  Given a tile that's being dragged and a set it's being dragged over, only
-		//  allow tiles to be dragged into sets that already contain them.  The tile id
-		//  should start with the set id.
-		function set_can_take_tile( drop_set, drag_tile )
-		{
-			set_id = drop_set.id;
-			tile_id = drag_tile.id;
-			return ( tile_id.substr( 0, set_id.length() == set_id ) );
+			jq_set.removeData( "lefts" );
+			jq_set.removeData( "orig" );
 		}
 
+		function drop_tile( pgset, event, ui )
+		{
+			//	Figure out where the new position is by looking at the lefts array.
+			var lefts = $(pgset).data( "lefts" );
+
+			//	Testing has shown that this is the difference from the original location of the tile.
+			var horiz_diff = ui.position.left;
+			var drag_num = tile_num( ui.draggable[0] );
+			var orig_left = lefts[drag_num];
+			var new_left = orig_left + horiz_diff;
+
+			//	Figure out where we should drop it.
+			var dest_num = 0;
+			for ( i = 0; i < 3; i++ )
+			{
+				var mid = (lefts[i+1] + lefts[i]) / 2;
+				if ( new_left <= mid ) break;
+				dest_num++;
+			}
+			$("#debug").text( "new position: " + dest_num );
+
+			//	If we're not moving it, forget it: restore it.
+			if ( dest_num == drag_num )
+			{
+				var pos = $(pgset).data( "orig");
+				$(ui.draggable[0]).animate( { left: $(pgset).data( "orig" ).left - $(pgset).position.left, top: $(pgset).data( "orig" ).top - $(pgset).position.top } );
+				return false;
+			}
+
+
+
+			//	Get the tile number that was dropped.
+		}
+		
 	</script>
 {% endblock %}
 
 {% block jquery-doc-ready %}
 
-	//  Fade the sets in, in order
-	$(".set-1").fadeIn( 500);
-	$(".set-2").fadeIn(1000);
-	$(".set-3").fadeIn(1500);
+	//  Fade the sets in, in order.  These set classes don't have sizes so we can use them as
+	//	generic sets.  Note they are 1,2,3 rather than 0-based so the index is the same as
+	//	the number of points assigned (for simplicity).
+	$(".pgset-1").fadeIn( 500);
+	$(".pgset-2").fadeIn(1000);
+	$(".pgset-3").fadeIn(1500);
 	
 	//  The tiles are draggable
 	//  TBD: put this in pgtile.html, how to do that while including it several times
@@ -64,7 +100,7 @@
 	//	set or sets are un-disabled.
 	$(".pgset").droppable( { 
 			disabled: true,
-			drop: function(event, ui) { alert("dropped"); }
+			drop: function(event, ui) { drop_tile( this, event, ui ); }
 		} );
 
 {% endblock %}
@@ -82,11 +118,13 @@
   </div>
   
   <br><br>
+	<span id="debug">Replace with debug text</span>  
+  <br><br>
   
   <!-- This div shows the 3-set deal -->
 	<div id="paigow321-deal" class="paigow321-deal">
-		<div id="pgset-div-0" class="pgset set-1 pgset-medium" style="display:none">{% show_pgset pgsets.0 "0" "medium" %}</div>
-		<div id="pgset-div-1" class="pgset set-2 pgset-medium" style="display:none">{% show_pgset pgsets.1 "1" "medium" %}</div>
-		<div id="pgset-div-2" class="pgset set-3 pgset-medium" style="display:none">{% show_pgset pgsets.2 "2" "medium" %}</div>
+		<div id="pgset-div-0" class="pgset pgset-1 pgset-{{ pgtile_size }}" style="display:none">{% show_pgset pgsets.0 "1" pgtile_size %}</div>
+		<div id="pgset-div-1" class="pgset pgset-2 pgset-{{ pgtile_size }}" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
+		<div id="pgset-div-2" class="pgset pgset-3 pgset-{{ pgtile_size }}" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
 	</div>
 {% endblock %}

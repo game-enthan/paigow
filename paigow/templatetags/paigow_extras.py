@@ -21,14 +21,14 @@ def opponent_for_game( value, arg, autoescape = None ):
   return "computer"
 
 @register.inclusion_tag("pgtile.html", takes_context=True)
-def tile_image( context, tile, tile_style, drag_id ):
-  return { 'tile': tile, 'tile_style': tile_style, 'drag_id': drag_id }
+def tile_image( context, tile, tile_size, drag_id ):
+  return { 'tile': tile, 'tile_size': tile_size, 'drag_id': drag_id }
 
 @register.inclusion_tag("hand.html", takes_context=True)
-def show_hand( context, hand, tile_style ):
-  return { 'hand': hand, 'tile_style': tile_style }
+def show_hand( context, hand, tile_size ):
+  return { 'hand': hand, 'tile_size': tile_size }
 
 @register.inclusion_tag("pgset.html", takes_context=True)
-def show_pgset( context, pgset, pgset_id, tile_style ):
-  return { 'pgset': pgset, 'pgset_id': pgset_id, 'tile_style': tile_style }
+def show_pgset( context, pgset, pgset_id, tile_size ):
+  return { 'pgset': pgset, 'pgset_id': pgset_id, 'tile_size': tile_size }
 

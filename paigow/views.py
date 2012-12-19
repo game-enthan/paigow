@@ -221,6 +221,7 @@ def play_game( request, game_id, params = {} ):
   
   # create the hands for this player
   params['pgsets'] = game.sets_for_player( session_player( request ) )
+  params['pgtile_size'] = "medium"
   
   # set up the opponent for the template
   params['opponent'] = session_player( request ).opponents_for_game( game )[0]
