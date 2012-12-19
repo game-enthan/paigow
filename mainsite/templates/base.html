@@ -72,6 +72,9 @@
   <!-- add form validation overrides to this block -->
   {% block form_validation %}{% endblock %}
 
+  <!-- extra javascript for header -->
+  {% block header-javascript %}{% endblock %}
+
   <!-- Don't want search engines to find us! ... inside a block so it can be overriden -->
   {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 

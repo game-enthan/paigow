@@ -3,8 +3,8 @@
 <!-- show_set is a registered tag (currently in paigow_extras) -->
 {% load paigow_extras %}
 
-<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.0 tile_style pgset_id|add:"_0" %}</div>
-<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.1 tile_style pgset_id|add:"_1" %}</div>
-<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.2 tile_style pgset_id|add:"_2" %}</div>
-<div class="tile_div_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.3 tile_style pgset_id|add:"_3" %}</div>
+<div class="tile_div_{{tile_style}}_0" id="{{ pgset_id }}_0_tile_div">{% tile_image pgset.tiles.0 tile_style pgset_id|add:"_0" %}</div>
+<div class="tile_div_{{tile_style}}_1" id="{{ pgset_id }}_1_tile_div">{% tile_image pgset.tiles.1 tile_style pgset_id|add:"_1" %}</div>
+<div class="tile_div_{{tile_style}}_2" id="{{ pgset_id }}_2_tile_div">{% tile_image pgset.tiles.2 tile_style pgset_id|add:"_2" %}</div>
+<div class="tile_div_{{tile_style}}_3" id="{{ pgset_id }}_3_tile_div">{% tile_image pgset.tiles.3 tile_style pgset_id|add:"_3" %}</div>
 

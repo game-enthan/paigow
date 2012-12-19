@@ -7,33 +7,65 @@
 
 {% block content_title %}<h1>{{ game.name }}</h1>{% endblock %}
 
-{% block jquery-doc-ready %}
-    //  Fade the sets in, in order
-    $(".set-1").fadeIn( 500);
-    $(".set-2").fadeIn(1000);
-    $(".set-3").fadeIn(1500);
-    
-    //  The tiles are draggable
-    //  TBD: put this in pgtile.html, how to do that while including it several times
-    $(".pgtile").draggable();
-    
-    //  The spans holding the hands are draggable
-    //  TBD: put this in hand.html, how to do that while including it several times
-    $(".pgset").droppable(
-        { 
-          revert: 'invalid',
-          drop: function(event, ui) { alert("dropped"); } }
-      );
+{% block header-javascript %}
+	<script language="javascript">
 
-    //  Given a tile that's being dragged and a set it's being dragged over, only
-    //  allow tiles to be dragged into sets that already contain them.  The tile id
-    //  should start with the set id.
-    function set_can_take_tile( drop_set, drag_tile )
-    {
-      set_id = drop_set.id;
-      tile_id = drag_tile.id;
-      return ( tile_id.substr( 0, set_id.length() == set_id ) );
-    }
+		//	Convenience functions for getting ids etc.
+		function set_num( pgtile )
+		{
+			return pgtile.id.substring(0, 1);
+		}
+
+		function drag_start( pgtile, event, ui )
+		{
+			//	Get the set number from the tile, and make only that set droppable.
+			var pgset_id = "pgset-div-" + set_num( pgtile );
+			var jq_set = $( "#" + pgset_id );
+			jq_set.droppable( "option", "disabled", false );
+		}
+		
+		function drag_stop( pgtile, event, ui )
+		{
+			//	Get the set number from the tile, and undo setting it droppable
+			var jq_set = $( "#pgset-div-" + set_num( pgtile ) );
+			jq_set.droppable( "option", "disabled", true );
+		}
+		
+		//  Given a tile that's being dragged and a set it's being dragged over, only
+		//  allow tiles to be dragged into sets that already contain them.  The tile id
+		//  should start with the set id.
+		function set_can_take_tile( drop_set, drag_tile )
+		{
+			set_id = drop_set.id;
+			tile_id = drag_tile.id;
+			return ( tile_id.substr( 0, set_id.length() == set_id ) );
+		}
+
+	</script>
+{% endblock %}
+
+{% block jquery-doc-ready %}
+
+	//  Fade the sets in, in order
+	$(".set-1").fadeIn( 500);
+	$(".set-2").fadeIn(1000);
+	$(".set-3").fadeIn(1500);
+	
+	//  The tiles are draggable
+	//  TBD: put this in pgtile.html, how to do that while including it several times
+	$(".pgtile").draggable( {
+			revert: "invalid",
+			start: function( event, ui ) { drag_start( this, event, ui ); },
+			stop: function( event, ui ) { drag_stop( this, event, ui ); }
+		} );
+
+	//  The divs holding the sets will be droppable, but only accept tiles.
+	//	They are disabled until a tile is dragged, and only the appropriate
+	//	set or sets are un-disabled.
+	$(".pgset").droppable( { 
+			disabled: true,
+			drop: function(event, ui) { alert("dropped"); }
+		} );
 
 {% endblock %}
 
@@ -41,21 +73,20 @@
 
 {% block content %}
   <!-- Info about the game -->
-  <p class="lead">Playing against <strong>{{ game|opponent_for_game:player }}</strong>
-  <font class="lead pull-right">Score: <strong>10 - 6</strong></font>
+  <p class="lead">{{ player }}&nbsp;&nbsp;&nbsp;<strong>10 - 6</strong>&nbsp;&nbsp;&nbsp;{{ game|opponent_for_game:player }}</p>
 
-  <br><br>
-  
   <!-- Commands in the game -->
   <div class="btn-toolbar">
-    <button class="btn btn-small btn-primary" type="button">Deal</button>
-    <button class="btn btn-small btn-primary" type="button">Pause</button>
+    <button class="btn btn-small btn-primary" type="button">Update Display</button>
+    <button class="btn btn-small btn-primary" type="button">Hands are all set</button>
   </div>
+  
+  <br><br>
   
   <!-- This div shows the 3-set deal -->
 	<div id="paigow321-deal" class="paigow321-deal">
-		<div id="pgset-div-1" class="pgset set-1 pgset-medium" style="display:none">{% show_pgset pgsets.0 "0" "medium" %}</div>
-		<div id="pgset-div-2" class="pgset set-2 pgset-medium" style="display:none">{% show_pgset pgsets.1 "1" "medium" %}</div>
-		<div id="pgset-div-3" class="pgset set-3 pgset-medium" style="display:none">{% show_pgset pgsets.2 "2" "medium" %}</div>
+		<div id="pgset-div-0" class="pgset set-1 pgset-medium" style="display:none">{% show_pgset pgsets.0 "0" "medium" %}</div>
+		<div id="pgset-div-1" class="pgset set-2 pgset-medium" style="display:none">{% show_pgset pgsets.1 "1" "medium" %}</div>
+		<div id="pgset-div-2" class="pgset set-3 pgset-medium" style="display:none">{% show_pgset pgsets.2 "2" "medium" %}</div>
 	</div>
 {% endblock %}
