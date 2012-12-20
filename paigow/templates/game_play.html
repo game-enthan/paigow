@@ -83,7 +83,13 @@
 			if ( !is_moving_left) dest_index--;
 
 			//	If we're not moving it, forget it: returning 'false' will stop the drag.
-			if ( dest_index == source_index ) return false;
+			if ( dest_index == source_index )
+			{
+				ui.draggable.animate( {
+					left: $(pgset).data("orig").left, top: $(pgset).data("orig").top
+				} );
+				return false;
+			}
 
 			//	Re-arrange the tiles for the drop.
 
