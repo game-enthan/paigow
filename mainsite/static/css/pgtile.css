@@ -1,5 +1,7 @@
 /* Styles for tile sprites */
 
+/* --------------------- All sizes ----------------------	*/
+
 .pgtile {
   float:left;
   margin-right:5px;
@@ -12,6 +14,16 @@
 	top: 0px;
 }
 
+.paigow321-deal {
+	position: relative;
+}
+
+.pgset {
+	position: absolute;
+}
+
+/* ------------------------ Large ------------------------	*/
+
 .pgtile-large {
   height: 250px;
   width: 100px;
@@ -23,10 +35,53 @@
 	width: 440px;
 }
 
+.paigow321-deal-large {
+	height: 900px;
+}
+
+.pgtile-div-large-0 {
+	left: 0px;
+}
+
+.pgtile-div-large-1 {
+	left: 110px;
+}
+
+.pgtile-div-large-2 {
+	left: 220px;
+}
+
+.pgtile-div-large-3 {
+	left: 330px;
+}
+
+.pgset-large {
+	height: 280px;
+	width: 640px;
+}
+
+.pgset-large-1 {
+	top: 100px;
+}
+
+.pgset-large-2 {
+	top: 400px;
+}
+
+.pgset-large-3 {
+	top: 700px;
+}
+
+/* ------------------------ Medium -----------------------	*/
+
 .pgtile-medium {
   height: 125px;
   width: 50px;
   background-size:600%;
+}
+
+.paigow321-deal-medium {
+	height: 450px;
 }
 
 .pgtile-div-medium-0 {
@@ -43,10 +98,6 @@
 
 .pgtile-div-medium-3 {
 	left: 165px;
-}
-
-.pgset {
-	position: absolute;
 }
 
 .pgset-medium {
@@ -66,9 +117,7 @@
 	top: 350px;
 }
 
-.paigow321-deal-medium {
-	height: 450px;
-}
+/* ------------------------ Small -----------------------	*/
 
 .pgtile-small {
   height: 63px;
@@ -76,12 +125,40 @@
   background-size:600%;
 }
 
-.pgset-small {
-	height: 70px;
-	width: 110px;
+.paigow321-deal-small {
+	height: 225px;
 }
 
-.paigow321-deal {
-	position: relative;
+.pgtile-div-small-0 {
+	left: 0px;
+}
+
+.pgtile-div-small-1 {
+	left: 28px;
+}
+
+.pgtile-div-small-2 {
+	left: 56px;
+}
+
+.pgtile-div-small-3 {
+	left: 84px;
+}
+
+.pgset-small {
+	height: 70px;
+	width: 160px;
+}
+
+.pgset-small-1 {
+	top: 25px;
+}
+
+.pgset-small-2 {
+	top: 100px;
+}
+
+.pgset-small-3 {
+	top: 175px;
 }
 
