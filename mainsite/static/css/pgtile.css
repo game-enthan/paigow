@@ -7,6 +7,11 @@
   src:url('/static/img_trans.gif');
 }
 
+.pgtile-div {
+	position: absolute;
+	top: 0px;
+}
+
 .pgtile-large {
   height: 250px;
   width: 100px;
@@ -24,9 +29,45 @@
   background-size:600%;
 }
 
+.pgtile-div-medium-0 {
+	left: 0px;
+}
+
+.pgtile-div-medium-1 {
+	left: 55px;
+}
+
+.pgtile-div-medium-2 {
+	left: 110px;
+}
+
+.pgtile-div-medium-3 {
+	left: 165px;
+}
+
+.pgset {
+	position: absolute;
+}
+
 .pgset-medium {
 	height: 140px;
-	width: 220px;
+	width: 320px;
+}
+
+.pgset-medium-1 {
+	top: 50px;
+}
+
+.pgset-medium-2 {
+	top: 200px;
+}
+
+.pgset-medium-3 {
+	top: 350px;
+}
+
+.paigow321-deal-medium {
+	height: 450px;
 }
 
 .pgtile-small {

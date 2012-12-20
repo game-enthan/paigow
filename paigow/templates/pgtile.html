@@ -1,4 +1,4 @@
-<img id="{{drag_id}}_tile" class="pgtile pgtile-{{ tile_size }}" style="background-position:
-{% if tile_size == "small" %}-{% widthratio tile.sprite_left 4 1 %}px -{% widthratio tile.sprite_top 4 1 %}px;{% endif %}
-{% if tile_size == "medium" %}-{% widthratio tile.sprite_left 2 1 %}px -{% widthratio tile.sprite_top 2 1 %}px;{% endif %}
-{% if tile_size == "large" %}-{{tile.sprite_left}}px -{{tile.sprite_top}}px;{% endif %}"></img>
+<img id="{{drag_id}}_pgtile" class="pgtile pgtile-{{ pgtile_size }}" style="background-position:
+{% if pgtile_size == "small" %}-{% widthratio pgtile.sprite_left 4 1 %}px -{% widthratio pgtile.sprite_top 4 1 %}px;{% endif %}
+{% if pgtile_size == "medium" %}-{% widthratio pgtile.sprite_left 2 1 %}px -{% widthratio pgtile.sprite_top 2 1 %}px;{% endif %}
+{% if pgtile_size == "large" %}-{{pgtile.sprite_left}}px -{{pgtile.sprite_top}}px;{% endif %}"></img>

@@ -185,7 +185,7 @@ def add_game( request, params = {} ):
   if (not request.session.get('player_id', False)):
     return goto_home( request )
 
-  #   
+  # create a new game
   game = PGGame.create( request.POST['game_name'] )
   game.save() # must be done before adding player, so we have an ID
   
@@ -208,7 +208,7 @@ def play_game( request, game_id, params = {} ):
   if (not request.session.get('player_id', False)):
     return goto_home( request )
   
-  # create the game
+  # get the game from the db
   game = PGGame.with_id( game_id )
   if ( not game ):
     messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
