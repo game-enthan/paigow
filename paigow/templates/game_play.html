@@ -25,6 +25,9 @@
 			var foo = $(pgtile).position();
 			jq_set.data( "orig", $(pgtile).position() );
 
+			//	Put the tile on top of the other tiles.
+			$(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) + 1 );
+
 			//	Add to the droppable the data of the topleft of each of the tiles.
 			var lefts = new Array(4);
 			var i;
@@ -43,6 +46,10 @@
 			jq_set.droppable( "option", "disabled", true );
 			jq_set.removeData( "lefts" );
 			jq_set.removeData( "orig" );
+
+			//	Put the tile in the same plane as the others
+			$(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) - 1 );
+
 		}
 
 		function drop_tile( pgset, event, ui )
@@ -178,7 +185,7 @@
 	//  The tiles are draggable
 	//  TBD: put this in pgtile.html, how to do that while including it several times
 	$(".pgtile-div").draggable( {
-			helper: "clone",
+			//helper: "clone",
 			revert: "invalid",
 			start: function( event, ui ) { drag_start( this, event, ui ); },
 			stop: function( event, ui ) { drag_stop( this, event, ui ); }

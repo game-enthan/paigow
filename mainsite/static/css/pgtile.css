@@ -12,6 +12,7 @@
 .pgtile-div {
 	position: absolute;
 	top: 0px;
+	z-index: 10;
 }
 
 .paigow321-deal {
