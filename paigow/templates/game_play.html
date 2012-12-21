@@ -13,9 +13,26 @@
     //  Convenience functions for getting ids etc.
     function set_num_of_button( button )  { return parseInt(button.id.substring(0, 1)); }      // first char
 
+    function set_num_of_set( pgset )
+    {
+      var parent = $(pgset).parent();
+      var jqsets = parent.find(".pgset");
+      return jqsets.index( pgset );
+    }
+
+    function jqset_of_num( set_num )
+    {
+      var jqdeal = $("#paigow321-deal");
+      var jqsets = jqdeal.find(".pgset");
+      return $(jqsets[ set_num-1] );      // 1-based
+      //return $( "#" + set_id_of_num( set_num ) );
+    }
+
+    function jqset_of_tile( pgtile ) { return $(pgtile).parent(); }
+
     function set_num_of_tile( pgtile )  { return set_num_of_set( $(pgtile).parent()[0] ); }
 
-    function set_num_of_set( pgset )  { return parseInt(pgset.id.substring(10, 11)); }      // "pgset-div-#'
+    //function set_num_of_set( pgset ) { return parseInt(pgset.id.substring(10, 11)); }      // "pgset-div-#'
 
     function tiles_of_jqset( jqset ) { return jqset.find('.pgtile-div'); }
 
@@ -27,9 +44,6 @@
 
     function set_class_of_num( set_num ) { return "pgset-{{ pgtile_size }}-" + set_num; }
 
-    function jqset_of_num( set_num ) { return $( "#" + set_id_of_num( set_num ) ); }
-
-    function jqtile_of_nums( set_num, tile_num ) { return $(tiles_of_jqset( jqset_of_num( set_num ) )[tile_num]); }
 
 
     //  Switch class and ID convenience.
@@ -53,7 +67,7 @@
     {
       //  Get the set number from the tile, and make only that set droppable, and
       //  only allow dropping of tiles.
-      var jq_set = $( "#" + set_id( pgtile ) );
+      var jq_set = jqset_of_tile( pgtile );
       jq_set.droppable( {
           disabled: false,
           drop: function(event, ui) { drop_tile( this, event, ui ); }
@@ -66,11 +80,11 @@
 
       //  Add to the droppable the data of the topleft of each of the tiles.
       var lefts = new Array(4);
+      var tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
       var i;
       for ( i = 0; i < 4; i++ )
       {
-        var jqtile = jqtile_of_nums( set_num_of_tile( pgtile ), i );
-        lefts[i] = jqtile.offset().left;
+        lefts[i] = $(tiles[i]).offset().left;
       }
       jq_set.data( "lefts", lefts );
     }
@@ -97,7 +111,8 @@
       var lefts = jqset.data( "lefts" );
 
       //  Testing has shown that this is the difference from the original location of the tile.
-      var source_index = tile_num( ui.draggable[0] );
+      var pgtile = ui.draggable[0];
+      var source_index = tile_num( pgtile );
       var new_left = ui.offset.left;
 
       //  Figure out where we should drop it.  There are FIVE possible locations,
@@ -138,18 +153,13 @@
       //  2) reset the positions
       //  3) reset the classes indicating tile number
 
-      new_indices = new Array(4);
-      var jqtiles = new Array(4);
 
-      //  Calculate the new index
+      //  Calculate the new index for each of the four current tiles.
+      new_indices = new Array(4);
       var i;
-      var new_index;
       for ( i = 0; i < 4; i++ )
       {
-        //  Save these for changing classes.
-        jqtiles[i] = jqtile_of_nums( set_num_of_set( pgset ), i );
-
-        new_index = i;
+        var new_index = i;
         if ( i == source_index )
         {
           //  Is the source tile: move to dest.
@@ -178,10 +188,11 @@
       }
 
       //  Move the tiles
+      var tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
       for ( i = 0; i < 4; i++ )
       {
         new_index = new_indices[i];
-        jqtiles[i].animate( {
+        $(tiles[i]).animate( {
           left: "" + lefts[new_index] - jqset.offset().left + "px", top: "0px"
         } );
       }
@@ -189,16 +200,14 @@
       //  Get the tile and move it, in the DOM, to its place in the list.
       //  We use dest_index to find out if we're moving it to the end
       //  (only moving left), but orig_dest_index to do the final move.
-      var jq_orig_order_tiles = jqset.find(".pgtile-div");
-      var jqmoved = $(jq_orig_order_tiles[source_index]);
-      // jqmoved.detach();
+      var jqmoved = $(tiles[source_index]);
       if ( dest_index == 3 )
       {
         jqset.append(jqmoved);
       }
       else
       {
-        jqmoved.insertBefore(jq_orig_order_tiles[orig_dest_index]);
+        jqmoved.insertBefore(tiles[orig_dest_index]);
       }
     }
 
