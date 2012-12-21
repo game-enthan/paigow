@@ -109,6 +109,9 @@ class PGTile( models.Model ):
   def is_teen_or_day( self ):
     return self.name == "teen" or self.name == "day"
   
+  def is_gee_joon_tile( self ):
+    return self.name == "gee joon"
+  
   # overload the math when comparing tiles
   def __lt__( self, other ):
     return self.tile_rank < other.tile_rank

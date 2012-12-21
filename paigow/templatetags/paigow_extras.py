@@ -1,8 +1,7 @@
 from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
-from mainsite.settings import STATIC_URL
-from paigow.models.pgtile import TILE_IMAGE_WIDTH, TILE_IMAGE_HEIGHT
+from paigow.pghand import PGHand
 
 register = template.Library()
 
@@ -24,14 +23,19 @@ def opponent_for_game( value, arg, autoescape = None ):
 def tile_image( context, tile, tile_size ):
   return { 'pgtile': tile, 'pgtile_size': tile_size }
 
-@register.inclusion_tag("hand.html", takes_context=True)
-def show_hand( context, hand, tile_size ):
-  return { 'hand': hand, 'pgtile_size': tile_size }
+@register.inclusion_tag("pghand.html", takes_context=True)
+def show_hand( context, pgset_id, pgtile1, pgtile2, pgtile_size ):
+  return { 'pgset_id': pgset_id, 'pgtile1': pgtile1, 'pgtile2': pgtile2, 'pgtile_size': pgtile_size }
 
 @register.inclusion_tag("pgset.html", takes_context=True)
 def show_pgset( context, pgset, pgset_id, tile_size ):
   return { 'pgset': pgset, 'pgset_id': pgset_id, 'pgtile_size': tile_size }
 
-@register.inclusion_tag("pgset_button.html", takes_context=True)
-def show_pgset_button( context, pgset_id, is_up, tile_size ):
-  return { 'pgset_id': pgset_id, 'is_up': True if is_up == 1 else False, 'button_name': 'up' if is_up else 'down', 'pgtile_size': tile_size }
+@register.inclusion_tag("switch_button.html", takes_context=True)
+def show_switch_button( context, pgset_id, tile_size ):
+  return { 'pgset_id': pgset_id, 'pgtile_size': tile_size }
+
+@register.simple_tag(takes_context=True)
+def show_hand_label( context, tile1, tile2 ):
+  pghand = PGHand.create( tile1, tile2 )
+  return pghand.label()

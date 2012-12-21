@@ -35,17 +35,31 @@ class PGHand:
   def create( cls, tile1, tile2 ):
     return cls( tile1 = tile1, tile2 = tile2 )
   
+  def label( self ):
+    if self.is_pair():
+      return "pair" 
+    if self.is_wong():
+      return "wong" 
+    if self.is_gong():
+      return "gong" 
+    if self.is_high_nine():
+      return "high nine"
+    return str(self.numerical_value())
+  
   # convenience functions for  naming and comparisons.
   def is_pair( self ):
-    return high_tile == low_tile
+    return self.high_tile == self.low_tile
   def is_wong( self ):
-    return high_tile.is_teen_or_day() and (low_tile.tile_value == 9)
+    return self.high_tile.is_teen_or_day() and ( self.low_tile.tile_value == 9 )
   def is_gong( self ):
-    return high_tile.is_teen_or_day() and (low_tile.tile_value == 8)
+    return self.high_tile.is_teen_or_day() and ( self.low_tile.tile_value == 8 )
   def is_high_nine( self ):
-    return high_tile.is_teen_or_day() and (low_tile.tile_value == 7)
+    return self.high_tile.is_teen_or_day() and ( self.low_tile.tile_value == 7 )
   def numerical_value( self ):
-    return ( high_tile.tile_value + low_tile.tile_value ) % 10
+    if ( self.low_tile.is_gee_joon_tile() ):
+      return "it's complicated"
+    else:
+      return ( self.high_tile.tile_value + self.low_tile.tile_value ) % 10
   
 # ----------------------------------------------------
 # Test PGHand class

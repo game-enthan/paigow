@@ -23,10 +23,26 @@
 	position: absolute;
 }
 
-.pgset-button-updown {
+.pgset-button-switch {
 	position: absolute;
 	left: 0px;
 	cursor: pointer;
+}
+
+.pghand-labels {
+	position: absolute;
+}
+
+.pghand-rotated {
+	-webkit-transition: all 1s ease-in-out;
+	-moz-transition: all 1s ease-in-out; 
+	-o-transition: all 1s ease-in-out; 
+	-ms-transition: all 1s ease-in-out; 
+	
+	-webkit-transform: rotate(90deg); 
+	-moz-transform: rotate(90deg); 
+	-o-transform: rotate(90deg);
+	-ms-transform: rotate(90deg); 
 }
 
 /* ------------------------ Large ------------------------	*/
@@ -89,7 +105,7 @@
 
 .paigow321-deal-medium {
 	width: 420px;
-	height: 450px;
+	height: 500px;
 }
 
 .pgtile-div-medium-0 {
@@ -119,27 +135,39 @@
 }
 
 .pgset-medium-2 {
-	top: 160px;
+	top: 200px;
 }
 
 .pgset-medium-3 {
-	top: 310px;
+	top: 390px;
 }
 
-.pgset-button-down-medium-1 {
-	top: 105px;
+.pghand-labels-medium {
+	top: 125px;
+	width: 105px;
+	height: 34px;
+	text-align: center;
 }
 
-.pgset-button-up-medium-2 {
-	top: 165px;
+.pghand-labels-medium-0 {
+	left: 25px;
 }
 
-.pgset-button-down-medium-2 {
-	top: 255px;
+.pghand-labels-medium-1 {
+	left: 165px;
 }
 
-.pgset-button-up-medium-3 {
-	top: 315px;
+.xpghand-div-medium-1 {
+	position: absolute;
+	left: 165px;
+}
+
+.pgset-button-switch-medium-1 {
+	top: 155px;
+}
+
+ .pgset-button-switch-medium-2 {
+	top: 345px;
 }
 
 

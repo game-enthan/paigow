@@ -30,13 +30,13 @@
 
     function jqset_of_tile( pgtile ) { return $(pgtile).parent(); }
 
-    function set_num_of_tile( pgtile )  { return set_num_of_set( $(pgtile).parent()[0] ); }
+    function set_num_of_tile( pgtile )  { return set_num_of_set( jqset_of_tile(pgtile)[0] ); }
 
     //function set_num_of_set( pgset ) { return parseInt(pgset.id.substring(10, 11)); }      // "pgset-div-#'
 
     function tiles_of_jqset( jqset ) { return jqset.find('.pgtile-div'); }
 
-    function tile_num( pgtile ) { return tiles_of_jqset( $(pgtile).parent() ).index( pgtile ); }    // index in tile list
+    function tile_num( pgtile ) { return tiles_of_jqset( jqset_of_tile(pgtile) ).index( pgtile ); }    // index in tile list
 
     function set_id( pgtile) { return "pgset-div-" + set_num_of_tile( pgtile ); }
 
@@ -72,7 +72,6 @@
           disabled: false,
           drop: function(event, ui) { drop_tile( this, event, ui ); }
         } );
-      var foo = $(pgtile).position();
       jq_set.data( "orig", $(pgtile).position() );
 
       //  Put the tile on top of the other tiles.
@@ -93,7 +92,7 @@
     {
       //  Get the set number from the tile, and undo setting it droppable
       //  and get rid of the drop function.
-      var jq_set = $( "#" + set_id( pgtile ) );
+      var jq_set = jqset_of_tile( pgtile );
       disable_drop( jq_set );
       jq_set.removeData( "lefts" );
       jq_set.removeData( "orig" );
@@ -212,20 +211,17 @@
     }
 
     //  Click the up or down button for a set
-    function updown_click( button )
+    function switch_click( button )
     {
       //  Get the set number: it's the first char of the id.
       var source_set_num = set_num_of_button( button );
 
       //  Get whether we're moving it up or down.
-      var is_up = ( button.id.match( /up$/ ) != null );
-      var dest_set_num = source_set_num + ( is_up ? -1 : 1 )
+      var dest_set_num = source_set_num + 1
 
       //  Get the jq objects of the two sets
       var source = jqset_of_num( source_set_num );
       var dest = jqset_of_num( dest_set_num );
-
-      // alert( "Set " + pgset_num + " going " + (is_up ? "UP!" : "DOWN") );
 
       //  Switch the location of the two sets
       var source_top = source.position().top;
@@ -237,10 +233,6 @@
       if ( dest_set_num == 3 )     // goes to the end (1-based, remember)
       {
         $(source.parent()).append( source );
-      }
-      else if ( is_up )
-      {
-        source.insertBefore(dest);
       }
       else
       {
@@ -285,7 +277,7 @@
       disabled: true
     } );
 
-  $(".pgset-button-updown").click( function( button ) { return updown_click( this ); } );
+  $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
 
 {% endblock %}
 
@@ -312,9 +304,7 @@
       <div id="pgset-div-2" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
       <div id="pgset-div-3" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
     </div>
-    {% show_pgset_button "1" 0 pgtile_size %}
-    {% show_pgset_button "2" 1 pgtile_size %}
-    {% show_pgset_button "2" 0 pgtile_size %}
-    {% show_pgset_button "3" 1 pgtile_size %}
+    {% show_switch_button 1 pgtile_size %}
+    {% show_switch_button 2 pgtile_size %}
   </div>
 {% endblock %}
