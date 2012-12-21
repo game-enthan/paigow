@@ -11,14 +11,25 @@
   <script language="javascript">
 
     //  Convenience functions for getting ids etc.
-    function set_num_of_tile( pgtile )  { return parseInt(pgtile.id.substring(0, 1)); }      // first char
+    function set_num_of_button( button )  { return parseInt(button.id.substring(0, 1)); }      // first char
+
+    function set_num_of_tile( pgtile )  { return set_num_of_set( $(pgtile).parent()[0] ); }
+
     function set_num_of_set( pgset )  { return parseInt(pgset.id.substring(10, 11)); }      // "pgset-div-#'
-    function tile_num( pgtile ) { return parseInt(pgtile.id.substring(2, 3)); }      // third char
+
+    function tiles_of_jqset( jqset ) { return jqset.find('.pgtile-div'); }
+
+    function tile_num( pgtile ) { return tiles_of_jqset( $(pgtile).parent() ).index( pgtile ); }    // index in tile list
+
     function set_id( pgtile) { return "pgset-div-" + set_num_of_tile( pgtile ); }
+
     function set_id_of_num( set_num ) { return "pgset-div-" + set_num; }
+
     function set_class_of_num( set_num ) { return "pgset-{{ pgtile_size }}-" + set_num; }
+
     function jqset_of_num( set_num ) { return $( "#" + set_id_of_num( set_num ) ); }
-    function jqtile_of_nums( set_num, tile_num ) { return $("#" + set_num + "_" + tile_num + "_tile_div"); }
+
+    function jqtile_of_nums( set_num, tile_num ) { return $(tiles_of_jqset( jqset_of_num( set_num ) )[tile_num]); }
 
 
     //  Switch class and ID convenience.
@@ -80,8 +91,10 @@
 
     function drop_tile( pgset, event, ui )
     {
+      var jqset = $(pgset);
+
       //  Figure out where the new position is by looking at the lefts array.
-      var lefts = $(pgset).data( "lefts" );
+      var lefts = jqset.data( "lefts" );
 
       //  Testing has shown that this is the difference from the original location of the tile.
       var source_index = tile_num( ui.draggable[0] );
@@ -101,6 +114,7 @@
         }
       }
 
+      var orig_dest_index = dest_index;
       var is_moving_left = (dest_index <= source_index);
 
       //  If we're moving right, then the dest index is actually
@@ -112,7 +126,7 @@
       if ( dest_index == source_index )
       {
         ui.draggable.animate( {
-          left: $(pgset).data("orig").left, top: $(pgset).data("orig").top
+          left: jqset.data("orig").left, top: jqset.data("orig").top
         } );
         return false;
       }
@@ -168,31 +182,23 @@
       {
         new_index = new_indices[i];
         jqtiles[i].animate( {
-          left: "" + lefts[new_index] - $(pgset).offset().left + "px", top: "0px"
+          left: "" + lefts[new_index] - jqset.offset().left + "px", top: "0px"
         } );
       }
 
-      //  Reset the classes
-      for ( i = 0; i < 4; i++ )
+      //  Get the tile and move it, in the DOM, to its place in the list.
+      //  We use dest_index to find out if we're moving it to the end
+      //  (only moving left), but orig_dest_index to do the final move.
+      var jq_orig_order_tiles = jqset.find(".pgtile-div");
+      var jqmoved = $(jq_orig_order_tiles[source_index]);
+      // jqmoved.detach();
+      if ( dest_index == 3 )
       {
-        var class_name = "pgtile-div-{{ pgtile_size }}-" + i;
-        jqtiles[i].removeClass( class_name );
-        class_name = "pgtile-div-{{ pgtile_size }}-" + new_indices[i];
-        jqtiles[i].addClass( class_name );
-        var new_id = "" + set_num_of_set( pgset ) + "_" + new_indices[i] + "_tile_div";
-        jqtiles[i].attr( "id", new_id );
+        jqset.append(jqmoved);
       }
-
-      //  Reset the positions in the DOM: first get the new order
-      new_order = new Array(4);
-      for ( i = 0; i < 4; i++ )
+      else
       {
-        new_order[i] = jqtile_of_nums( set_num_of_set( pgset ), i );
-      }
-      $(pgset).children().detach(".pgtile-div");
-      for ( i = 0; i < 4; i++ )
-      {
-        $(pgset).append(new_order[i]);
+        jqmoved.insertBefore(jq_orig_order_tiles[orig_dest_index]);
       }
     }
 
@@ -200,7 +206,7 @@
     function updown_click( button )
     {
       //  Get the set number: it's the first char of the id.
-      var source_set_num = set_num_of_tile( button );
+      var source_set_num = set_num_of_button( button );
 
       //  Get whether we're moving it up or down.
       var is_up = ( button.id.match( /up$/ ) != null );
@@ -218,14 +224,24 @@
       source.animate( { top: dest_top } );
       dest.animate( { top: source_top } );
 
-      //  Switch the two sets.
-      change_class_and_id( source, set_class_of_num( source_set_num ), set_class_of_num( dest_set_num ), set_id_of_num( dest_set_num ) );
-      change_class_and_id( dest, set_class_of_num( dest_set_num ), set_class_of_num( source_set_num ), set_id_of_num( source_set_num ) );
-    }
+      //  Reorder the sets within the deal.
+      if ( dest_set_num == 3 )     // goes to the end (1-based, remember)
+      {
+        $(source.parent()).append( source );
+      }
+      else if ( is_up )
+      {
+        source.insertBefore(dest);
+      }
+      else
+      {
+        source.insertAfter(dest);
+      }
 
-    //  Hover over up or down button for a set
-    function updown_hover( button )
-    {
+      //  Switch the two sets.
+      //  NO: do not do this: we use the set numbers to figure out the tiles in them in drop_tile
+      // change_class_and_id( source, set_class_of_num( source_set_num ), set_class_of_num( dest_set_num ), set_id_of_num( dest_set_num ) );
+      //change_class_and_id( dest, set_class_of_num( dest_set_num ), set_class_of_num( source_set_num ), set_id_of_num( source_set_num ) );
     }
 
   </script>
@@ -261,7 +277,6 @@
     } );
 
   $(".pgset-button-updown").click( function( button ) { return updown_click( this ); } );
-//  $(".pgset-button-updown").hover( function( button ) { return updown_hover( this ); } );
 
 {% endblock %}
 
@@ -282,13 +297,15 @@
   <br><br>
   
   <!-- This div shows the 3-set deal -->
-  <div id="paigow321-deal" class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
+  <div id="paigow321-deal-container"  class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
+    <div id="paigow321-deal" class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
+      <div id="pgset-div-1" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-1" style="display:none">{% show_pgset pgsets.0 "1" pgtile_size %}</div>
+      <div id="pgset-div-2" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
+      <div id="pgset-div-3" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
+    </div>
     {% show_pgset_button "1" 0 pgtile_size %}
-    <div id="pgset-div-1" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-1" style="display:none">{% show_pgset pgsets.0 "1" pgtile_size %}</div>
     {% show_pgset_button "2" 1 pgtile_size %}
     {% show_pgset_button "2" 0 pgtile_size %}
-    <div id="pgset-div-2" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
     {% show_pgset_button "3" 1 pgtile_size %}
-    <div id="pgset-div-3" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
   </div>
 {% endblock %}

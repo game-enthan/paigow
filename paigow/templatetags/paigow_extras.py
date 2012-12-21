@@ -21,8 +21,8 @@ def opponent_for_game( value, arg, autoescape = None ):
   return "computer"
 
 @register.inclusion_tag("pgtile.html", takes_context=True)
-def tile_image( context, tile, tile_size, drag_id ):
-  return { 'pgtile': tile, 'pgtile_size': tile_size, 'drag_id': drag_id }
+def tile_image( context, tile, tile_size ):
+  return { 'pgtile': tile, 'pgtile_size': tile_size }
 
 @register.inclusion_tag("hand.html", takes_context=True)
 def show_hand( context, hand, tile_size ):
