@@ -1,0 +1,8 @@
+{% load static %}
+<div id="{{ pgset_id }}_pgset_button_{{ button_name }}" class="pgset-button-updown pgset-button-{{ button_name }}-{{ pgtile_size }}-{{ pgset_id }}">
+    {% if is_up %}
+		<img src="{% static "img/glyphicons_369_collapse_top.png" %}"></img>
+    {% else %}
+		<img src="{% static "img/glyphicons_367_expand.png" %}"></img>
+    {% endif %}
+</div>

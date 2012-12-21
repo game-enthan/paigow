@@ -32,3 +32,6 @@ def show_hand( context, hand, tile_size ):
 def show_pgset( context, pgset, pgset_id, tile_size ):
   return { 'pgset': pgset, 'pgset_id': pgset_id, 'pgtile_size': tile_size }
 
+@register.inclusion_tag("pgset_button.html", takes_context=True)
+def show_pgset_button( context, pgset_id, is_up, tile_size ):
+  return { 'pgset_id': pgset_id, 'is_up': True if is_up == 1 else False, 'button_name': 'up' if is_up else 'down', 'pgtile_size': tile_size }

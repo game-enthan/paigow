@@ -8,202 +8,260 @@
 {% block content_title %}<h1>{{ game.name }}</h1>{% endblock %}
 
 {% block header-javascript %}
-	<script language="javascript">
+  <script language="javascript">
 
-		//	Convenience functions for getting ids etc.
-		function set_num_of_tile( pgtile )  { return parseInt(pgtile.id.substring(0, 1)); }			// first char
-		function set_num_of_set( pgset )  { return parseInt(pgset.id.substring(10, 11)); }			// "pgset-div-#'
-		function tile_num( pgtile ) { return parseInt(pgtile.id.substring(2, 3)); }			// third char
-		function set_id( pgtile) { return "pgset-div-" + set_num_of_tile( pgtile ); }
-		function jqtile_of_nums( set_num, tile_num ) { return $("#" + set_num + "_" + tile_num + "_tile_div"); }
-
-		function drag_start( pgtile, event, ui )
-		{
-			//	Get the set number from the tile, and make only that set droppable.
-			var jq_set = $( "#" + set_id( pgtile ) );
-			jq_set.droppable( "option", "disabled", false );
-			var foo = $(pgtile).position();
-			jq_set.data( "orig", $(pgtile).position() );
-
-			//	Put the tile on top of the other tiles.
-			$(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) + 1 );
-
-			//	Add to the droppable the data of the topleft of each of the tiles.
-			var lefts = new Array(4);
-			var i;
-			for ( i = 0; i < 4; i++ )
-			{
-				var jqtile = jqtile_of_nums( set_num_of_tile( pgtile ), i );
-				lefts[i] = jqtile.offset().left;
-			}
-			jq_set.data( "lefts", lefts );
-		}
-		
-		function drag_stop( pgtile, event, ui )
-		{
-			//	Get the set number from the tile, and undo setting it droppable
-			var jq_set = $( "#" + set_id( pgtile ) );
-			jq_set.droppable( "option", "disabled", true );
-			jq_set.removeData( "lefts" );
-			jq_set.removeData( "orig" );
-
-			//	Put the tile in the same plane as the others
-			$(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) - 1 );
-
-		}
-
-		function drop_tile( pgset, event, ui )
-		{
-			//	Figure out where the new position is by looking at the lefts array.
-			var lefts = $(pgset).data( "lefts" );
-
-			//	Testing has shown that this is the difference from the original location of the tile.
-			var source_index = tile_num( ui.draggable[0] );
-			var new_left = ui.offset.left;
-
-			//	Figure out where we should drop it.  There are FIVE possible locations,
-			//	from left of the leftmost tile to right of the rightmost tile.  For
-			//	moving to the left, only the first four make sense.  For moving to the
-			//	right, only the last four make sense.
-			var dest_index = 4;
-			for ( i = 0; i < 4; i++ )
-			{
-				if ( new_left < lefts[i] )
-				{
-					dest_index = i;
-					break;
-				}
-			}
-
-			var is_moving_left = (dest_index <= source_index);
-
-			//	If we're moving right, then the dest index is actually
-			//	one less (zero doesn't make sense, but moving to "1" is
-			//	moving to zero).
-			if ( !is_moving_left) dest_index--;
-
-			//	If we're not moving it, forget it: returning 'false' will stop the drag.
-			if ( dest_index == source_index )
-			{
-				ui.draggable.animate( {
-					left: $(pgset).data("orig").left, top: $(pgset).data("orig").top
-				} );
-				return false;
-			}
-
-			//	Re-arrange the tiles for the drop.
-
-			//	Get the number of the tile being dropped, in three loops:
-			//	1) calculate the new index for the div
-			//	2) reset the positions
-			//	3) reset the classes indicating tile number
-
-			new_indices = new Array(4);
-			var jqtiles = new Array(4);
+    //  Convenience functions for getting ids etc.
+    function set_num_of_tile( pgtile )  { return parseInt(pgtile.id.substring(0, 1)); }      // first char
+    function set_num_of_set( pgset )  { return parseInt(pgset.id.substring(10, 11)); }      // "pgset-div-#'
+    function tile_num( pgtile ) { return parseInt(pgtile.id.substring(2, 3)); }      // third char
+    function set_id( pgtile) { return "pgset-div-" + set_num_of_tile( pgtile ); }
+    function set_id_of_num( set_num ) { return "pgset-div-" + set_num; }
+    function set_class_of_num( set_num ) { return "pgset-{{ pgtile_size }}-" + set_num; }
+    function jqset_of_num( set_num ) { return $( "#" + set_id_of_num( set_num ) ); }
+    function jqtile_of_nums( set_num, tile_num ) { return $("#" + set_num + "_" + tile_num + "_tile_div"); }
 
 
-			//	Calculate the new index
-			var i;
-			var new_index;
-			for ( i = 0; i < 4; i++ )
-			{
-				//	Save these for changing classes.
-				jqtiles[i] = jqtile_of_nums( set_num_of_set( pgset ), i );
+    //  Switch class and ID convenience.
+    function change_class_and_id( jqobj, old_class, new_class, new_id )
+    {
+        jqobj.removeClass( old_class );
+        jqobj.addClass( new_class );
+        jqobj.attr( "id", new_id );
+    }
 
-				new_index = i;
-				if ( i == source_index )
-				{
-					//	Is the source tile: move to dest.
-					new_index = dest_index;
-				}
-				else if ( i < dest_index && i < source_index )
-				{
-					//	To the left of all the action: leave it alone.
-				}
-				else if ( is_moving_left && (i >= dest_index && i < source_index ))
-				{
-					//	tile inserted before us: move right (index up)
-					new_index = i + 1;
-				}
-				else if ( is_moving_left )
-				{
-					//	Must be to right of all the action, leave alone.
-				}
-				else if ( i <= dest_index && i > source_index )
-				{
-					//	Moving to the right, between: slide left.
-					new_index = i - 1;
-				}
+    //  Drag/drop convenience functions
+    function disable_drop( jqobj )
+    {
+      jqobj.droppable( {
+          disabled: true,
+          drop: undefined
+        } );
+    }
 
-				new_indices[i] = new_index;
-			}
+    function drag_tile_start( pgtile, event, ui )
+    {
+      //  Get the set number from the tile, and make only that set droppable, and
+      //  only allow dropping of tiles.
+      var jq_set = $( "#" + set_id( pgtile ) );
+      jq_set.droppable( {
+          disabled: false,
+          drop: function(event, ui) { drop_tile( this, event, ui ); }
+        } );
+      var foo = $(pgtile).position();
+      jq_set.data( "orig", $(pgtile).position() );
 
-			//	Move the tiles
-			for ( i = 0; i < 4; i++ )
-			{
-				new_index = new_indices[i];
-				jqtiles[i].animate( {
-					left: "" + lefts[new_index] - $(pgset).offset().left + "px", top: "0px"
-				} );
-			}
+      //  Put the tile on top of the other tiles.
+      $(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) + 1 );
 
-			//	Reset the classes
-			for ( i = 0; i < 4; i++ )
-			{
-				var class_name = "pgtile-div-{{ pgtile_size }}-" + i;
-				jqtiles[i].removeClass( class_name );
-				class_name = "pgtile-div-{{ pgtile_size }}-" + new_indices[i];
-				jqtiles[i].addClass( class_name );
-				var new_id = "" + set_num_of_set( pgset ) + "_" + new_indices[i] + "_tile_div";
-				jqtiles[i].attr( "id", new_id );
-			}
+      //  Add to the droppable the data of the topleft of each of the tiles.
+      var lefts = new Array(4);
+      var i;
+      for ( i = 0; i < 4; i++ )
+      {
+        var jqtile = jqtile_of_nums( set_num_of_tile( pgtile ), i );
+        lefts[i] = jqtile.offset().left;
+      }
+      jq_set.data( "lefts", lefts );
+    }
+    
+    function drag_tile_stop( pgtile, event, ui )
+    {
+      //  Get the set number from the tile, and undo setting it droppable
+      //  and get rid of the drop function.
+      var jq_set = $( "#" + set_id( pgtile ) );
+      disable_drop( jq_set );
+      jq_set.removeData( "lefts" );
+      jq_set.removeData( "orig" );
 
-			//	Reset the positions in the DOM: first get the new order
-			new_order = new Array(4);
-			for ( i = 0; i < 4; i++ )
-			{
-				new_order[i] = jqtile_of_nums( set_num_of_set( pgset ), i );
-			}
-			$(pgset).children().detach(".pgtile-div");
-			for ( i = 0; i < 4; i++ )
-			{
-				$(pgset).append(new_order[i]);
-			}
-		}
+      //  Put the tile in the same plane as the others
+      $(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) - 1 );
 
-		function sort_by_id( a, b )
-		{
-			return (a.id < b.id) ? -1 : ((a.id > b.id) ? 1 : 0);
-		}
-		
-	</script>
+    }
+
+    function drop_tile( pgset, event, ui )
+    {
+      //  Figure out where the new position is by looking at the lefts array.
+      var lefts = $(pgset).data( "lefts" );
+
+      //  Testing has shown that this is the difference from the original location of the tile.
+      var source_index = tile_num( ui.draggable[0] );
+      var new_left = ui.offset.left;
+
+      //  Figure out where we should drop it.  There are FIVE possible locations,
+      //  from left of the leftmost tile to right of the rightmost tile.  For
+      //  moving to the left, only the first four make sense.  For moving to the
+      //  right, only the last four make sense.
+      var dest_index = 4;
+      for ( i = 0; i < 4; i++ )
+      {
+        if ( new_left < lefts[i] )
+        {
+          dest_index = i;
+          break;
+        }
+      }
+
+      var is_moving_left = (dest_index <= source_index);
+
+      //  If we're moving right, then the dest index is actually
+      //  one less (zero doesn't make sense, but moving to "1" is
+      //  moving to zero).
+      if ( !is_moving_left) dest_index--;
+
+      //  If we're not moving it, forget it: returning 'false' will stop the drag.
+      if ( dest_index == source_index )
+      {
+        ui.draggable.animate( {
+          left: $(pgset).data("orig").left, top: $(pgset).data("orig").top
+        } );
+        return false;
+      }
+
+      //  Re-arrange the tiles for the drop.
+
+      //  Get the number of the tile being dropped, in three loops:
+      //  1) calculate the new index for the div
+      //  2) reset the positions
+      //  3) reset the classes indicating tile number
+
+      new_indices = new Array(4);
+      var jqtiles = new Array(4);
+
+      //  Calculate the new index
+      var i;
+      var new_index;
+      for ( i = 0; i < 4; i++ )
+      {
+        //  Save these for changing classes.
+        jqtiles[i] = jqtile_of_nums( set_num_of_set( pgset ), i );
+
+        new_index = i;
+        if ( i == source_index )
+        {
+          //  Is the source tile: move to dest.
+          new_index = dest_index;
+        }
+        else if ( i < dest_index && i < source_index )
+        {
+          //  To the left of all the action: leave it alone.
+        }
+        else if ( is_moving_left && (i >= dest_index && i < source_index ))
+        {
+          //  tile inserted before us: move right (index up)
+          new_index = i + 1;
+        }
+        else if ( is_moving_left )
+        {
+          //  Must be to right of all the action, leave alone.
+        }
+        else if ( i <= dest_index && i > source_index )
+        {
+          //  Moving to the right, between: slide left.
+          new_index = i - 1;
+        }
+
+        new_indices[i] = new_index;
+      }
+
+      //  Move the tiles
+      for ( i = 0; i < 4; i++ )
+      {
+        new_index = new_indices[i];
+        jqtiles[i].animate( {
+          left: "" + lefts[new_index] - $(pgset).offset().left + "px", top: "0px"
+        } );
+      }
+
+      //  Reset the classes
+      for ( i = 0; i < 4; i++ )
+      {
+        var class_name = "pgtile-div-{{ pgtile_size }}-" + i;
+        jqtiles[i].removeClass( class_name );
+        class_name = "pgtile-div-{{ pgtile_size }}-" + new_indices[i];
+        jqtiles[i].addClass( class_name );
+        var new_id = "" + set_num_of_set( pgset ) + "_" + new_indices[i] + "_tile_div";
+        jqtiles[i].attr( "id", new_id );
+      }
+
+      //  Reset the positions in the DOM: first get the new order
+      new_order = new Array(4);
+      for ( i = 0; i < 4; i++ )
+      {
+        new_order[i] = jqtile_of_nums( set_num_of_set( pgset ), i );
+      }
+      $(pgset).children().detach(".pgtile-div");
+      for ( i = 0; i < 4; i++ )
+      {
+        $(pgset).append(new_order[i]);
+      }
+    }
+
+    //  Click the up or down button for a set
+    function updown_click( button )
+    {
+      //  Get the set number: it's the first char of the id.
+      var source_set_num = set_num_of_tile( button );
+
+      //  Get whether we're moving it up or down.
+      var is_up = ( button.id.match( /up$/ ) != null );
+      var dest_set_num = source_set_num + ( is_up ? -1 : 1 )
+
+      //  Get the jq objects of the two sets
+      var source = jqset_of_num( source_set_num );
+      var dest = jqset_of_num( dest_set_num );
+
+      // alert( "Set " + pgset_num + " going " + (is_up ? "UP!" : "DOWN") );
+
+      //  Switch the location of the two sets
+      var source_top = source.position().top;
+      var dest_top = dest.position().top;
+      source.animate( { top: dest_top } );
+      dest.animate( { top: source_top } );
+
+      //  Switch the two sets.
+      change_class_and_id( source, set_class_of_num( source_set_num ), set_class_of_num( dest_set_num ), set_id_of_num( dest_set_num ) );
+      change_class_and_id( dest, set_class_of_num( dest_set_num ), set_class_of_num( source_set_num ), set_id_of_num( source_set_num ) );
+    }
+
+    //  Hover over up or down button for a set
+    function updown_hover( button )
+    {
+    }
+
+  </script>
 {% endblock %}
 
 {% block jquery-doc-ready %}
 
-	//  Fade the sets in, in order.  These set classes don't have sizes so we can use them as
-	//	generic sets.  Note they are 1,2,3 rather than 0-based so the index is the same as
-	//	the number of points assigned (for simplicity).
-	$("#pgset-div-1").fadeIn( 500);
-	$("#pgset-div-2").fadeIn(1000);
-	$("#pgset-div-3").fadeIn(1500);
-	
-	//  The tiles are draggable
-	//  TBD: put this in pgtile.html, how to do that while including it several times
-	$(".pgtile-div").draggable( {
-			//helper: "clone",
-			revert: "invalid",
-			start: function( event, ui ) { drag_start( this, event, ui ); },
-			stop: function( event, ui ) { drag_stop( this, event, ui ); }
-		} );
+  //  Fade the sets in, in order.  These set classes don't have sizes so we can use them as
+  //  generic sets.  Note they are 1,2,3 rather than 0-based so the index is the same as
+  //  the number of points assigned (for simplicity).
+  $("#pgset-div-1").fadeIn( 500);
+  $("#pgset-div-2").fadeIn(1000);
+  $("#pgset-div-3").fadeIn(1500);
+  
+  //  The tiles are draggable
+  //  TBD: put this in pgtile.html, how to do that while including it several times
+  $(".pgtile-div").draggable( {
+      //helper: "clone",
+      revert: "invalid",
+      start: function( event, ui ) { drag_tile_start( this, event, ui ); },
+      stop: function( event, ui ) { drag_tile_stop( this, event, ui ); }
+    } );
 
-	//  The divs holding the sets will be droppable, but only accept tiles.
-	//	They are disabled until a tile is dragged, and only the appropriate
-	//	set or sets are un-disabled.
-	$(".pgset").droppable( { 
-			disabled: true,
-			drop: function(event, ui) { drop_tile( this, event, ui ); }
-		} );
+  //  The divs holding the sets will be droppable, but only accept tiles.
+  //  They are disabled until a tile is dragged, and only the appropriate
+  //  set or sets are un-disabled.
+  $(".pgset").droppable( { 
+      disabled: true
+    } );
+
+  $(".paigow321-deal").droppable( {
+      disabled: true
+    } );
+
+  $(".pgset-button-updown").click( function( button ) { return updown_click( this ); } );
+//  $(".pgset-button-updown").hover( function( button ) { return updown_hover( this ); } );
 
 {% endblock %}
 
@@ -220,13 +278,17 @@
   </div>
   
   <!-- <br><br>
-	<span id="debug">Replace with debug text</span> --?
+  <span id="debug">Replace with debug text</span> --?
   <br><br>
   
   <!-- This div shows the 3-set deal -->
-	<div id="paigow321-deal" class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
-		<div id="pgset-div-1" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-1 pgset-{{ pgtile_size }} sortable" style="display:none">{% show_pgset pgsets.0 "1" pgtile_size %}</div>
-		<div id="pgset-div-2" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2 pgset-{{ pgtile_size }}" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
-		<div id="pgset-div-3" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3 pgset-{{ pgtile_size }}" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
-	</div>
+  <div id="paigow321-deal" class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
+    {% show_pgset_button "1" 0 pgtile_size %}
+    <div id="pgset-div-1" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-1" style="display:none">{% show_pgset pgsets.0 "1" pgtile_size %}</div>
+    {% show_pgset_button "2" 1 pgtile_size %}
+    {% show_pgset_button "2" 0 pgtile_size %}
+    <div id="pgset-div-2" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
+    {% show_pgset_button "3" 1 pgtile_size %}
+    <div id="pgset-div-3" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
+  </div>
 {% endblock %}

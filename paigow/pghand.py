@@ -38,9 +38,14 @@ class PGHand:
   # convenience functions for  naming and comparisons.
   def is_pair( self ):
     return high_tile == low_tile
-  
   def is_wong( self ):
     return high_tile.is_teen_or_day() and (low_tile.tile_value == 9)
+  def is_gong( self ):
+    return high_tile.is_teen_or_day() and (low_tile.tile_value == 8)
+  def is_high_nine( self ):
+    return high_tile.is_teen_or_day() and (low_tile.tile_value == 7)
+  def numerical_value( self ):
+    return ( high_tile.tile_value + low_tile.tile_value ) % 10
   
 # ----------------------------------------------------
 # Test PGHand class

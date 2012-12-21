@@ -23,6 +23,12 @@
 	position: absolute;
 }
 
+.pgset-button-updown {
+	position: absolute;
+	left: 0px;
+	cursor: pointer;
+}
+
 /* ------------------------ Large ------------------------	*/
 
 .pgtile-large {
@@ -82,41 +88,60 @@
 }
 
 .paigow321-deal-medium {
+	width: 420px;
 	height: 450px;
 }
 
 .pgtile-div-medium-0 {
-	left: 0px;
+	left: 25px;
 }
 
 .pgtile-div-medium-1 {
-	left: 55px;
+	left: 80px;
 }
 
 .pgtile-div-medium-2 {
-	left: 110px;
+	left: 165px;
 }
 
 .pgtile-div-medium-3 {
-	left: 165px;
+	left: 220px;
 }
 
 .pgset-medium {
 	height: 140px;
-	width: 320px;
+	width: 350px;
+	left: 20px;
 }
 
 .pgset-medium-1 {
-	top: 50px;
+	top: 10px;
 }
 
 .pgset-medium-2 {
-	top: 200px;
+	top: 160px;
 }
 
 .pgset-medium-3 {
-	top: 350px;
+	top: 310px;
 }
+
+.pgset-button-down-medium-1 {
+	top: 105px;
+}
+
+.pgset-button-up-medium-2 {
+	top: 165px;
+}
+
+.pgset-button-down-medium-2 {
+	top: 255px;
+}
+
+.pgset-button-up-medium-3 {
+	top: 315px;
+}
+
 
 /* ------------------------ Small -----------------------	*/
 
