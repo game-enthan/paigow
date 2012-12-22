@@ -93,7 +93,6 @@ class PGHandTest( TestCase ):
     teen1 = PGTile.with_name( "teen", True )
     teen2 = PGTile.with_name( "teen", False )
     hand1 = PGHand.create( teen1, teen2 )
-    print hand1.label()
     self.assertEqual( hand1.label(), "teen bo" )
 
 

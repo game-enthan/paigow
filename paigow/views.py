@@ -259,8 +259,9 @@ def play_game( request, game_id, params = {} ):
 #-------------------------------------------------------------------
 # AJAX response for the label for a hand
 def hand_label( request, params = {} ):
-  pghand = PGHand.create( PGTile.objects.get( id = request.GET['tile0'] ), PGTile.objects.get( id = request.GET['tile1'] ) )
+  hand_chars = request.GET['hand']
+  pghand = PGHand.create( PGTile.objects.get( tile_char = hand_chars[0] ), PGTile.objects.get( tile_char = hand_chars[1] ) )
   label = pghand.label()
-  pghand = PGHand.create( PGTile.objects.get( id = request.GET['tile2'] ), PGTile.objects.get( id = request.GET['tile3'] ) )
+  pghand = PGHand.create( PGTile.objects.get( tile_char = hand_chars[2] ), PGTile.objects.get( tile_char = hand_chars[3] ) )
   label = label + "|" + pghand.label()
   return HttpResponse( label )

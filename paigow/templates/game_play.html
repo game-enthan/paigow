@@ -213,10 +213,15 @@
         url: "/paigow/hand",
         context: pgset,
         data: {
-          tile0: new_tiles[0].getAttribute('tile_id'),
-          tile1: new_tiles[1].getAttribute('tile_id'),
-          tile2: new_tiles[2].getAttribute('tile_id'),
-          tile3: new_tiles[3].getAttribute('tile_id')
+            hand: new_tiles[0].getAttribute('tile_id') + 
+                  new_tiles[1].getAttribute('tile_id') + 
+                  new_tiles[2].getAttribute('tile_id') + 
+                  new_tiles[3].getAttribute('tile_id')
+                  
+//           tile0: new_tiles[0].getAttribute('tile_id'),
+//           tile1: new_tiles[1].getAttribute('tile_id'),
+//           tile2: new_tiles[2].getAttribute('tile_id'),
+//           tile3: new_tiles[3].getAttribute('tile_id')
         },
         success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
         error: function( data, textStatus, jqXHR ) { alert( "Returned error status " + textStatus ); }

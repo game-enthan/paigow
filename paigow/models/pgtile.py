@@ -39,6 +39,10 @@ class PGTile( models.Model ):
   # whose file name matches this name.
   name = models.CharField( max_length = 30 )
   
+  # Each tile has a unique single char value for
+  # compact communication
+  tile_char = models.CharField( max_length = 1)
+  
   # Rank of the tile and its pair: 15:highest, 0:lowest;
   # I think it's save to assume that POSITIVE SMALL INTEGER
   # is still large enough to represent 15 ;)
@@ -89,6 +93,11 @@ class PGTile( models.Model ):
   def with_rank( cls, rank, is_first = True ):
     return cls.get_tiles_matching( { 'tile_rank': rank }, is_first )
   
+  # return the tile with the given char
+  @classmethod
+  def with_char( cls, tile_char ):
+    return cls.objects.get( tile_char__exact = tile_char )
+  
   # convenience to allow creation of tiles by name.
   # * double-underscore means that what follows is an
   #   adjustment of the field, so below it will query
@@ -105,6 +114,8 @@ class PGTile( models.Model ):
   
   def is_gee_joon_tile( self ):
     return self.name == "gee joon"
+  
+  # for compact communication, each tile has a unique letter representing it.
   
   # overload the math when comparing tiles
   def __lt__( self, other ):
@@ -193,6 +204,13 @@ class PGTileTest(TestCase):
     self.assertTrue( tile.is_teen_or_day() )
     tile = PGTile.with_name( "day" )
     self.assertTrue( tile.is_teen_or_day() )
+  
+  def test_with_char( self ):
+    tile1 = PGTile.with_char( "A" )
+    tile2 = PGTile.with_char( "a" )
+    tile3 = PGTile.with_char( "b" )
+    self.assertTrue( tile1 == tile2 )
+    self.assertTrue( tile1 != tile3 )
 
 
 # run the test when invoked as a test (this is boilerplate

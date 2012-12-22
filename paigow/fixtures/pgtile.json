@@ -1,417 +1,449 @@
 [
-	{
-		"model" : "paigow.pgtile",
-		"pk": 1,
-		"fields": {
-			"name": "gee joon",
-			"tile_rank": 0,
-			"pair_rank": 15,
-			"tile_value": 3,
-			"sprite_left": 500,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 1,
+    "fields": {
+      "name": "gee joon",
+      "tile_char": "P",
+      "tile_rank": 0,
+      "pair_rank": 15,
+      "tile_value": 3,
+      "sprite_left": 500,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 2,
-		"fields": {
-			"name": "gee joon",
-			"tile_rank": 0,
-			"pair_rank": 15,
-			"tile_value": 3,
-			"sprite_left": 200,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 2,
+    "fields": {
+      "name": "gee joon",
+      "tile_char": "p",
+      "tile_rank": 0,
+      "pair_rank": 15,
+      "tile_value": 3,
+      "sprite_left": 200,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 3,
-		"fields": {
-			"name": "teen",
-			"tile_rank": 15,
-			"pair_rank": 14,
-			"tile_value": 12,
-			"sprite_left": 0,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 3,
+    "fields": {
+      "name": "teen",
+      "tile_char": "A",
+      "tile_rank": 15,
+      "pair_rank": 14,
+      "tile_value": 12,
+      "sprite_left": 0,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 4,
-		"fields": {
-			"name": "teen",
-			"tile_rank": 15,
-			"pair_rank": 14,
-			"tile_value": 12,
-			"sprite_left": 0,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 4,
+    "fields": {
+      "name": "teen",
+      "tile_char": "a",
+      "tile_rank": 15,
+      "pair_rank": 14,
+      "tile_value": 12,
+      "sprite_left": 0,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 5,
-		"fields": {
-			"name": "day",
-			"tile_rank": 14,
-			"pair_rank": 13,
-			"tile_value": 2,
-			"sprite_left": 500,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 5,
+    "fields": {
+      "name": "day",
+      "tile_char": "B",
+      "tile_rank": 14,
+      "pair_rank": 13,
+      "tile_value": 2,
+      "sprite_left": 500,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 6,
-		"fields": {
-			"name": "day",
-			"tile_rank": 14,
-			"pair_rank": 13,
-			"tile_value": 2,
-			"sprite_left": 500,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 6,
+    "fields": {
+      "name": "day",
+      "tile_char": "b",
+      "tile_rank": 14,
+      "pair_rank": 13,
+      "tile_value": 2,
+      "sprite_left": 500,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 7,
-		"fields": {
-			"name": "high eight",
-			"tile_rank": 13,
-			"pair_rank": 12,
-			"tile_value": 8,
-			"sprite_left": 200,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 7,
+    "fields": {
+      "name": "high eight",
+      "tile_char": "C",
+      "tile_rank": 13,
+      "pair_rank": 12,
+      "tile_value": 8,
+      "sprite_left": 200,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 8,
-		"fields": {
-			"name": "high eight",
-			"tile_rank": 13,
-			"pair_rank": 12,
-			"tile_value": 8,
-			"sprite_left": 200,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 8,
+    "fields": {
+      "name": "high eight",
+      "tile_char": "c",
+      "tile_rank": 13,
+      "pair_rank": 12,
+      "tile_value": 8,
+      "sprite_left": 200,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 9,
-		"fields": {
-			"name": "harmony four",
-			"tile_rank": 12,
-			"pair_rank": 11,
-			"tile_value": 4,
-			"sprite_left": 100,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 9,
+    "fields": {
+      "name": "harmony four",
+      "tile_char": "D",
+      "tile_rank": 12,
+      "pair_rank": 11,
+      "tile_value": 4,
+      "sprite_left": 100,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 10,
-		"fields": {
-			"name": "harmony four",
-			"tile_rank": 12,
-			"pair_rank": 11,
-			"tile_value": 4,
-			"sprite_left": 100,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 10,
+    "fields": {
+      "name": "harmony four",
+      "tile_char": "d",
+      "tile_rank": 12,
+      "pair_rank": 11,
+      "tile_value": 4,
+      "sprite_left": 100,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 11,
-		"fields": {
-			"name": "high ten",
-			"tile_rank": 11,
-			"pair_rank": 10,
-			"tile_value": 10,
-			"sprite_left": 100,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 11,
+    "fields": {
+      "name": "high ten",
+      "tile_char": "E",
+      "tile_rank": 11,
+      "pair_rank": 10,
+      "tile_value": 10,
+      "sprite_left": 100,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 12,
-		"fields": {
-			"name": "high ten",
-			"tile_rank": 11,
-			"pair_rank": 10,
-			"tile_value": 10,
-			"sprite_left": 100,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 12,
+    "fields": {
+      "name": "high ten",
+      "tile_char": "e",
+      "tile_rank": 11,
+      "pair_rank": 10,
+      "tile_value": 10,
+      "sprite_left": 100,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 13,
-		"fields": {
-			"name": "long six",
-			"tile_rank": 10,
-			"pair_rank": 9,
-			"tile_value": 6,
-			"sprite_left": 300,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 13,
+    "fields": {
+      "name": "long six",
+      "tile_char": "F",
+      "tile_rank": 10,
+      "pair_rank": 9,
+      "tile_value": 6,
+      "sprite_left": 300,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 14,
-		"fields": {
-			"name": "long six",
-			"tile_rank": 10,
-			"pair_rank": 9,
-			"tile_value": 6,
-			"sprite_left": 300,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 14,
+    "fields": {
+      "name": "long six",
+      "tile_char": "f",
+      "tile_rank": 10,
+      "pair_rank": 9,
+      "tile_value": 6,
+      "sprite_left": 300,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 15,
-		"fields": {
-			"name": "low four",
-			"tile_rank": 9,
-			"pair_rank": 8,
-			"tile_value": 4,
-			"sprite_left": 400,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 15,
+    "fields": {
+      "name": "low four",
+      "tile_char": "G",
+      "tile_rank": 9,
+      "pair_rank": 8,
+      "tile_value": 4,
+      "sprite_left": 400,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 16,
-		"fields": {
-			"name": "low four",
-			"tile_rank": 9,
-			"pair_rank": 8,
-			"tile_value": 4,
-			"sprite_left": 400,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 16,
+    "fields": {
+      "name": "low four",
+      "tile_char": "g",
+      "tile_rank": 9,
+      "pair_rank": 8,
+      "tile_value": 4,
+      "sprite_left": 400,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 17,
-		"fields": {
-			"name": "eleven",
-			"tile_rank": 8,
-			"pair_rank": 7,
-			"tile_value": 11,
-			"sprite_left": 300,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 17,
+    "fields": {
+      "name": "eleven",
+      "tile_char": "H",
+      "tile_rank": 8,
+      "pair_rank": 7,
+      "tile_value": 11,
+      "sprite_left": 300,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 18,
-		"fields": {
-			"name": "eleven",
-			"tile_rank": 8,
-			"pair_rank": 7,
-			"tile_value": 11,
-			"sprite_left": 300,
-			"sprite_top": 500
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 18,
+    "fields": {
+      "name": "eleven",
+      "tile_char": "h",
+      "tile_rank": 8,
+      "pair_rank": 7,
+      "tile_value": 11,
+      "sprite_left": 300,
+      "sprite_top": 500
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 19,
-		"fields": {
-			"name": "low ten",
-			"tile_rank": 7,
-			"pair_rank": 6,
-			"tile_value": 10,
-			"sprite_left": 200,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 19,
+    "fields": {
+      "name": "low ten",
+      "tile_char": "I",
+      "tile_rank": 7,
+      "pair_rank": 6,
+      "tile_value": 10,
+      "sprite_left": 200,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 20,
-		"fields": {
-			"name": "low ten",
-			"tile_rank": 7,
-			"pair_rank": 6,
-			"tile_value": 10,
-			"sprite_left": 200,
-			"sprite_top": 750
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 20,
+    "fields": {
+      "name": "low ten",
+      "tile_char": "i",
+      "tile_rank": 7,
+      "pair_rank": 6,
+      "tile_value": 10,
+      "sprite_left": 200,
+      "sprite_top": 750
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 21,
-		"fields": {
-			"name": "high seven",
-			"tile_rank": 6,
-			"pair_rank": 5,
-			"tile_value": 7,
-			"sprite_left": 500,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 21,
+    "fields": {
+      "name": "high seven",
+      "tile_char": "J",
+      "tile_rank": 6,
+      "pair_rank": 5,
+      "tile_value": 7,
+      "sprite_left": 500,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 22,
-		"fields": {
-			"name": "high seven",
-			"tile_rank": 6,
-			"pair_rank": 5,
-			"tile_value": 7,
-			"sprite_left": 500,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 22,
+    "fields": {
+      "name": "high seven",
+      "tile_char": "j",
+      "tile_rank": 6,
+      "pair_rank": 5,
+      "tile_value": 7,
+      "sprite_left": 500,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 23,
-		"fields": {
-			"name": "low six",
-			"tile_rank": 5,
-			"pair_rank": 4,
-			"tile_value": 6,
-			"sprite_left": 300,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 23,
+    "fields": {
+      "name": "low six",
+      "tile_char": "K",
+      "tile_rank": 5,
+      "pair_rank": 4,
+      "tile_value": 6,
+      "sprite_left": 300,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 24,
-		"fields": {
-			"name": "low six",
-			"tile_rank": 5,
-			"pair_rank": 4,
-			"tile_value": 6,
-			"sprite_left": 300,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 24,
+    "fields": {
+      "name": "low six",
+      "tile_char": "k",
+      "tile_rank": 5,
+      "pair_rank": 4,
+      "tile_value": 6,
+      "sprite_left": 300,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 25,
-		"fields": {
-			"name": "mixed nine",
-			"tile_rank": 4,
-			"pair_rank": 3,
-			"tile_value": 9,
-			"sprite_left": 100,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 25,
+    "fields": {
+      "name": "mixed nine",
+      "tile_char": "L",
+      "tile_rank": 4,
+      "pair_rank": 3,
+      "tile_value": 9,
+      "sprite_left": 100,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 26,
-		"fields": {
-			"name": "mixed nine",
-			"tile_rank": 4,
-			"pair_rank": 3,
-			"tile_value": 9,
-			"sprite_left": 400,
-			"sprite_top": 0
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 26,
+    "fields": {
+      "name": "mixed nine",
+      "tile_char": "l",
+      "tile_rank": 4,
+      "pair_rank": 3,
+      "tile_value": 9,
+      "sprite_left": 400,
+      "sprite_top": 0
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 27,
-		"fields": {
-			"name": "mixed eight",
-			"tile_rank": 3,
-			"pair_rank": 2,
-			"tile_value": 8,
-			"sprite_left": 100,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 27,
+    "fields": {
+      "name": "mixed eight",
+      "tile_char": "M",
+      "tile_rank": 3,
+      "pair_rank": 2,
+      "tile_value": 8,
+      "sprite_left": 100,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 28,
-		"fields": {
-			"name": "mixed eight",
-			"tile_rank": 3,
-			"pair_rank": 2,
-			"tile_value": 8,
-			"sprite_left": 500,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 28,
+    "fields": {
+      "name": "mixed eight",
+      "tile_char": "m",
+      "tile_rank": 3,
+      "pair_rank": 2,
+      "tile_value": 8,
+      "sprite_left": 500,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 29,
-		"fields": {
-			"name": "mixed seven",
-			"tile_rank": 2,
-			"pair_rank": 1,
-			"tile_value": 7,
-			"sprite_left": 200,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 29,
+    "fields": {
+      "name": "mixed seven",
+      "tile_char": "N",
+      "tile_rank": 2,
+      "pair_rank": 1,
+      "tile_value": 7,
+      "sprite_left": 200,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 30,
-		"fields": {
-			"name": "mixed seven",
-			"tile_rank": 2,
-			"pair_rank": 1,
-			"tile_value": 7,
-			"sprite_left": 400,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 30,
+    "fields": {
+      "name": "mixed seven",
+      "tile_char": "n",
+      "tile_rank": 2,
+      "pair_rank": 1,
+      "tile_value": 7,
+      "sprite_left": 400,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 31,
-		"fields": {
-			"name": "mixed five",
-			"tile_rank": 1,
-			"pair_rank": 0,
-			"tile_value": 5,
-			"sprite_left": 300,
-			"sprite_top": 250
-		}
-	},
+  {
+    "model" : "paigow.pgtile",
+    "pk": 31,
+    "fields": {
+      "name": "mixed five",
+      "tile_char": "O",
+      "tile_rank": 1,
+      "pair_rank": 0,
+      "tile_value": 5,
+      "sprite_left": 300,
+      "sprite_top": 250
+    }
+  },
 
-	{
-		"model" : "paigow.pgtile",
-		"pk": 32,
-		"fields": {
-			"name": "mixed five",
-			"tile_rank": 1,
-			"pair_rank": 0,
-			"tile_value": 5,
-			"sprite_left": 400,
-			"sprite_top": 500
-		}
-	}
+  {
+    "model" : "paigow.pgtile",
+    "pk": 32,
+    "fields": {
+      "name": "mixed five",
+      "tile_char": "o",
+      "tile_rank": 1,
+      "pair_rank": 0,
+      "tile_value": 5,
+      "sprite_left": 400,
+      "sprite_top": 500
+    }
+  }
 ]
