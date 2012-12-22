@@ -207,16 +207,43 @@ def play_game( request, game_id, params = {} ):
   
   from models.pgtile import PGTile
   from pghand import PGHand
+  from paigow.models import PGPlayerInGame
   
-  if (not request.session.get('player_id', False)):
+  player_id = request.session.get('player_id', False) 
+  if ( not player_id ):
     return goto_home( request )
+  player = PGPlayer.objects.get( id = player_id )
   
   # get the game from the db
   game = PGGame.with_id( game_id )
   if ( not game ):
-    messages.add_message( request, messages.ERROR, "Cannot find that game, I'm sure it was around here somewhere!" )
+    messages.add_message( request, messages.ERROR, "WTF?  That game has disappeared into the ether (which doesn't exist)" )
     return goto_home( request )
+  
+  # set the score for the other player.
+  players_in_game = game.players()
+  
+  # make sure you're in the game: you can't look at other games.
+  print "Player: " + str(player)
+  print "Player: " + str(players_in_game)
+  if not ( player in players_in_game ):
+    messages.add_message( request, messages.ERROR, "I'm sorry, you are not allowed in that game, it's only for VIPs" )
+    return goto_home( request )
+  
+  you_in_game = PGPlayerInGame.objects.filter( game = game, player = player )
+
+  # set the game and score for you
   params['game'] = game
+  params['score_you'] = you_in_game[0].score
+  
+  # set up the opponent for the template
+  params['opponent'] = session_player( request ).opponents_for_game( game )[0]
+  
+  # get your opponent's score
+  other_player_in_game = PGPlayerInGame.objects.filter( game = game, player = params['opponent'] )
+  params['score_opponent'] = -1
+  if ( other_player_in_game[0] ):
+    params['score_opponent'] = other_player_in_game[0].score
   
   # deal if it's not already dealt
   if ( game.game_state == PGGame.ABOUT_TO_DEAL ):
@@ -225,9 +252,6 @@ def play_game( request, game_id, params = {} ):
   # create the hands for this player
   params['pgsets'] = game.sets_for_player( session_player( request ) )
   params['pgtile_size'] = "medium"
-  
-  # set up the opponent for the template
-  params['opponent'] = session_player( request ).opponents_for_game( game )[0]
   
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
