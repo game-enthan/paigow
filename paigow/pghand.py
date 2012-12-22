@@ -58,7 +58,12 @@ class PGHand:
     return self.high_tile.is_teen_or_day() and ( self.low_tile.tile_value == 7 )
   def numerical_value( self ):
     if ( self.low_tile.is_gee_joon_tile() ):
-      return "it's complicated"
+      num1 = (self.high_tile.tile_value + 3) % 10
+      num2 = (self.high_tile.tile_value + 6) % 10
+      if ( num1 > num2 ):
+        return num1
+      else:
+        return num2
     else:
       return ( self.high_tile.tile_value + self.low_tile.tile_value ) % 10
   

@@ -223,13 +223,20 @@
       } );
     }
 
+    //  We got a response from our request for the new values for our hands, called
+    //  by ajax in drop_tiles above.
     function set_hand_label( context, data, textStatus, jqXHR )
     {
+      //  The response is the two labels, with a vertical bar in between.
       var hands = data.split("|");
+
+      //  The context is the set div we were dragging in.
       var set_num = set_num_of_set( context );
-      var label_prefix = "pghand-labels-" + set_num + "-";
-      $("#" + label_prefix + "0").text( hands[0] );
-      $("#" + label_prefix + "1").text( hands[1] );
+
+      //  Get the labels for this div, and assign by index.
+      var labels = $(context).find(".pghand-labels");
+      $(labels[0]).text( hands[0] );
+      $(labels[1]).text( hands[1] );
     }
 
     //  Click the up or down button for a set
@@ -309,12 +316,6 @@
   <!-- Info about the game -->
   <p class="lead">{{ player }}&nbsp;&nbsp;&nbsp;<strong>10 - 6</strong>&nbsp;&nbsp;&nbsp;{{ game|opponent_for_game:player }}</p>
 
-  <!-- Commands in the game -->
-  <div class="btn-toolbar">
-    <button class="btn btn-small btn-primary" type="button">Update Display</button>
-    <button class="btn btn-small btn-primary" type="button">Hands are all set</button>
-  </div>
-  
   <!-- <br><br>
   <span id="debug">Replace with debug text</span> --?
   <br><br>

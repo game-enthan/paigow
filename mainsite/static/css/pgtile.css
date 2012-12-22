@@ -31,6 +31,8 @@
 
 .pghand-labels {
 	position: absolute;
+	font-weight: bold;
+	font-size: 18px;
 }
 
 .pghand-rotated {
@@ -143,7 +145,7 @@
 }
 
 .pghand-labels-medium {
-	top: 125px;
+	top: 130px;
 	width: 105px;
 	height: 34px;
 	text-align: center;
