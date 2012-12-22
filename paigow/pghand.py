@@ -35,6 +35,7 @@ class PGHand:
   def create( cls, tile1, tile2 ):
     return cls( tile1 = tile1, tile2 = tile2 )
   
+  # return the label for this hand
   def label( self ):
     if self.is_pair():
       return "pair" 

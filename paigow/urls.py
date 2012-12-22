@@ -21,6 +21,7 @@ urlpatterns = patterns('',
   url(r'^game/new$', 'paigow.views.new_game' ),
   url(r'^game/add$', 'paigow.views.add_game' ),
   url(r'^game/([0-9]+)$', 'paigow.views.play_game' ),
+  url(r'^hand/', 'paigow.views.hand_label' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',

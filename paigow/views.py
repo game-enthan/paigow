@@ -4,7 +4,10 @@ from django.shortcuts import render_to_response, redirect
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.template import RequestContext
+from django.http import HttpResponse
 
+from models.pgtile import PGTile
+from paigow.pghand import PGHand
 from models.pggame import PGGame
 from models.pgplayer import PGPlayer
 
@@ -229,3 +232,11 @@ def play_game( request, game_id, params = {} ):
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
 
+#-------------------------------------------------------------------
+# AJAX response for the label for a hand
+def hand_label( request, params = {} ):
+  pghand = PGHand.create( PGTile.objects.get( id = request.GET['tile0'] ), PGTile.objects.get( id = request.GET['tile1'] ) )
+  label = pghand.label()
+  pghand = PGHand.create( PGTile.objects.get( id = request.GET['tile2'] ), PGTile.objects.get( id = request.GET['tile3'] ) )
+  label = label + "|" + pghand.label()
+  return HttpResponse( label )

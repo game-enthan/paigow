@@ -15,12 +15,6 @@ from django.db import models
 #    class Meta:
 #      app_label = 'paigow'
 
-# TBD: these should be in some views class: model shouldn't
-# know about how big the images are.
-
-TILE_IMAGE_WIDTH = "100"
-TILE_IMAGE_HEIGHT = "250"
-
 # This represents one tile; this table never change and
 # is pre-populated with the standard Pai Gow deck.  Although
 # most of the fields could be computed at runtime from

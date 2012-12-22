@@ -17,22 +17,20 @@
     {
       var parent = $(pgset).parent();
       var jqsets = parent.find(".pgset");
-      return jqsets.index( pgset );
+      return jqsets.index( pgset ) + 1;   // 1-based
     }
 
     function jqset_of_num( set_num )
     {
       var jqdeal = $("#paigow321-deal");
       var jqsets = jqdeal.find(".pgset");
-      return $(jqsets[ set_num-1] );      // 1-based
+      return $(jqsets[ set_num-1 ] );      // 1-based
       //return $( "#" + set_id_of_num( set_num ) );
     }
 
     function jqset_of_tile( pgtile ) { return $(pgtile).parent(); }
 
     function set_num_of_tile( pgtile )  { return set_num_of_set( jqset_of_tile(pgtile)[0] ); }
-
-    //function set_num_of_set( pgset ) { return parseInt(pgset.id.substring(10, 11)); }      // "pgset-div-#'
 
     function tiles_of_jqset( jqset ) { return jqset.find('.pgtile-div'); }
 
@@ -208,6 +206,30 @@
       {
         jqmoved.insertBefore(tiles[orig_dest_index]);
       }
+
+      //  Time to update the labels: send a request to get the new values.
+      var new_tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
+      $.ajax( {
+        url: "/paigow/hand",
+        context: pgset,
+        data: {
+          tile0: new_tiles[0].getAttribute('tile_id'),
+          tile1: new_tiles[1].getAttribute('tile_id'),
+          tile2: new_tiles[2].getAttribute('tile_id'),
+          tile3: new_tiles[3].getAttribute('tile_id')
+        },
+        success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
+        error: function( data, textStatus, jqXHR ) { alert( "Returned error status " + textStatus ); }
+      } );
+    }
+
+    function set_hand_label( context, data, textStatus, jqXHR )
+    {
+      var hands = data.split("|");
+      var set_num = set_num_of_set( context );
+      var label_prefix = "pghand-labels-" + set_num + "-";
+      $("#" + label_prefix + "0").text( hands[0] );
+      $("#" + label_prefix + "1").text( hands[1] );
     }
 
     //  Click the up or down button for a set
