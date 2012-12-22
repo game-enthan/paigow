@@ -210,7 +210,7 @@
       //  Time to update the labels: send a request to get the new values.
       var new_tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
       $.ajax( {
-        url: "/paigow/hand",
+        url: "/paigow/hand/",
         context: pgset,
         data: {
             hand: new_tiles[0].getAttribute('tile_id') + 
