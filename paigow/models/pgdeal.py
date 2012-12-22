@@ -47,8 +47,7 @@ class PGDeal( models.Model ):
     from pgtile import PGTile
     deck_vals = ""
     for tile in tiles:
-      char = "0123456789ABCDEF"[tile.tile_rank]
-      deck_vals += char
+      deck_vals += tile.tile_char
     return cls( deck = deck_vals, game = game, deal_number = deal_number )
   
   
@@ -59,16 +58,8 @@ class PGDeal( models.Model ):
     if ( offset < 0 or offset > 31 ):
       return None
     
-    # get the char and we'll index it into tiles... but
-    # we want to decide if it's the first or second
-    tile_rank_char = self.deck[offset]
-    
-    # loop to check if it's the first or not    
-    offset_check = 0
-    is_first = (self.deck.index( tile_rank_char ) == offset)
-    
     # return the appropriate number
-    return PGTile.with_rank( int(str(tile_rank_char), 16), is_first )
+    return PGTile.with_char( self.deck[offset] )
 
 
 # ----------------------------------------------------
