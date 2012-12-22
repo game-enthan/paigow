@@ -137,12 +137,12 @@ class PGTile( models.Model ):
 from django.test import TestCase
 
 class PGTileTest(TestCase):
-
+  
   fixtures = [ 'pgtile.json', ]
-
+  
   def test_fixtures( self ):
     self.assertEquals( PGTile.objects.all().count(), 32 )
-
+  
   def test_shuffle( self ):
     shuffled_tiles = PGTile.get_shuffled_tiles();
     self.assertEqual( len( shuffled_tiles ), 32 );
@@ -170,7 +170,7 @@ class PGTileTest(TestCase):
     self.assertNotEqual( tile1, tile2 )
     tile2 = PGTile.with_rank( -1 )
     self.assertIsNone( tile2 )
-    
+  
   def test_with_name( self ):
     tile1 = PGTile.with_name( "mixed seven", True )
     self.assertIsNotNone( tile1 )
@@ -193,7 +193,7 @@ class PGTileTest(TestCase):
     self.assertTrue( tile.is_teen_or_day() )
     tile = PGTile.with_name( "day" )
     self.assertTrue( tile.is_teen_or_day() )
-  
+
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

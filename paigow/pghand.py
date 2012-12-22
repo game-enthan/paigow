@@ -38,7 +38,7 @@ class PGHand:
   # return the label for this hand
   def label( self ):
     if self.is_pair():
-      return "pair" 
+      return "" + self.high_tile.name + " bo"
     if self.is_wong():
       return "wong" 
     if self.is_gong():
@@ -88,6 +88,13 @@ class PGHandTest( TestCase ):
     hand2 = PGHand.create( low_four, gee_joon )
     self.assertEqual( hand2.low_tile, gee_joon )
     self.assertEqual( hand2.high_tile, low_four )
+  
+  def test_name( self ):
+    teen1 = PGTile.with_name( "teen", True )
+    teen2 = PGTile.with_name( "teen", False )
+    hand1 = PGHand.create( teen1, teen2 )
+    print hand1.label()
+    self.assertEqual( hand1.label(), "teen bo" )
 
 
 # run the test when invoked as a test (this is boilerplate
