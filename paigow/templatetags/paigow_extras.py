@@ -17,7 +17,24 @@ def opponent_for_game( value, arg, autoescape = None ):
   if ( opponents ):
     opponent = opponents[0]
     return mark_safe( opponent.name )
-  return "computer"
+  return "unknown"
+
+@register.filter(needs_autoescape=True)
+def state_for_player( value, arg, autoescape = None ):
+  player = arg
+  game = value
+  return game.state_for_player( player )
+
+@register.filter(needs_autoescape=True)
+def state_for_opponent( value, arg, autoescape = None ):
+  player = arg
+  game = value
+  opponents = player.opponents_for_game( game )
+  if ( opponents ):
+    opponent = opponents[0]
+    return game.state_for_player( opponent )
+  else:
+    return "unknown state"
 
 @register.inclusion_tag("pgtile.html", takes_context=True)
 def tile_image( context, tile, tile_size ):

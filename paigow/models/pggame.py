@@ -48,16 +48,20 @@ class PGGame( models.Model ):
   # Games can be in any of the following states ( the two-letter codes
   # are stored in the database, and the text descriptions are for viewing
   # the state on a website or app ).
-  ABOUT_TO_DEAL =   'BD'   # between deals in an unfinished game; the
-                           # game when created is this because it's about
-                           # to deal.
-  GAME_OVER =       'GO'   # the game is over
-  PLAYING =         'PL'   # the players are playing the deal
+  ABOUT_TO_DEAL =   'BD'    # between deals in an unfinished game; the
+                            # game when created is this because it's about
+                            # to deal.
+  SETTING_TILES =   'ST'    # the tiles have been dealt and at least one
+                            # player is still setting tiles
+  COMPARING_HANDS = 'CH'    # all players have set their tiles and are
+                            # looking at the results
+  GAME_OVER =       'GO'    # the game is over
   
   GAME_STATE_CHOICES = ( 
-    ( ABOUT_TO_DEAL, 'About to deal' ),
-    ( PLAYING,       'Playing the tiles' ),
-    ( GAME_OVER,     'Game over, dude' ),
+    ( ABOUT_TO_DEAL,    'About to deal' ),
+    ( SETTING_TILES,    'Setting tiles' ),
+    ( COMPARING_HANDS,  'Checking who has won and lost' ),
+    ( GAME_OVER,        'Game over, dude' ),
   )
   game_state = models.CharField(
     max_length = 2,
@@ -100,13 +104,13 @@ class PGGame( models.Model ):
     for pig in pigs:
       players.append( pig.player )
     return players
-
+  
   # Add a player to this game
   def add_player( self, player ):
     from pgplayer import PGPlayer
     from models import PGPlayerInGame
-    player = PGPlayerInGame.create( self, player )
-    player.save()
+    pig = PGPlayerInGame.create( self, player )
+    pig.save()
   
   # Get the deal given the deal number
   def deal( self, deal_number ):
@@ -118,12 +122,18 @@ class PGGame( models.Model ):
       return deals[0]
     else:
       return None
-    
+  
   # Get the current deal
   def current_deal( self ):
     return self.deal( self.current_deal_number )
-    
   
+  def player_in_game( self, player ):
+    from models import PGPlayerInGame
+    pigs = PGPlayerInGame.objects.filter( game = self, player = player )
+    if ( not pigs ):
+      return None
+    return pigs[0]
+    
   # shuffle the deck and save it as the current deal
   def deal_tiles( self ):
     
@@ -148,7 +158,8 @@ class PGGame( models.Model ):
   def sets_for_player( self, player ):
     
     from paigow.pgset import PGSet
-    
+    from models import PGPlayerInGame
+  
     players = self.players()
     
     # TBD: remove assumption that there are only two players.  This
@@ -170,10 +181,25 @@ class PGGame( models.Model ):
                         )
       sets.append( set )
       index += 8
-  
+    
+    # remember that this player asked for this deal
+    pig = PGPlayerInGame.objects.get( game = self, player = player )
+    pig.tiles_were_requested()
+    
     return sets
   
-  
+  def state_for_player( self, player ):
+    from models import PGPlayerInGame    
+    pig = self.player_in_game( player )
+    if ( not pig ):
+      return "twiddling thumbs"
+    if (pig.state() == PGPlayerInGame.NOT_READY):
+      return "not seated"
+    elif (pig.state() == PGPlayerInGame.SETTING_TILES):
+      return "setting tiles"
+    else:
+      return "finished setting tiles"
+
 # ----------------------------------------------------
 # Test PGGame class
 

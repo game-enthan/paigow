@@ -319,7 +319,7 @@
 
 {% block content %}
   <!-- Info about the game -->
-  <p class="lead">{{ player }}&nbsp;:&nbsp;&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;:&nbsp;&nbsp;{{ game|opponent_for_game:player }}</p>
+  <p class="lead">{{ player }}&nbsp;({{ game|state_for_player:player }})&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;{{ game|opponent_for_game:player }}&nbsp;({{ game|state_for_opponent:player }})</p>
 
   <!-- <br><br>
   <span id="debug">Replace with debug text</span> --?
