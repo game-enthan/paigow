@@ -202,7 +202,7 @@
       //  Time to update the labels: send a request to get the new values.
       var new_tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
       $.ajax( {
-        url: "/paigow/hand/",
+        url: "/paigow/data/hand/",
         context: pgset,
         data: {
             hand: new_tiles[0].getAttribute('tile_id') + 
@@ -211,7 +211,7 @@
                   new_tiles[3].getAttribute('tile_id')
         },
         success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
-        error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "???|???", "error", undefined ); }
+        error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "<error>|<errr>", "error", undefined ); }
       } );
     }
 
@@ -261,6 +261,35 @@
       }
     }
 
+    // Poll the server for the opponent's state
+    function get_opponent_state()
+    {
+      $.ajax( {
+        url: "/paigow/data/game/{{ game.id }}/opponent_state",
+        context: document.body,
+        success: function( data, textStatus, jqXHR ) { return set_opponent_state( this, data, textStatus, jqXHR ); },
+        error: function( data, textStatus, jqXHR ) { return set_opponent_state( this, "<error>|<error>", "error", undefined ); }
+      } );
+    }
+    
+    function set_opponent_state( context, data, textStatus, jqXHR )
+    {
+        //  The return value is the text that goes into the state.  If there
+        //  is some sort of error, show "<error>". We know it's the state because
+        //  it starts with "|".
+        if ( data[0] != '|' )
+        {
+          $("#opponent_state").text( "unknown" );
+        }
+        else
+        {
+          var state_array = data.split("|");
+          $("#opponent_state").text( state_array[1] );
+        }
+
+        //  Do it again in 5 seconds
+        setTimeout( get_opponent_state, 5000 );
+    }
   </script>
 {% endblock %}
 
@@ -294,6 +323,9 @@
     } );
 
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
+  
+  //  Start polling for the opponent state
+  get_opponent_state();
 
 {% endblock %}
 
@@ -301,7 +333,7 @@
 
 {% block content %}
   <!-- Info about the game -->
-  <p class="lead">{{ player }}&nbsp;({{ game|state_for_player:player }})&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;{{ game|opponent_for_game:player }}&nbsp;({{ game|state_for_opponent:player }})</p>
+  <p class="lead">{{ player }}&nbsp;({{ game|state_for_player:player }})&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;{{ game|opponent_for_game:player }}&nbsp;(<span id="opponent_state">{{ game|state_for_opponent:player }}</span>)</p>
 
   <!-- <br><br>
   <span id="debug">Replace with debug text</span> --?

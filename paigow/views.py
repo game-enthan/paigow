@@ -258,10 +258,23 @@ def play_game( request, game_id, params = {} ):
 
 #-------------------------------------------------------------------
 # AJAX response for the label for a hand
-def hand_label( request, params = {} ):
+def data_hand_label( request, params = {} ):
   hand_chars = request.GET['hand']
   pghand = PGHand.create( PGTile.objects.get( tile_char = hand_chars[0] ), PGTile.objects.get( tile_char = hand_chars[1] ) )
   label = pghand.label()
   pghand = PGHand.create( PGTile.objects.get( tile_char = hand_chars[2] ), PGTile.objects.get( tile_char = hand_chars[3] ) )
   label = label + "|" + pghand.label()
   return HttpResponse( label )
+
+#-------------------------------------------------------------------
+# AJAX response for the opponent state
+def data_opponent_state( request, game_id ):
+  game = PGGame.objects.get( id = game_id )
+  player = session_player( request )
+  opponents = player.opponents_for_game( game )
+  status = "|"
+  if ( opponents and opponents[0] ):
+    status += game.state_for_player( opponents[0] )
+  else:
+    status += "error"
+  return HttpResponse( status )
