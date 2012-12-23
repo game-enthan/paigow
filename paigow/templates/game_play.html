@@ -143,14 +143,6 @@
         return false;
       }
 
-      //  Re-arrange the tiles for the drop.
-
-      //  Get the number of the tile being dropped, in three loops:
-      //  1) calculate the new index for the div
-      //  2) reset the positions
-      //  3) reset the classes indicating tile number
-
-
       //  Calculate the new index for each of the four current tiles.
       new_indices = new Array(4);
       var i;
@@ -184,7 +176,7 @@
         new_indices[i] = new_index;
       }
 
-      //  Move the tiles
+      //  Move the tiles on the screen
       var tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
       for ( i = 0; i < 4; i++ )
       {
@@ -217,14 +209,9 @@
                   new_tiles[1].getAttribute('tile_id') + 
                   new_tiles[2].getAttribute('tile_id') + 
                   new_tiles[3].getAttribute('tile_id')
-                  
-//           tile0: new_tiles[0].getAttribute('tile_id'),
-//           tile1: new_tiles[1].getAttribute('tile_id'),
-//           tile2: new_tiles[2].getAttribute('tile_id'),
-//           tile3: new_tiles[3].getAttribute('tile_id')
         },
         success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
-        error: function( data, textStatus, jqXHR ) { alert( "Returned error status " + textStatus ); }
+        error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "???|???", "error", undefined ); }
       } );
     }
 
@@ -272,11 +259,6 @@
       {
         source.insertAfter(dest);
       }
-
-      //  Switch the two sets.
-      //  NO: do not do this: we use the set numbers to figure out the tiles in them in drop_tile
-      // change_class_and_id( source, set_class_of_num( source_set_num ), set_class_of_num( dest_set_num ), set_id_of_num( dest_set_num ) );
-      //change_class_and_id( dest, set_class_of_num( dest_set_num ), set_class_of_num( source_set_num ), set_id_of_num( source_set_num ) );
     }
 
   </script>
