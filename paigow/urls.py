@@ -26,11 +26,16 @@ urlpatterns = patterns('',
   # the labels for the two hands separated by vertical bar.
   url(r'^data/hand/', 'paigow.views.data_hand_label' ),
   
-  # given the game and the player, return the state of the
+  # given the game, return the state of the
   # opponent as a string that is shown, preceded by a
   # vertical bar (to distinguish from errors of some sort).
   # first param: game ID; player ID is in request session.
   url(r'^data/game/([0-9]+)/opponent_state/', 'paigow.views.data_opponent_state' ),
+  url(r'^data/game/([0-9]+)/player_state/', 'paigow.views.data_player_state' ),
+  
+  # given the game, mark the player as having set
+  # their hands and are ready to compare.
+  url(r'^data/game/([0-9]+)/hands_are_set', 'paigow.views.hands_are_set' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',

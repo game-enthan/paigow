@@ -278,3 +278,21 @@ def data_opponent_state( request, game_id ):
   else:
     status += "error"
   return HttpResponse( status )
+
+#-------------------------------------------------------------------
+# AJAX response for the opponent state
+def data_player_state( request, game_id ):
+  game = PGGame.objects.get( id = game_id )
+  player = session_player( request )
+  status = "|" + game.state_for_player( player )
+  return HttpResponse( status )
+
+#-------------------------------------------------------------------
+# AJAX response for setting the hands
+def hands_are_set( request, game_id ):
+  game = PGGame.objects.get( id = game_id )
+  player = session_player( request )
+  pig = game.player_in_game( player )
+  print "Calling player_is_ready for player " + str( player )
+  pig.player_is_ready( request.GET['hand1'], request.GET['hand2'], request.GET['hand3'] )
+  return HttpResponse( "OK" )

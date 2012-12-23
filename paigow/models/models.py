@@ -21,6 +21,10 @@ class PGPlayerInGame(models.Model):
   # make sure the DB table name is what we want
   class Meta:
     app_label = 'paigow'
+  
+  # What it prints out
+  def __unicode__( self ):
+    return "pig: " + str( self.player ) + " in " + str( self.game )
 
   # The 'through' fields, so we can find, from a game,
   # all the players in a game.
@@ -62,6 +66,7 @@ class PGPlayerInGame(models.Model):
   READY =           'RD'    # the player has set the tiles
   
   DEAL_STATE_CHOICES = ( 
+    ( NOT_READY,    'Not yet seated' ),
     ( SETTING_TILES,    'Setting tiles' ),
     ( READY,  'Tiles have been set' ),
   )
@@ -80,14 +85,25 @@ class PGPlayerInGame(models.Model):
   def state( self ):
     return self.deal_state
   
+  # player has been dealt sets, remember these when they set it
+  def set_dealt_sets( self, sets ):
+    self.hand1 = sets[0].tile_chars()
+    self.hand2 = sets[1].tile_chars()
+    self.hand3 = sets[2].tile_chars()
+    self.save()
+  
   def tiles_were_requested( self ):
     self.deal_state = PGPlayerInGame.SETTING_TILES
     self.save()
   
   def player_is_ready( self, hand1, hand2, hand3 ):
-    self.hand1 = hand1
-    self.hand2 = hand2
-    self.hand3 = hand3
+    from paigow.pgset import PGSet
+    if PGSet.create_with_tile_chars( self.hand1 ).can_be_rearranged_to( hand1 ):
+      self.hand1 = hand1
+    if PGSet.create_with_tile_chars( self.hand2 ).can_be_rearranged_to( hand2 ):
+      self.hand2 = hand2
+    if PGSet.create_with_tile_chars( self.hand3 ).can_be_rearranged_to( hand3 ):
+      self.hand3 = hand3
     self.deal_state = PGPlayerInGame.READY
     self.save() 
   

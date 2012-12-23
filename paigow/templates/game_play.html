@@ -42,7 +42,14 @@
 
     function set_class_of_num( set_num ) { return "pgset-{{ pgtile_size }}-" + set_num; }
 
-
+    function tile_chars_of_jqset( jqset ) {
+      var tiles = tiles_of_jqset( jqset );
+      return  "" +
+              tiles[0].getAttribute('tile_id') + 
+              tiles[1].getAttribute('tile_id') + 
+              tiles[2].getAttribute('tile_id') + 
+              tiles[3].getAttribute('tile_id');
+    }
 
     //  Switch class and ID convenience.
     function change_class_and_id( jqobj, old_class, new_class, new_id )
@@ -205,10 +212,7 @@
         url: "/paigow/data/hand/",
         context: pgset,
         data: {
-            hand: new_tiles[0].getAttribute('tile_id') + 
-                  new_tiles[1].getAttribute('tile_id') + 
-                  new_tiles[2].getAttribute('tile_id') + 
-                  new_tiles[3].getAttribute('tile_id')
+            hand: tile_chars_of_jqset( jqset_of_tile( pgtile ) )
         },
         success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
         error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "<error>|<errr>", "error", undefined ); }
@@ -264,32 +268,64 @@
     // Poll the server for the opponent's state
     function get_opponent_state()
     {
-      $.ajax( {
-        url: "/paigow/data/game/{{ game.id }}/opponent_state",
-        context: document.body,
-        success: function( data, textStatus, jqXHR ) { return set_opponent_state( this, data, textStatus, jqXHR ); },
-        error: function( data, textStatus, jqXHR ) { return set_opponent_state( this, "<error>|<error>", "error", undefined ); }
-      } );
+      get_xxx_state( "opponent", true )
     }
     
-    function set_opponent_state( context, data, textStatus, jqXHR )
+    // Ask the server for the player's state (we know it, but to have only one place
+    // where the strings are used, we have the server give it to us.
+    function get_player_state()
+    {
+      get_xxx_state( "player", false )
+    }
+
+    function get_xxx_state( label, keep_polling )
+    {
+      $.ajax( {
+        url: "/paigow/data/game/{{ game.id }}/" + label + "_state",
+        context: document.body,
+        success: function( data, textStatus, jqXHR ) { return set_opponent_state( this, data, textStatus, jqXHR, label, keep_polling ); },
+        error: function( data, textStatus, jqXHR ) { return set_opponent_state( this, "<error>|<error>", "error", undefined, label, keep_polling ); }
+      } );
+    }
+
+    function set_opponent_state( context, data, textStatus, jqXHR, label, poll_again )
     {
         //  The return value is the text that goes into the state.  If there
         //  is some sort of error, show "<error>". We know it's the state because
         //  it starts with "|".
-        if ( data[0] != '|' )
-        {
-          $("#opponent_state").text( "unknown" );
-        }
-        else
+        var state = "unknown"
+        if ( data[0] == '|' )
         {
           var state_array = data.split("|");
-          $("#opponent_state").text( state_array[1] );
+          state = state_array[1];
         }
+        $("#" + label + "_state").text( state );
 
         //  Do it again in 5 seconds
-        setTimeout( get_opponent_state, 5000 );
+        if ( poll_again )
+        {
+          setTimeout( get_opponent_state, 5000 );
+        }
     }
+    
+    function hands_are_set()
+    {
+      $.ajax( {
+        url: "/paigow/data/game/{{ game.id }}/hands_are_set",
+        context: document.body,
+        data: {
+            hand1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
+            hand2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
+            hand3: tile_chars_of_jqset( jqset_of_num( 3 ) )
+        },
+        //success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
+        //error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "<error>|<errr>", "error", undefined ); }
+      } );
+      
+      // Our state has changed.
+      get_player_state();
+    }
+
   </script>
 {% endblock %}
 
@@ -322,7 +358,11 @@
       disabled: true
     } );
 
+  // Make the switch buttons active
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
+  
+  // Make the "hands-are-set" button active
+  $("#hands-are-set").click( function( button ) { return hands_are_set( this ); } );
   
   //  Start polling for the opponent state
   get_opponent_state();
@@ -333,12 +373,15 @@
 
 {% block content %}
   <!-- Info about the game -->
-  <p class="lead">{{ player }}&nbsp;({{ game|state_for_player:player }})&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;{{ game|opponent_for_game:player }}&nbsp;(<span id="opponent_state">{{ game|state_for_opponent:player }}</span>)</p>
+  <p class="lead">{{ player }}&nbsp;(<span id="player_state">{{ game|state_for_player:player }}</span>)&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;{{ game|opponent_for_game:player }}&nbsp;(<span id="opponent_state">{{ game|state_for_opponent:player }}</span>)</p>
 
   <!-- <br><br>
-  <span id="debug">Replace with debug text</span> --?
-  <br><br>
+  <span id="debug">Replace with debug text</span> -->
+  <br>
   
+  <span id="hands-are-set"><button type="button" class="btn btn-primary">Hands are set, ready to rumble!</button></span>
+  <br><br>
+
   <!-- This div shows the 3-set deal -->
   <div id="paigow321-deal-container"  class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
     <div id="paigow321-deal" class="paigow321-deal paigow321-deal-{{ pgtile_size }}">

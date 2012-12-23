@@ -186,6 +186,11 @@ class PGGame( models.Model ):
     pig = PGPlayerInGame.objects.get( game = self, player = player )
     pig.tiles_were_requested()
     
+    # remember what hands were dealt; when it comes time for
+    # the player to say how they set, we want to verify that
+    # they didn't cheat ;)
+    pig.set_dealt_sets( sets )
+    
     return sets
   
   def state_for_player( self, player ):
