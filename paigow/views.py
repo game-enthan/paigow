@@ -11,13 +11,13 @@ from paigow.pghand import PGHand
 from models.pggame import PGGame
 from models.pgplayer import PGPlayer
 
-
+from paigow.session_utils import session_player
 
 
 #-------------------------------------------------------------------
 # convenience
 # return the PGPlayer with the current request session id
-def session_player( request ):
+def xsession_player( request ):
   if 'player_id' in request.session:
     return PGPlayer.with_id( request.session['player_id'] )
   else:
@@ -224,8 +224,6 @@ def play_game( request, game_id, params = {} ):
   players_in_game = game.players()
   
   # make sure you're in the game: you can't look at other games.
-  print "Player: " + str(player)
-  print "Player: " + str(players_in_game)
   if not ( player in players_in_game ):
     messages.add_message( request, messages.ERROR, "I'm sorry, you are not allowed in that game, it's only for VIPs" )
     return goto_home( request )
@@ -293,6 +291,5 @@ def hands_are_set( request, game_id ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
   pig = game.player_in_game( player )
-  print "Calling player_is_ready for player " + str( player )
   pig.player_is_ready( request.GET['hand1'], request.GET['hand2'], request.GET['hand3'] )
   return HttpResponse( "OK" )

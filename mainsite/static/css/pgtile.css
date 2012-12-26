@@ -5,7 +5,15 @@
 .pgtile {
   float:left;
   margin-right:5px;
+}
+
+.pgtile-player {
   background-image:url('/static/pgtiles.jpg');
+  src:url('/static/img_trans.gif');
+}
+
+.pgtile-opponent {
+  background-color:black;
   src:url('/static/img_trans.gif');
 }
 
@@ -13,6 +21,17 @@
 	position: absolute;
 	top: 0px;
 	z-index: 10;
+}
+
+.player-deal-label {
+  position: absolute;
+  top: 0px;
+  left: 25px;
+}
+
+.player-name {
+	font-weight: bold;
+	font-size: 18px;
 }
 
 .paigow321-deal {
@@ -110,6 +129,10 @@
 	height: 500px;
 }
 
+.player-deal-label-medium {
+  left: 45px;  /* pgtile-div-medium-0.left + pgset-medium.left */
+}
+
 .pgtile-div-medium-0 {
 	left: 25px;
 }
@@ -156,11 +179,6 @@
 }
 
 .pghand-labels-medium-1 {
-	left: 165px;
-}
-
-.xpghand-div-medium-1 {
-	position: absolute;
 	left: 165px;
 }
 

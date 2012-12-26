@@ -299,7 +299,7 @@
           var state_array = data.split("|");
           state = state_array[1];
         }
-        $("#" + label + "_state").text( state );
+        $("#state_" + label).text( state );
 
         //  Do it again in 5 seconds
         if ( poll_again )
@@ -334,13 +334,17 @@
   //  Fade the sets in, in order.  These set classes don't have sizes so we can use them as
   //  generic sets.  Note they are 1,2,3 rather than 0-based so the index is the same as
   //  the number of points assigned (for simplicity).
-  $("#pgset-div-1").fadeIn( 500);
-  $("#pgset-div-2").fadeIn(1000);
-  $("#pgset-div-3").fadeIn(1500);
+  $("#pgset-div-1-player").fadeIn( 500);
+  $("#pgset-div-2-player").fadeIn(1000);
+  $("#pgset-div-3-player").fadeIn(1500);
+  
+  $("#pgset-div-1-opponent").fadeIn(2000);
+  $("#pgset-div-2-opponent").fadeIn(1500);
+  $("#pgset-div-3-opponent").fadeIn(3000);
   
   //  The tiles are draggable
   //  TBD: put this in pgtile.html, how to do that while including it several times
-  $(".pgtile-div").draggable( {
+  $(".pgtile-div-player").draggable( {
       //helper: "clone",
       revert: "invalid",
       start: function( event, ui ) { drag_tile_start( this, event, ui ); },
@@ -350,13 +354,13 @@
   //  The divs holding the sets will be droppable, but only accept tiles.
   //  They are disabled until a tile is dragged, and only the appropriate
   //  set or sets are un-disabled.
-  $(".pgset").droppable( { 
+  $(".pgset-player").droppable( { 
       disabled: true
     } );
 
-  $(".paigow321-deal").droppable( {
-      disabled: true
-    } );
+  //$(".paigow321-deal").droppable( {
+  //    disabled: true
+  //  } );
 
   // Make the switch buttons active
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
@@ -372,9 +376,6 @@
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->
 
 {% block content %}
-  <!-- Info about the game -->
-  <p class="lead">{{ player }}&nbsp;(<span id="player_state">{{ game|state_for_player:player }}</span>)&nbsp;<strong>{{ score_you }} - {{ score_opponent }}</strong>&nbsp;{{ game|opponent_for_game:player }}&nbsp;(<span id="opponent_state">{{ game|state_for_opponent:player }}</span>)</p>
-
   <!-- <br><br>
   <span id="debug">Replace with debug text</span> -->
   <br>
@@ -382,14 +383,15 @@
   <span id="hands-are-set"><button type="button" class="btn btn-primary">Hands are set, ready to rumble!</button></span>
   <br><br>
 
-  <!-- This div shows the 3-set deal -->
-  <div id="paigow321-deal-container"  class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
-    <div id="paigow321-deal" class="paigow321-deal paigow321-deal-{{ pgtile_size }}">
-      <div id="pgset-div-1" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-1" style="display:none">{% show_pgset pgsets.0 "1" pgtile_size %}</div>
-      <div id="pgset-div-2" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2" style="display:none">{% show_pgset pgsets.1 "2" pgtile_size %}</div>
-      <div id="pgset-div-3" class="pgset pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3" style="display:none">{% show_pgset pgsets.2 "3" pgtile_size %}</div>
-    </div>
-    {% show_switch_button 1 pgtile_size %}
-    {% show_switch_button 2 pgtile_size %}
-  </div>
+  <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
+  <table>
+    <tr>
+        <td width="50%">
+          {% show_deal pgsets player %}
+        </td>
+        <td width="50%">
+          {% show_deal pgsets game|opponent_for_game:player %}
+        </td>
+    </tr>
+  </table>
 {% endblock %}

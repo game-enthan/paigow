@@ -1,0 +1,31 @@
+{% load paigow_extras %}
+<div id="paigow321-deal-container"  class="paigow321-deal paigow321-deal-{{ player_type }} paigow321-deal-{{ pgtile_size }}">
+<table>
+  <!-- TBD: skanky way to position the tiles below the names; this is not resizeable for small/medium/large. -->
+  <tr>
+    <td height="20px" valign="top">
+      <div style="position:relative">
+        <div class="player-deal-label player-deal-label-{{ pgtile_size }} player-name">{{ deal_owner.name }}</div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td height="14px" valign="top">
+      <div style="position:relative">
+        <div class="player-deal-label player-deal-label-{{ pgtile_size }}"><span id="state-{{ player_type }}">[ {{ player_state }} ]</span><div>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div id="paigow321-deal" class="paigow321-deal  paigow321-deal-{{ player_type }} paigow321-deal-{{ pgtile_size }}">
+        <div id="pgset-div-1-{{ player_type }}" class="pgset pgset-{{ player_type }} pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-1" style="display:none">{% show_pgset pgsets.0 "1" player_type %}</div>
+        <div id="pgset-div-2-{{ player_type }}" class="pgset pgset-{{ player_type }} pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-2" style="display:none">{% show_pgset pgsets.1 "2" player_type %}</div>
+        <div id="pgset-div-3-{{ player_type }}" class="pgset pgset-{{ player_type }} pgset-{{ pgtile_size }} pgset-{{ pgtile_size }}-3" style="display:none">{% show_pgset pgsets.2 "3" player_type %}</div>
+      </div>
+      {% show_switch_button 1 %}
+      {% show_switch_button 2 %}
+    </td>
+  </tr>
+</table>
+</div>
