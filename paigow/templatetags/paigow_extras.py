@@ -50,6 +50,7 @@ def show_deal( context, pgsets, deal_owner ):
   player = session_player( context['request'] )  
   if ( deal_owner != player ):
     player_type = "opponent"
+    context['is_opponent'] = True
   
   # this is the status of the player ("setting tiles" etc)
   context['player_state'] = context['game'].state_for_player( deal_owner )

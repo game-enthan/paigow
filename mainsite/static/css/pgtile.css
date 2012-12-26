@@ -48,6 +48,11 @@
 	cursor: pointer;
 }
 
+.pgset-action-button {
+	position: absolute;
+    cursor: pointer;
+}
+
 .pghand-labels {
 	position: absolute;
 	font-weight: bold;
@@ -133,6 +138,10 @@
   left: 45px;  /* pgtile-div-medium-0.left + pgset-medium.left */
 }
 
+.pgset-action-button-medium {
+	left: 220px;
+}
+
 .pgtile-div-medium-0 {
 	left: 25px;
 }
@@ -183,12 +192,13 @@
 }
 
 .pgset-button-switch-medium-1 {
-	top: 155px;
+	top: 205px;
 }
 
  .pgset-button-switch-medium-2 {
-	top: 345px;
+	top: 395px;
 }
+
 
 
 /* ------------------------ Small -----------------------	*/

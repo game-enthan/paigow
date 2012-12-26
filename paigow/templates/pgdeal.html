@@ -3,16 +3,19 @@
 <table>
   <!-- TBD: skanky way to position the tiles below the names; this is not resizeable for small/medium/large. -->
   <tr>
-    <td height="20px" valign="top">
+    <td height="20px" valign="top" align="right">
       <div style="position:relative">
         <div class="player-deal-label player-deal-label-{{ pgtile_size }} player-name">{{ deal_owner.name }}</div>
+        {% if not is_opponent %}
+          <div class="pgset-action-button pgset-action-button-{{ pgtile_size }}"><span id="hands-are-set"><button type="button" class="btn btn-mini btn-primary">Tiles are set</button></span></div>
+        {% endif %}
       </div>
     </td>
   </tr>
   <tr>
     <td height="14px" valign="top">
       <div style="position:relative">
-        <div class="player-deal-label player-deal-label-{{ pgtile_size }}"><span id="state-{{ player_type }}">[ {{ player_state }} ]</span><div>
+        <div class="player-deal-label player-deal-label-{{ pgtile_size }}">[ <span id="state_{{ player_type }}">{{ player_state }}</span> ]<div>
       </div>
     </td>
   </tr>

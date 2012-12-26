@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="{% static "css/pgtile.css" %}" />
 {% endblock %}
 
-{% block content_title %}<h1>{{ game.name }}</h1>{% endblock %}
+{% block content_title %}<p><span class="lead"><strong>{{ game.name }}</strong></span>{% endblock %}
 
 {% block header-javascript %}
   <script language="javascript">
@@ -377,12 +377,9 @@
 
 {% block content %}
   <!-- <br><br>
-  <span id="debug">Replace with debug text</span> -->
-  <br>
+  <span id="debug">Replace with debug text</span>
+  <br> -->
   
-  <span id="hands-are-set"><button type="button" class="btn btn-primary">Hands are set, ready to rumble!</button></span>
-  <br><br>
-
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
   <table>
     <tr>
@@ -394,4 +391,6 @@
         </td>
     </tr>
   </table>
+
+
 {% endblock %}
