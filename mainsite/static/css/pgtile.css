@@ -48,9 +48,15 @@
 	cursor: pointer;
 }
 
-.pgset-action-button {
+.pgset-action-buttons {
 	position: absolute;
-    cursor: pointer;
+    left: 20px;
+    width: 130px;
+    text-align: right;
+}
+
+.pgset-action-button {
+    width: 110px;
 }
 
 .pghand-labels {
@@ -135,11 +141,11 @@
 }
 
 .player-deal-label-medium {
-  left: 45px;  /* pgtile-div-medium-0.left + pgset-medium.left */
+  left: 45px;
 }
 
-.pgset-action-button-medium {
-	left: 220px;
+.pgset-action-buttons-medium {
+    top: 160px;
 }
 
 .pgtile-div-medium-0 {

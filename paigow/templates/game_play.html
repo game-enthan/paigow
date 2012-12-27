@@ -325,6 +325,23 @@
       // Our state has changed.
       get_player_state();
     }
+    
+    var current_player_state = "setting tiles";
+    function preview_hands()
+    {
+        if ( current_player_state == "setting tiles" )
+        {
+            $("#preview-hands-button").text( "Un-preview hands" );
+            current_player_state = "previewing hands";
+            $("#hands-are-set-button").removeClass("disabled");
+        }
+        else
+        {
+            $("#preview-hands-button").text( "Preview Hands" );
+            current_player_state = "setting tiles";
+            $("#hands-are-set-button").addClass("disabled");
+        }
+    }
 
   </script>
 {% endblock %}
@@ -368,6 +385,9 @@
   // Make the "hands-are-set" button active
   $("#hands-are-set").click( function( button ) { return hands_are_set( this ); } );
   
+  // Make the "hands-are-set" button active
+  $("#preview-hands-button").click( function( button ) { return preview_hands( this ); } );
+  
   //  Start polling for the opponent state
   get_opponent_state();
 
@@ -379,7 +399,14 @@
   <!-- <br><br>
   <span id="debug">Replace with debug text</span>
   <br> -->
-  
+
+  <!-- player action buttons, down along the left edge. -->
+          <div class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}">
+            <span id="preview-hands"><button id="preview-hands-button" type="button" class="btn btn-mini btn-primary pgset-action-button">Preview Hands</button></span>
+            <br><br>
+            <span id="hands-are-set"><button id="hands-are-set-button" type="button" class="btn btn-mini btn-primary pgset-action-button disabled">Tiles are set</button></span>
+          </div>
+
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
   <table>
     <tr>
