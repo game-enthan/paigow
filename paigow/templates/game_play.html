@@ -36,6 +36,8 @@
 
     function tile_num( pgtile ) { return tiles_of_jqset( jqset_of_tile(pgtile) ).index( pgtile ); }    // index in tile list
 
+    function jqtile_of_nums( set_num, tile_num ) { return $(tiles_of_jqset( jqset_of_num( set_num ) )[tile_num] ); }
+
     function set_id( pgtile) { return "pgset-div-" + set_num_of_tile( pgtile ); }
 
     function set_id_of_num( set_num ) { return "pgset-div-" + set_num; }
@@ -326,21 +328,80 @@
       get_player_state();
     }
     
+    function move_and_rotate_tile( jqtile, left_amt, top_amt, rotating )
+    {
+      jqtile.addClass("pgtile-ease-in-out");
+      if ( rotating )
+      {
+        jqtile.addClass("rotated");
+        jqtile.removeClass("unrotated");
+        jqtile.draggable( "disable" );
+      }
+      else
+      {
+        jqtile.addClass("unrotated");
+        jqtile.removeClass("rotated");
+        setTimeout( function() { finish_unpreview( jqtile ); }, 1500 );
+      }
+      jqtile.animate( { left: left_amt, top: top_amt } );
+    }
+    
+
+    function finish_unpreview( jqtile )
+    {
+        // If we had previewed, we had added this class an it effects
+        // the animate motion.  Make sure it's gone
+        jqtile.removeClass("pgtile-ease-in-out");
+        
+        // This class makes it un-draggable for some reason.  Remove
+        // it too.
+        jqtile.removeClass("unrotated");
+
+        // Enable dragging, now that the classes are set correctly.
+        jqtile.draggable( "enable" );
+    }
+
     var current_player_state = "setting tiles";
     function preview_hands()
     {
+      for ( var i = 1; i <= 3; i++ )
+        preview_hands_in_set( i );
+    
+      var new_text;
+
+      if ( current_player_state == "setting tiles" )
+      {
+        current_player_state = "previewing hands";
+        new_text = "Un-preview Hands";
+        $("#hands-are-set-button").removeClass("disabled");
+      }
+      else
+      {
+        new_text = "Preview Hands";
+        current_player_state = "setting tiles";
+        $("#hands-are-set-button").addClass("disabled");
+      }
+    
+      $("#preview-hands-button").text( new_text );
+    }
+    
+    function preview_hands_in_set( set_num )
+    {
+        var jqtile2 = jqtile_of_nums( set_num, 2 ); // $("#" + set_num + "_2_tile_div-player");
+        var jqtile3 = jqtile_of_nums( set_num, 3 ); // $("#" + set_num + "_3_tile_div-player");
+
         if ( current_player_state == "setting tiles" )
         {
-            $("#preview-hands-button").text( "Un-preview hands" );
-            current_player_state = "previewing hands";
-            $("#hands-are-set-button").removeClass("disabled");
+
+            move_and_rotate_tile( jqtile2, '+=20px', '-=25px', true );
+            move_and_rotate_tile( jqtile3, '-=35px', '+=30px', true );
         }
         else
         {
-            $("#preview-hands-button").text( "Preview Hands" );
-            current_player_state = "setting tiles";
-            $("#hands-are-set-button").addClass("disabled");
+            move_and_rotate_tile( jqtile2, '-=20px', '+=25px', false );
+            move_and_rotate_tile( jqtile3, '+=35px', '-=30px', false );
         }
+        
     }
 
   </script>
