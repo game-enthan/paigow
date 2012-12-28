@@ -347,12 +347,6 @@
         jqtile.removeClass("unrotated");
     }
 
-    function add_draggable( jqtile )
-    {
-        // Enable dragging, now that the classes are set correctly.
-        jqtile.draggable( "enable" );
-    }
-
     var current_player_state = "setting tiles";
     function preview_hands()
     {
@@ -412,6 +406,13 @@
       setTimeout( set_hands_for_preview2, 500 );
     }
 
+    function restore_draggable_to_tiles( jqtile )
+    {
+      for ( var s = 1; s <= 3; s++ )
+        for ( var t = 0; t < 4; t++ )
+          jqtile_of_nums( s, t ).draggable("enable");
+    }
+
     function set_hands_for_preview2()
     {
       for ( var i = 1; i <= 3; i++ )
@@ -430,6 +431,8 @@
         new_text = "Preview Hands";
         current_player_state = "setting tiles";
         $("#tiles-are-set-button").addClass("disabled");
+
+        setTimeout( restore_draggable_to_tiles, 1100 );
       }
     
       $("#preview-hands-button").text( new_text );
@@ -458,14 +461,13 @@
       // Make sure they are, or aren't, draggable.  If we're currently
       // setting the tiles, then we're moving to preview, and we need
       // to turn it off; otherwise we turn it on.
-      var needs_to_be_draggable = !(current_player_state == "setting tiles");
-      for ( var i = 0; i < 4; i++ )
+      if (current_player_state == "setting tiles")
       {
-        var jqtile = jqtile_of_nums( set_num, i );
-        if (needs_to_be_draggable)
-          setTimeout( function() { add_draggable( jqtile ); }, 1100 );
-        else
-          jqtile.draggable( "disable" );
+        for ( var i = 0; i < 4; i++ )
+        {
+          var jqtile = jqtile_of_nums( set_num, i );
+            jqtile.draggable( "disable" );
+        }
       }
 
       // Rotage the second two tiles as well.
