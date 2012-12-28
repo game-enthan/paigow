@@ -19,9 +19,39 @@ class PGSet:
   def __init__( self, tile_list ):
     self.tiles = tile_list
   
+  def __unicode__( self ):
+    return "Set: " + self.tile_chars()
+  
   # return the four-char string for the tiles
   def tile_chars( self ):
     return "" + self.tiles[0].char() + self.tiles[1].char() + self.tiles[2].char() + self.tiles[3].char()
+  
+  # the user has set the first and second tile to a specific hand, and the third and fourth.
+  # Keep the hands intact, but switch the hands and the tiles within them to the correct
+  # high/low hand, and within that the the high/low tile.
+  def tile_chars_for_set_hands( self ):
+    from paigow.pghand import PGHand
+    high_hand = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
+    low_hand = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
+    if ( low_hand > high_hand ):
+      high_hand, low_hand = low_hand, high_hand
+    tile1, tile2 = high_hand.high_tile.char(), high_hand.low_tile.char()
+    tile3, tile4 = low_hand.high_tile.char(), low_hand.low_tile.char()
+    return "" + tile1 + tile2 + tile3 + tile4
+  
+  # the user has set the first and second tile to a specific hand, and the third and fourth.
+  # Keep the hands intact, but switch the hands and the tiles within them to the correct
+  # high/low hand, and within that the the high/low tile.  Return the re-ordering from 
+  # zero to three.
+  def tile_ordering_for_set_hands( self ):
+    from paigow.pghand import PGHand
+    high_hand = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
+    low_hand = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
+    if ( low_hand > high_hand ):
+      high_hand, low_hand = low_hand, high_hand
+    tile0, tile1 = high_hand.high_tile, high_hand.low_tile
+    tile2, tile3 = low_hand.high_tile, low_hand.low_tile
+    return  str( self.tiles.index(tile0) ) + str( self.tiles.index(tile1) ) + str( self.tiles.index(tile2) ) + str( self.tiles.index(tile3) )
   
   # utility to sort the tiles alphabetically for comparison
   @classmethod

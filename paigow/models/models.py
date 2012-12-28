@@ -37,9 +37,9 @@ class PGPlayerInGame(models.Model):
   
   # If the player has set their tiles, these are the
   # hands they've set.
-  hand1 = models.CharField( max_length = 4 );
-  hand2 = models.CharField( max_length = 4 );
-  hand3 = models.CharField( max_length = 4 );
+  set1 = models.CharField( max_length = 4 );
+  set2 = models.CharField( max_length = 4 );
+  set3 = models.CharField( max_length = 4 );
   
   # allow creation with default fields
   @classmethod
@@ -48,9 +48,9 @@ class PGPlayerInGame(models.Model):
       game = game,
       player = player,
       deal_state = PGPlayerInGame.NOT_READY,
-      hand1 = "    ",
-      hand2 = "    ",
-      hand3 = "    ",
+      set1 = "    ",
+      set2 = "    ",
+      set3 = "    ",
       player_score = 0 )
 
   # The current state of this player in this particular deal.
@@ -87,23 +87,23 @@ class PGPlayerInGame(models.Model):
   
   # player has been dealt sets, remember these when they set it
   def set_dealt_sets( self, sets ):
-    self.hand1 = sets[0].tile_chars()
-    self.hand2 = sets[1].tile_chars()
-    self.hand3 = sets[2].tile_chars()
+    self.set1 = sets[0].tile_chars()
+    self.set2 = sets[1].tile_chars()
+    self.set3 = sets[2].tile_chars()
     self.save()
   
   def tiles_were_requested( self ):
     self.deal_state = PGPlayerInGame.SETTING_TILES
     self.save()
   
-  def player_is_ready( self, hand1, hand2, hand3 ):
+  def player_is_ready( self, set1, set2, set3 ):
     from paigow.pgset import PGSet
-    if PGSet.create_with_tile_chars( self.hand1 ).can_be_rearranged_to( hand1 ):
-      self.hand1 = hand1
-    if PGSet.create_with_tile_chars( self.hand2 ).can_be_rearranged_to( hand2 ):
-      self.hand2 = hand2
-    if PGSet.create_with_tile_chars( self.hand3 ).can_be_rearranged_to( hand3 ):
-      self.hand3 = hand3
+    if PGSet.create_with_tile_chars( self.set1 ).can_be_rearranged_to( set1 ):
+      self.set1 = set1
+    if PGSet.create_with_tile_chars( self.set2 ).can_be_rearranged_to( set2 ):
+      self.set2 = set2
+    if PGSet.create_with_tile_chars( self.set3 ).can_be_rearranged_to( set3 ):
+      self.set3 = set3
     self.deal_state = PGPlayerInGame.READY
-    self.save() 
-  
+    self.save()
+

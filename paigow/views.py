@@ -10,6 +10,7 @@ from models.pgtile import PGTile
 from paigow.pghand import PGHand
 from models.pggame import PGGame
 from models.pgplayer import PGPlayer
+from paigow.pgset import PGSet
 
 from paigow.session_utils import session_player
 
@@ -287,9 +288,18 @@ def data_player_state( request, game_id ):
 
 #-------------------------------------------------------------------
 # AJAX response for setting the hands
-def hands_are_set( request, game_id ):
+def tiles_are_set( request, game_id ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
   pig = game.player_in_game( player )
-  pig.player_is_ready( request.GET['hand1'], request.GET['hand2'], request.GET['hand3'] )
+  pig.player_is_ready( request.GET['set1'], request.GET['set2'], request.GET['set3'] )
+  print "tiles_are_set 5"
   return HttpResponse( "OK" )
+  
+#-------------------------------------------------------------------
+# AJAX response for previewing the set hands
+def preview_hands( request, game_id ):
+  new_set1 = PGSet.create_with_tile_chars( request.GET['set1'] ).tile_ordering_for_set_hands()
+  new_set2 = PGSet.create_with_tile_chars( request.GET['set2'] ).tile_ordering_for_set_hands()
+  new_set3 = PGSet.create_with_tile_chars( request.GET['set3'] ).tile_ordering_for_set_hands()
+  return HttpResponse( "|" + new_set1 + "|" + new_set2 + "|" + new_set3 + "|" )

@@ -310,21 +310,27 @@
         }
     }
     
-    function hands_are_set()
+    function tiles_are_set()
     {
+      // User has hit "Tiles are Set" so tell the server of our state.
       $.ajax( {
-        url: "/paigow/data/game/{{ game.id }}/hands_are_set",
+        url: "/paigow/data/game/{{ game.id }}/tiles_are_set",
         context: document.body,
         data: {
-            hand1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
-            hand2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
-            hand3: tile_chars_of_jqset( jqset_of_num( 3 ) )
+            set1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
+            set2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
+            set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
         },
-        //success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
+        success: function( data, textStatus, jqXHR ) { return tiles_are_set_success( this, data, textStatus, jqXHR ); },
         //error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "<error>|<errr>", "error", undefined ); }
       } );
-      
-      // Our state has changed.
+
+    }
+    
+    function tiles_are_set_success( context, data, textStatus, jqXHR )
+    {
+      // ajax call for setting tiles has returned so the server knows our state
+      // is new, so we can get it.
       get_player_state();
     }
     
@@ -364,44 +370,84 @@
     var current_player_state = "setting tiles";
     function preview_hands()
     {
+      if ( current_player_state == "setting tiles" )
+      {
+          $.ajax( {
+            url: "/paigow/data/game/{{ game.id }}/preview_hands",
+            context: document.body,
+            data: {
+                set1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
+                set2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
+                set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
+            },
+            success: function( data, textStatus, jqXHR ) { return set_hands_for_preview( this, data, textStatus, jqXHR ); },
+          } );
+      }
+      else
+      {
+        return set_hands_for_preview( undefined, undefined, undefined, undefined );
+      }
+    }
+    
+    function reorder_hands_in_set( set_num, reorder_str )
+    {
+      // alert( "set " + set_num + ": reorder: " + reorder_str );
+      var tiles = tiles_of_jqset( jqset_of_num( set_num ) );
+      for ( t = 0; t < 4; t++ )
+      {
+        // TBD: move the tiles to the right place.
+      }
+    }
+    
+    function set_hands_for_preview( context, data, textStatus, jqXRH )
+    {
+      if ( current_player_state == "setting tiles" )
+      {
+        // The return values show where the tiles should appear if the dealer
+        // turned over our set hands: high hand upright to the left, and
+        // low hand horizontal to the right.
+        var reorder_array = data.split("|");
+        for ( var r = 1; r <= 3; r++ )
+          reorder_hands_in_set( r, reorder_array[r] );
+      }
+
       for ( var i = 1; i <= 3; i++ )
         preview_hands_in_set( i );
-    
+      
       var new_text;
-
+      
       if ( current_player_state == "setting tiles" )
       {
         current_player_state = "previewing hands";
         new_text = "Un-preview Hands";
-        $("#hands-are-set-button").removeClass("disabled");
+        $("#tiles-are-set-button").removeClass("disabled");
       }
       else
       {
         new_text = "Preview Hands";
         current_player_state = "setting tiles";
-        $("#hands-are-set-button").addClass("disabled");
+        $("#tiles-are-set-button").addClass("disabled");
       }
     
       $("#preview-hands-button").text( new_text );
+
     }
     
     function preview_hands_in_set( set_num )
     {
-        var jqtile2 = jqtile_of_nums( set_num, 2 ); // $("#" + set_num + "_2_tile_div-player");
-        var jqtile3 = jqtile_of_nums( set_num, 3 ); // $("#" + set_num + "_3_tile_div-player");
+      var jqtile2 = jqtile_of_nums( set_num, 2 );
+      var jqtile3 = jqtile_of_nums( set_num, 3 );
 
-        if ( current_player_state == "setting tiles" )
-        {
-
-            move_and_rotate_tile( jqtile2, '+=20px', '-=25px', true );
-            move_and_rotate_tile( jqtile3, '-=35px', '+=30px', true );
-        }
-        else
-        {
-            move_and_rotate_tile( jqtile2, '-=20px', '+=25px', false );
-            move_and_rotate_tile( jqtile3, '+=35px', '-=30px', false );
-        }
-        
+      if ( current_player_state == "setting tiles" )
+      {
+        move_and_rotate_tile( jqtile2, '+=20px', '-=25px', true );
+        move_and_rotate_tile( jqtile3, '-=35px', '+=30px', true );
+      }
+      else
+      {
+        move_and_rotate_tile( jqtile2, '-=20px', '+=25px', false );
+        move_and_rotate_tile( jqtile3, '+=35px', '-=30px', false );
+      }
     }
 
   </script>
@@ -443,10 +489,10 @@
   // Make the switch buttons active
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
   
-  // Make the "hands-are-set" button active
-  $("#hands-are-set").click( function( button ) { return hands_are_set( this ); } );
+  // Make the "tiles-are-set" button active
+  $("#tiles-are-set").click( function( button ) { return tiles_are_set( this ); } );
   
-  // Make the "hands-are-set" button active
+  // Make the "tiles-are-set" button active
   $("#preview-hands-button").click( function( button ) { return preview_hands( this ); } );
   
   //  Start polling for the opponent state
@@ -465,7 +511,7 @@
           <div class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}">
             <span id="preview-hands"><button id="preview-hands-button" type="button" class="btn btn-mini btn-primary pgset-action-button">Preview Hands</button></span>
             <br><br>
-            <span id="hands-are-set"><button id="hands-are-set-button" type="button" class="btn btn-mini btn-primary pgset-action-button disabled">Tiles are set</button></span>
+            <span id="tiles-are-set"><button id="tiles-are-set-button" type="button" class="btn btn-mini btn-primary pgset-action-button disabled">Tiles are set</button></span>
           </div>
 
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->

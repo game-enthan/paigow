@@ -19,7 +19,7 @@ class PGHand:
   # so printout shows the hand.
   def __unicode__( self ):
     return str( self.high_tile ) + " / " + str( self.low_tile )
-
+ 
   # when given two tiles, make sure we put them in order.  This makes
   # later comparisons easy.
   def __init__(self, tile1, tile2 ):
@@ -34,6 +34,11 @@ class PGHand:
   @classmethod
   def create( cls, tile1, tile2 ):
     return cls( tile1 = tile1, tile2 = tile2 )
+  
+  # convenience method for creation
+  @classmethod
+  def create_with_tile_chars( cls, tile_char1, tile_char2 ):
+    return PGHand.create( PGTile.with_char( tile_char1), PGTile.with_char( tile_char2 ) )
   
   # return the label for this hand
   def label( self ):
@@ -67,6 +72,71 @@ class PGHand:
     else:
       return ( self.high_tile.tile_value + self.low_tile.tile_value ) % 10
   
+  # convenience for comparison so math operators work.  We'll start with
+  # __lt__ for less-than, and use that for all other comparisons.
+  def __lt__( self, other ):
+    
+    # check pairs...
+    if other.is_pair():
+      if not self.is_pair():
+        return True                                 # other is a pair, we are not
+      return other.high_tile < self.high_tile       # both pairs: higher tile wins
+    elif self.is_pair():
+      return False;                                 # we are pair, other is not
+    # neither is pair...
+    
+    # check wongs
+    if other.is_wong():
+      if not self.is_wong():
+        return True                                 # other is wong, we are not
+      return other.high_tile < self.high_tile       # both wongs, check high tile
+    elif self.is_wong():
+      return False                                 # we are wong, other is not
+    # neither is wong...
+    
+    # check gongs
+    if other.is_gong():
+      if not self.is_gong():
+        return True                                 # other is gong, we are not
+      return other.high_tile < self.high_tile       # both gong, check high tile
+    elif self.is_gong():
+      return False                                 # we are gong, other is not
+    # neither is wong...
+    
+    # check high nine
+    if other.is_high_nine():
+      if not self.is_high_nine():
+        return True                                 # other is wong, we are not
+      return other.high_tile < self.high_tile       # both wongs, check high tile
+    elif self.is_high_nine():
+      return False                                 # we are high nine, other is not
+    # neither is high nine
+    
+    # check value
+    if self.numerical_value() == other.numerical_value():
+      return self.high_tile < other.high_tile                  # same value, return tile comparison
+    else:
+      return self.numerical_value() < other.numerical_value()  # different values, compare values
+  
+  def __le__( self, other ):
+    return self < other or self == other
+    
+  def __eq__( self, other ):
+    if self < other:
+      return False                  # self is less than, can't be equal
+    elif other < self:
+      return False                  # other is less than self, can't be equal
+    return True                     # niether is less than the other, must be equal
+  
+  def __ne__( self, other ):
+    return not (self == other)
+  
+  def __ge__( self, other ):
+    return other < self or self == other
+  
+  def __gt__( self, other ):
+    return other < self
+
 # ----------------------------------------------------
 # Test PGHand class
 
@@ -95,6 +165,23 @@ class PGHandTest( TestCase ):
     hand1 = PGHand.create( teen1, teen2 )
     self.assertEqual( hand1.label(), "teen bo" )
 
+  def test_comparison( self ):
+    gee_joon = PGTile.with_name( "gee joon" )
+    low_four = PGTile.with_name( "low four" )
+    teen = PGTile.with_name( "teen" )
+    mixed_five = PGTile.with_name( "mixed five" )
+    day = PGTile.with_name( "day" )
+    hand1 = PGHand.create( gee_joon, low_four )
+    hand2 = PGHand.create( teen, mixed_five )
+    hand3 = PGHand.create( day, mixed_five )
+    hand4 = PGHand.create( teen, day )
+    self.assertTrue( hand2 > hand1 )
+    self.assertTrue( hand2 >= hand1 )
+    self.assertFalse( hand2 == hand1 )
+    self.assertFalse( hand2 < hand1 )
+    self.assertFalse( hand2 <= hand1 )
+    self.assertTrue( hand2 > hand3 )
+    self.assertTrue( hand2 > hand4 )
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

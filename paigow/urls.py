@@ -35,7 +35,14 @@ urlpatterns = patterns('',
   
   # given the game, mark the player as having set
   # their hands and are ready to compare.
-  url(r'^data/game/([0-9]+)/hands_are_set', 'paigow.views.hands_are_set' ),
+  url(r'^data/game/([0-9]+)/tiles_are_set', 'paigow.views.tiles_are_set' ),
+  
+  # the player has set their tiles and wants a preview
+  # of the hands.  This will return the three sets with
+  # the same hands, but switched if necessary to put the
+  # high-low in the right order, and within each hand, the
+  # tiles are switched if necessary to high-low.
+  url(r'^data/game/([0-9]+)/preview_hands', 'paigow.views.preview_hands' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',
