@@ -69,6 +69,15 @@
           drop: undefined
         } );
     }
+    
+    function lefts_of_jqset( jq_set )
+    {
+      var lefts = new Array(4);
+      var tiles = tiles_of_jqset( jq_set );
+      for ( var i = 0; i < 4; i++ )
+        lefts[i] = $(tiles[i]).offset().left;
+      return lefts;
+    }
 
     function drag_tile_start( pgtile, event, ui )
     {
@@ -85,14 +94,7 @@
       $(pgtile).css( "z-index", parseInt($(pgtile).css("z-index")) + 1 );
 
       //  Add to the droppable the data of the topleft of each of the tiles.
-      var lefts = new Array(4);
-      var tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
-      var i;
-      for ( i = 0; i < 4; i++ )
-      {
-        lefts[i] = $(tiles[i]).offset().left;
-      }
-      jq_set.data( "lefts", lefts );
+      jq_set.data( "lefts", lefts_of_jqset( jq_set ) );
     }
     
     function drag_tile_stop( pgtile, event, ui )
@@ -334,25 +336,6 @@
       get_player_state();
     }
     
-    function move_and_rotate_tile( jqtile, left_amt, top_amt, rotating )
-    {
-      jqtile.addClass("pgtile-ease-in-out");
-      if ( rotating )
-      {
-        jqtile.addClass("rotated");
-        jqtile.removeClass("unrotated");
-        jqtile.draggable( "disable" );
-      }
-      else
-      {
-        jqtile.addClass("unrotated");
-        jqtile.removeClass("rotated");
-        setTimeout( function() { finish_unpreview( jqtile ); }, 1500 );
-      }
-      jqtile.animate( { left: left_amt, top: top_amt } );
-    }
-    
-
     function finish_unpreview( jqtile )
     {
         // If we had previewed, we had added this class an it effects
@@ -362,7 +345,10 @@
         // This class makes it un-draggable for some reason.  Remove
         // it too.
         jqtile.removeClass("unrotated");
+    }
 
+    function add_draggable( jqtile )
+    {
         // Enable dragging, now that the classes are set correctly.
         jqtile.draggable( "enable" );
     }
@@ -389,14 +375,24 @@
       }
     }
     
+    function switch_tiles( jqset, tiles, index, lefts )
+    {
+        $(tiles[index]).animate( { left: "" + lefts[index+1] - jqset.offset().left + "px", top: "0px" } );
+        $(tiles[index+1]).animate( { left: "" + lefts[index] - jqset.offset().left + "px", top: "0px" } );
+        $(tiles[index]).insertAfter( $(tiles[index+1]) );
+    }
+    
     function reorder_hands_in_set( set_num, reorder_str )
     {
-      // alert( "set " + set_num + ": reorder: " + reorder_str );
-      var tiles = tiles_of_jqset( jqset_of_num( set_num ) );
-      for ( t = 0; t < 4; t++ )
-      {
-        // TBD: move the tiles to the right place.
-      }
+      var jqset = jqset_of_num( set_num );
+      var tiles = tiles_of_jqset( jqset );
+      var  lefts = lefts_of_jqset( jqset );
+
+      // We re-order the tiles in each hand, then re-order the hands.
+      if (reorder_str.indexOf('1') < reorder_str.indexOf('0'))
+        switch_tiles( jqset, tiles, 0, lefts );
+      if (reorder_str.indexOf('3') < reorder_str.indexOf('2'))
+        switch_tiles( jqset, tiles, 2, lefts );
     }
     
     function set_hands_for_preview( context, data, textStatus, jqXRH )
@@ -410,7 +406,14 @@
         for ( var r = 1; r <= 3; r++ )
           reorder_hands_in_set( r, reorder_array[r] );
       }
+      
+      // We need to reorder first then spin (something about animation
+      // and spinning doesn't match well)
+      setTimeout( set_hands_for_preview2, 500 );
+    }
 
+    function set_hands_for_preview2()
+    {
       for ( var i = 1; i <= 3; i++ )
         preview_hands_in_set( i );
       
@@ -433,20 +436,51 @@
 
     }
     
+    function rotate_for_preview( jqtile, left_amt, top_amt, rotating )
+    {
+      jqtile.addClass("pgtile-ease-in-out");
+      if ( rotating )
+      {
+        jqtile.addClass("rotated");
+        jqtile.removeClass("unrotated");
+      }
+      else
+      {
+        jqtile.addClass("unrotated");
+        jqtile.removeClass("rotated");
+        setTimeout( function() { finish_unpreview( jqtile ); }, 1000 );
+      }
+      jqtile.animate( { left: left_amt, top: top_amt } );
+    }
+    
     function preview_hands_in_set( set_num )
     {
+      // Make sure they are, or aren't, draggable.  If we're currently
+      // setting the tiles, then we're moving to preview, and we need
+      // to turn it off; otherwise we turn it on.
+      var needs_to_be_draggable = !(current_player_state == "setting tiles");
+      for ( var i = 0; i < 4; i++ )
+      {
+        var jqtile = jqtile_of_nums( set_num, i );
+        if (needs_to_be_draggable)
+          setTimeout( function() { add_draggable( jqtile ); }, 1100 );
+        else
+          jqtile.draggable( "disable" );
+      }
+
+      // Rotage the second two tiles as well.
       var jqtile2 = jqtile_of_nums( set_num, 2 );
       var jqtile3 = jqtile_of_nums( set_num, 3 );
 
       if ( current_player_state == "setting tiles" )
       {
-        move_and_rotate_tile( jqtile2, '+=20px', '-=25px', true );
-        move_and_rotate_tile( jqtile3, '-=35px', '+=30px', true );
+        rotate_for_preview( jqtile2, '+=20px', '-=25px', true );
+        rotate_for_preview( jqtile3, '-=35px', '+=30px', true );
       }
       else
       {
-        move_and_rotate_tile( jqtile2, '-=20px', '+=25px', false );
-        move_and_rotate_tile( jqtile3, '+=35px', '-=30px', false );
+        rotate_for_preview( jqtile2, '-=20px', '+=25px', false );
+        rotate_for_preview( jqtile3, '+=35px', '-=30px', false );
       }
     }
 
