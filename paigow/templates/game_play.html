@@ -261,6 +261,13 @@
       $(labels[1]).text( hands[1] );
     }
 
+    //  This is our state as per button-pushing, which may be a little ahead
+    // of what the server thinks (and may not agree if the server goes down).
+    var current_player_state = "setting tiles";
+
+    //  This is the server's idea of what our opponent's state is.
+    var current_opponent_state = "unknown";
+
     //  Click the up or down button for a set
     function switch_click( button )
     {
@@ -306,15 +313,29 @@
 
     function get_xxx_state( label, keep_polling )
     {
+      // If the game is revealed, no reason to poll.
+      if ( !check_game_state( false ) )
+        return;
+
       $.ajax( {
         url: "/paigow/data/game/{{ game.id }}/" + label + "_state",
         context: document.body,
-        success: function( data, textStatus, jqXHR ) { return set_player_state( this, data, textStatus, jqXHR, label, keep_polling ); },
-        error: function( data, textStatus, jqXHR ) { return set_player_state( this, "<error>|<error>", "error", undefined, label, keep_polling ); }
+        success: function( data, textStatus, jqXHR ) { return get_player_state_success( this, data, textStatus, jqXHR, label, keep_polling ); },
+        error: function( jqXHR, textStatus, errorThrown ) { return get_player_state_error( this, jqXHR, textStatus, errorThrown, label, keep_polling ); }
       } );
     }
+    
+    var g_reported_problem_synchronizing = false;
+    function get_player_state_error( context, jqXHR, textStatus, errorThrown, label, keep_polling )
+    {
+      if ( !g_reported_problem_synchronizing )
+      {
+        g_reported_problem_synchronizing = true;
+        alert( "There was a problem synchronzing with the server, the states of players are now unknown and the game cannot continue.\n\nRefreshing the browser may help." );
+      }
+    }
 
-    function set_player_state( context, data, textStatus, jqXHR, label, poll_again )
+    function get_player_state_success( context, data, textStatus, jqXHR, label, poll_again )
     {
       //  The return value is the text that goes into the state.  If there
       //  is some sort of error, show "<error>". We know it's the state because
@@ -326,24 +347,29 @@
         state = state_array[1];
       }
       $("#state_" + label).text( state );
-
-      //  Do it again in 5 seconds
-      if ( poll_again )
-      {
-        setTimeout( get_opponent_state, 5000 );
-      }
-
-      // If this is the opponent, some states will cause movement of some kind.
+      
+      // If this is the opponent and the returned state is that they finished setting the
+      // tiles, there is no need to keep polling... AND if we've already finished, time to
+      // do the reveal!
       if ( label == "opponent" )
-      {
-        if ( state == "finished setting tiles" )
-        {
-        }
-      }
+        current_opponent_state = state;
+      
+      // This returns false if it's time to reveal, so we don't have to keep polling.  We would
+      // catch this anyway when it's time to poll, but we can stop it here.
+      var still_waiting = check_game_state( true );
+
+      // Ask again in 5 seconds
+      if ( poll_again && still_waiting )
+        setTimeout( get_opponent_state, 5000 );
     }
     
     function tiles_are_set()
     {
+      // Once the tiles are set, you cannot go back because it will show your
+      // tiles to the other player if they're there.
+      $("#preview-hands-button").addClass("disabled");
+      $("#tiles-are-set-button").addClass("disabled");
+
       // User has hit "Tiles are Set" so tell the server of our state.
       $.ajax( {
         url: "/paigow/data/game/{{ game.id }}/tiles_are_set",
@@ -353,12 +379,26 @@
             set2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
             set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
         },
-        success: function( data, textStatus, jqXHR ) { return tiles_are_set_success( this, data, textStatus, jqXHR ); },
-        //error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "<error>|<errr>", "error", undefined ); }
+        success: function( data, textStatus, jqXHR ) { tiles_are_set_success( this, data, textStatus, jqXHR ); },
+        error: function( jqXHR, textStatus, errorThrown ) { tiles_are_set_error( this, errorThrown, textStatus, jqXHR ); }
       } );
 
+      current_player_state = "finished setting tiles";
+      
+      // Check to see if it's time to reveal.
+      check_game_state( true );
     }
-    
+
+    function tiles_are_set_error( context, errorThrown, textStatus, jqXHR )
+    {
+      var error_msg = "Error trying to tell the servers that the tiles are set."
+      if ( textStatus && textStatus != "" )
+        error_msg += "\n\nStatus: '" + textStatus + "'";
+      if ( errorThrown && errorThrown !="" )
+        error_msg += "\n\nHTTP error: '" + errorThrown + "'";
+      alert( error_msg );
+    }
+
     function tiles_are_set_success( context, data, textStatus, jqXHR )
     {
       // ajax call for setting tiles has returned so the server knows our state
@@ -366,7 +406,6 @@
       get_player_state();
     }
     
-    var current_player_state = "setting tiles";
     function preview_hands()
     {
       // We get clicks whether or not disabled since we're doing the button stuff
@@ -385,14 +424,13 @@
       if ( current_player_state == "setting tiles" )
       {
         url_cmd = "preview_hands";
-        success_val = function( data, textStatus, jqXHR ) { return set_all_tiles_for_preview( this, data, textStatus, jqXHR ); };
+        success_val = function( data, textStatus, jqXHR ) { set_all_tiles_for_preview( this, data, textStatus, jqXHR ); };
         data_val = {
                 set1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
                 set2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
                 set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
             };
       }
-      
       $.ajax( {
         url: "/paigow/data/game/{{ game.id }}/" + url_cmd,
         context: document.body,
@@ -400,6 +438,8 @@
         success: success_val
       } );
 
+      // If we're coming back from preview (or tile-setting), we don't re-arrange hands
+      // so we can start rotating now.
       if ( current_player_state != "setting tiles" )
       {
         // we are un-previewing: no need to move tiles around, just rotate the
@@ -409,6 +449,7 @@
           rotate_low_hands_for_preview( s );
       }
 
+      // Whatever we did, we have a new player state.
       setTimeout( get_player_state, 1000 );
     }
     
@@ -570,6 +611,28 @@
   
       // Now we want to move it to the right place
       jqtile.animate( { left: left_amt, top: top_amt } );
+    }
+    
+    //  Called in all the places were we either want just check for reveal, or actually
+    // do the reveal.  The parameter says which.  Return true if the game is still going
+    // on, false if it's time to reveal.
+    var g_already_revealed = false;
+    function check_game_state( reveal_if_ready )
+    {
+      //  Find out if someone is still setting tiles.  If they are, or we're just checking, return that state.
+      var someone_is_still_setting_tiles = ( current_player_state != "finished setting tiles" ) || ( current_opponent_state != "finished setting tiles" );
+      if ( someone_is_still_setting_tiles || !reveal_if_ready )
+        return someone_is_still_setting_tiles;
+      
+      // Time to reveal!  Make sure we only do it once (that should already be taken care of
+      // by our clients logic, but make sure.
+      if ( !g_already_revealed )
+      {
+        g_already_revealed = true;
+        alert( "time to rumble!" );
+      }
+
+      return someone_is_still_setting_tiles;
     }
 
   </script>
