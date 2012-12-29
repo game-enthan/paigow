@@ -23,7 +23,7 @@ class PGHand:
   # when given two tiles, make sure we put them in order.  This makes
   # later comparisons easy.
   def __init__(self, tile1, tile2 ):
-    if ( tile1 > tile2 ):
+    if ( tile1 >= tile2 ):
       self.high_tile = tile1
       self.low_tile = tile2
     else:

@@ -293,7 +293,6 @@ def tiles_are_set( request, game_id ):
   player = session_player( request )
   pig = game.player_in_game( player )
   pig.player_is_ready( request.GET['set1'], request.GET['set2'], request.GET['set3'] )
-  print "tiles_are_set 5"
   return HttpResponse( "OK" )
   
 #-------------------------------------------------------------------

@@ -51,7 +51,8 @@ class PGSet:
       high_hand, low_hand = low_hand, high_hand
     tile0, tile1 = high_hand.high_tile, high_hand.low_tile
     tile2, tile3 = low_hand.high_tile, low_hand.low_tile
-    return  str( self.tiles.index(tile0) ) + str( self.tiles.index(tile1) ) + str( self.tiles.index(tile2) ) + str( self.tiles.index(tile3) )
+    ordering_str = str( self.tiles.index(tile0) ) + str( self.tiles.index(tile1) ) + str( self.tiles.index(tile2) ) + str( self.tiles.index(tile3) )
+    return ordering_str
   
   # utility to sort the tiles alphabetically for comparison
   @classmethod

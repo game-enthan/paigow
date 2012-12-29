@@ -341,17 +341,6 @@
       get_player_state();
     }
     
-    function finish_unpreview( jqtile )
-    {
-        // If we had previewed, we had added this class an it effects
-        // the animate motion.  Make sure it's gone
-        jqtile.removeClass("pgtile-ease-in-out");
-        
-        // This class makes it un-draggable for some reason.  Remove
-        // it too.
-        jqtile.removeClass("unrotated");
-    }
-
     var current_player_state = "setting tiles";
     function preview_hands()
     {
@@ -365,15 +354,20 @@
                 set2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
                 set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
             },
-            success: function( data, textStatus, jqXHR ) { return set_hands_for_preview( this, data, textStatus, jqXHR ); },
+            success: function( data, textStatus, jqXHR ) { return set_all_tiles_for_preview( this, data, textStatus, jqXHR ); },
           } );
       }
       else
       {
-        return set_hands_for_preview( undefined, undefined, undefined, undefined );
+        // we are un-previewing: no need to move tiles around, just rotate the
+        // low hands back (the global current_player_state tells this function
+        // how it should rotate).
+        for ( var s = 1; s <= 3; s++ )
+          rotate_low_hands_for_preview( s );
       }
     }
     
+    //  Switch two tiles' positions, animating it.
     function switch_tiles( jqset, index_src, index_dst, lefts )
     {
         var tiles = tiles_of_jqset( jqset )
@@ -388,31 +382,7 @@
         }
     }
     
-    function reorder_hands_in_set( set_num, reorder_str )
-    {
-      var jqset = jqset_of_num( set_num );
-      var tiles = tiles_of_jqset( jqset );
-      var  lefts = lefts_of_jqset( jqset );
-
-      // We re-order the tiles in each hand first; we can tell
-      // if we need to reorder by the relative location of the index
-      // returned by the server.
-      if (reorder_str.indexOf('1') < reorder_str.indexOf('0'))
-        switch_tiles( jqset, 0, 1, lefts );
-      if (reorder_str.indexOf('3') < reorder_str.indexOf('2'))
-        switch_tiles( jqset, 2, 3, lefts );
-    
-      // Now re-order the hands.
-      if (reorder_str.indexOf('3') < reorder_str.indexOf('0'))
-      {
-        switch_tiles( jqset, 0, 2, lefts );
-        switch_tiles( jqset, 1, 3, lefts );
-        update_hand_labels( jqset );
-      }
-      
-    }
-    
-    function set_hands_for_preview( context, data, textStatus, jqXRH )
+    function set_all_tiles_for_preview( context, data, textStatus, jqXRH )
     {
       if ( current_player_state == "setting tiles" )
       {
@@ -421,25 +391,53 @@
         // low hand horizontal to the right.
         var reorder_array = data.split("|");
         for ( var r = 1; r <= 3; r++ )
-          reorder_hands_in_set( r, reorder_array[r] );
+          reorder_tiles_in_hands( r, reorder_array[r] );
+      }
+    }
+
+    function reorder_tiles_in_hands( set_num, reorder_str )
+    {
+      var jqset = jqset_of_num( set_num );
+      var lefts = lefts_of_jqset( jqset );
+
+      // We re-order the tiles in each hand first; we can tell
+      // if we need to reorder by the relative location of the index
+      // returned by the server.
+      if (reorder_str.indexOf('1') < reorder_str.indexOf('0'))
+        switch_tiles( jqset, 0, 1, lefts );
+      if (reorder_str.indexOf('3') < reorder_str.indexOf('2'))
+        switch_tiles( jqset, 2, 3, lefts );
+
+      // Something about simultaneous animation of the same tiles
+      // doesn't work.  The default duration is 400 ms, so wait
+      // 500 msec and then reorder the hands if necessary.
+      setTimeout( function() { reorder_hands_in_set( set_num, reorder_str ); }, 500 );
+    }
+
+    function reorder_hands_in_set( set_num, reorder_str )
+    {
+      var jqset = jqset_of_num( set_num );
+      var lefts = lefts_of_jqset( jqset );
+
+      // Now re-order the hands.
+      if (reorder_str.indexOf('3') < reorder_str.indexOf('0'))
+      {
+        switch_tiles( jqset, 0, 2, lefts );
+        switch_tiles( jqset, 1, 3, lefts );
+        update_hand_labels( jqset );
       }
       
-      // We need to reorder first then spin (something about animation
-      // and spinning doesn't match well)
-      setTimeout( set_hands_for_preview2, 500 );
+      // After the reordering, we'll rotate.
+      setTimeout( function() { rotate_low_hands_for_preview( set_num ) }, 500 );
     }
-
+    
     function restore_draggable_to_tiles( jqtile )
     {
-      for ( var s = 1; s <= 3; s++ )
-        for ( var t = 0; t < 4; t++ )
-          jqtile_of_nums( s, t ).draggable("enable");
+       $(".pgtile-div-player").each( function() { $(this).draggable( "enable" ) } );
     }
 
-    function set_hands_for_preview2()
+    function set_new_preview_state()
     {
-      for ( var i = 1; i <= 3; i++ )
-        preview_hands_in_set( i );
       
       var new_text;
       
@@ -448,6 +446,10 @@
         current_player_state = "previewing hands";
         new_text = "Un-preview Hands";
         $("#tiles-are-set-button").removeClass("disabled");
+
+        // Make sure all tile are no longer draggable; this will be
+        // restored if the user un-previews
+        $(".pgtile-div-player").each( function() { $(this).draggable( "disable" ) } );
       }
       else
       {
@@ -455,44 +457,26 @@
         current_player_state = "setting tiles";
         $("#tiles-are-set-button").addClass("disabled");
 
-        setTimeout( restore_draggable_to_tiles, 1100 );
+        setTimeout( restore_draggable_to_tiles, 1000 );
       }
     
       $("#preview-hands-button").text( new_text );
 
     }
     
-    function rotate_for_preview( jqtile, left_amt, top_amt, rotating )
+    function rotate_low_hands_for_preview( set_num )
     {
-      jqtile.addClass("pgtile-ease-in-out");
-      if ( rotating )
-      {
-        jqtile.addClass("rotated");
-        jqtile.removeClass("unrotated");
-      }
-      else
-      {
-        jqtile.addClass("unrotated");
-        jqtile.removeClass("rotated");
-        setTimeout( function() { finish_unpreview( jqtile ); }, 1000 );
-      }
-      jqtile.animate( { left: left_amt, top: top_amt } );
-    }
-    
-    function preview_hands_in_set( set_num )
-    {
-      // Make sure they are, or aren't, draggable.  If we're currently
-      // setting the tiles, then we're moving to preview, and we need
-      // to turn it off; otherwise we turn it on.
-      if (current_player_state == "setting tiles")
-      {
-        for ( var i = 0; i < 4; i++ )
-        {
-          var jqtile = jqtile_of_nums( set_num, i );
-            jqtile.draggable( "disable" );
-        }
-      }
+      rotate_low_hand_in_set( set_num );
 
+      // finish it all up... this is skanky.  After the third set,
+      // we have to restore draggable or whatever needs to be done
+      // after all the animation.
+      if ( set_num == 3 )
+        set_new_preview_state();
+    }
+
+    function rotate_low_hand_in_set( set_num )
+    {
       // Rotage the second two tiles as well.
       var jqtile2 = jqtile_of_nums( set_num, 2 );
       var jqtile3 = jqtile_of_nums( set_num, 3 );
@@ -507,6 +491,39 @@
         rotate_for_preview( jqtile2, '-=20px', '+=25px', false );
         rotate_for_preview( jqtile3, '+=35px', '-=30px', false );
       }
+    }
+
+    function rotate_for_preview( jqtile, left_amt, top_amt, rotating )
+    {
+      jqtile.addClass("pgtile-ease-in-out");
+      if ( rotating )
+      {
+        jqtile.addClass("rotated");
+        jqtile.removeClass("unrotated");
+      }
+      else
+      {
+        jqtile.addClass("unrotated");
+        jqtile.removeClass("rotated");
+      }
+
+      //  We have to wait until the rotation is finished before moving it,
+      // or they'll interfere with each other.
+      setTimeout( function() { finish_unpreview( jqtile, left_amt, top_amt, rotating ); }, 500 );
+    }
+    
+    function finish_unpreview( jqtile, left_amt, top_amt, rotating )
+    {
+      // If we had previewed, we had added this class an it effects
+      // the animate motion.  Make sure it's gone
+      jqtile.removeClass("pgtile-ease-in-out");
+      
+      // This class makes it un-draggable for some reason.  Remove it too.
+      if (!rotating)
+        jqtile.removeClass("unrotated");
+  
+      // Now we want to move it to the right place
+      jqtile.animate( { left: left_amt, top: top_amt } );
     }
 
   </script>
