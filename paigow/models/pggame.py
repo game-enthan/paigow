@@ -202,6 +202,8 @@ class PGGame( models.Model ):
       return "not seated"
     elif (pig.state() == PGPlayerInGame.SETTING_TILES):
       return "setting tiles"
+    elif (pig.state() == PGPlayerInGame.PREVIEW_HANDS):
+      return "previewing hands"
     else:
       return "finished setting tiles"
 

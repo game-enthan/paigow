@@ -301,4 +301,18 @@ def preview_hands( request, game_id ):
   new_set1 = PGSet.create_with_tile_chars( request.GET['set1'] ).tile_ordering_for_set_hands()
   new_set2 = PGSet.create_with_tile_chars( request.GET['set2'] ).tile_ordering_for_set_hands()
   new_set3 = PGSet.create_with_tile_chars( request.GET['set3'] ).tile_ordering_for_set_hands()
+  game = PGGame.objects.get( id = game_id )
+  player = session_player( request )
+  pig = game.player_in_game( player )
+  pig.player_is_previewing_hands()
   return HttpResponse( "|" + new_set1 + "|" + new_set2 + "|" + new_set3 + "|" )
+
+#-------------------------------------------------------------------
+# AJAX response for previewing the set hands
+def unpreview_hands( request, game_id ):
+  game = PGGame.objects.get( id = game_id )
+  player = session_player( request )
+  pig = game.player_in_game( player )
+  pig.player_has_unpreviewed_hands()
+  return HttpResponse( "OK" )
+

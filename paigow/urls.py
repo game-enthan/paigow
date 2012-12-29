@@ -43,6 +43,7 @@ urlpatterns = patterns('',
   # high-low in the right order, and within each hand, the
   # tiles are switched if necessary to high-low.
   url(r'^data/game/([0-9]+)/preview_hands', 'paigow.views.preview_hands' ),
+  url(r'^data/game/([0-9]+)/unpreview_hands', 'paigow.views.unpreview_hands' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',

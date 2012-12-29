@@ -63,11 +63,13 @@ class PGPlayerInGame(models.Model):
                             # for this game, from this player, has
                             # not yet been made).
   SETTING_TILES =   'ST'    # the player is still setting tile
+  PREVIEW_HANDS =   'PH'    # the player is previewing his hands
   READY =           'RD'    # the player has set the tiles
   
   DEAL_STATE_CHOICES = ( 
     ( NOT_READY,    'Not yet seated' ),
     ( SETTING_TILES,    'Setting tiles' ),
+    ( PREVIEW_HANDS,    'Previwing hands' ),
     ( READY,  'Tiles have been set' ),
   )
   deal_state = models.CharField(
@@ -92,6 +94,14 @@ class PGPlayerInGame(models.Model):
     self.set3 = sets[2].tile_chars()
     self.save()
   
+  def player_is_previewing_hands( self ):
+    self.deal_state = PGPlayerInGame.PREVIEW_HANDS
+    self.save()
+    
+  def player_has_unpreviewed_hands( self ):
+    self.deal_state = PGPlayerInGame.SETTING_TILES
+    self.save()
+    
   def tiles_were_requested( self ):
     self.deal_state = PGPlayerInGame.SETTING_TILES
     self.save()

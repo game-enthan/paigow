@@ -17,12 +17,21 @@
     {
       var parent = $(pgset).parent();
       var jqsets = parent.find(".pgset");
-      return jqsets.index( pgset ) + 1;   // 1-based
+      var set_num = jqsets.index( pgset ) + 1;   // 1-based
+      if ( /opponent/.test(pgset.id) )
+        set_num += 3;
+      return set_num;
     }
 
     function jqset_of_num( set_num )
     {
-      var jqdeal = $("#paigow321-deal");
+      var player_type = "player";
+      if ( set_num > 3 )
+      {
+        set_num -= 3;
+        player_type = "opponent";
+      }
+      var jqdeal = $("#paigow321-deal-" + player_type);
       var jqsets = jqdeal.find(".pgset");
       return $(jqsets[ set_num-1 ] );      // 1-based
       //return $( "#" + set_id_of_num( set_num ) );
@@ -38,9 +47,17 @@
 
     function jqtile_of_nums( set_num, tile_num ) { return $(tiles_of_jqset( jqset_of_num( set_num ) )[tile_num] ); }
 
-    function set_id( pgtile) { return "pgset-div-" + set_num_of_tile( pgtile ); }
+    function set_id( pgtile ) { set_id_of_num( set_num_of_tile( pgtile ) ); }
 
-    function set_id_of_num( set_num ) { return "pgset-div-" + set_num; }
+    function set_id_of_num( set_num )
+    {
+      var ret_id = "pgset-div-";
+      if ( set_num <= 3 )
+        ret_id = ret_id + set_num + "-player";
+      else
+        ret_id = ret_id + (set_num - 3) + "-opponent";
+      return  ret_id;
+    }
 
     function set_class_of_num( set_num ) { return "pgset-{{ pgtile_size }}-" + set_num; }
 
@@ -292,29 +309,37 @@
       $.ajax( {
         url: "/paigow/data/game/{{ game.id }}/" + label + "_state",
         context: document.body,
-        success: function( data, textStatus, jqXHR ) { return set_opponent_state( this, data, textStatus, jqXHR, label, keep_polling ); },
-        error: function( data, textStatus, jqXHR ) { return set_opponent_state( this, "<error>|<error>", "error", undefined, label, keep_polling ); }
+        success: function( data, textStatus, jqXHR ) { return set_player_state( this, data, textStatus, jqXHR, label, keep_polling ); },
+        error: function( data, textStatus, jqXHR ) { return set_player_state( this, "<error>|<error>", "error", undefined, label, keep_polling ); }
       } );
     }
 
-    function set_opponent_state( context, data, textStatus, jqXHR, label, poll_again )
+    function set_player_state( context, data, textStatus, jqXHR, label, poll_again )
     {
-        //  The return value is the text that goes into the state.  If there
-        //  is some sort of error, show "<error>". We know it's the state because
-        //  it starts with "|".
-        var state = "unknown"
-        if ( data[0] == '|' )
-        {
-          var state_array = data.split("|");
-          state = state_array[1];
-        }
-        $("#state_" + label).text( state );
+      //  The return value is the text that goes into the state.  If there
+      //  is some sort of error, show "<error>". We know it's the state because
+      //  it starts with "|".
+      var state = "unknown"
+      if ( data[0] == '|' )
+      {
+        var state_array = data.split("|");
+        state = state_array[1];
+      }
+      $("#state_" + label).text( state );
 
-        //  Do it again in 5 seconds
-        if ( poll_again )
+      //  Do it again in 5 seconds
+      if ( poll_again )
+      {
+        setTimeout( get_opponent_state, 5000 );
+      }
+
+      // If this is the opponent, some states will cause movement of some kind.
+      if ( label == "opponent" )
+      {
+        if ( state == "finished setting tiles" )
         {
-          setTimeout( get_opponent_state, 5000 );
         }
+      }
     }
     
     function tiles_are_set()
@@ -344,20 +369,38 @@
     var current_player_state = "setting tiles";
     function preview_hands()
     {
+      // We get clicks whether or not disabled since we're doing the button stuff
+      // manually.  Ignore clicks while we're disabled.  Then don't allow us to
+      // be clicked in the middle, because it screws up the animation.  When all
+      // the movement is done, we'll be re-enabled.
+      if ( $("#preview-hands-button").hasClass("disabled") )
+        return;
+      $("#preview-hands-button").addClass("disabled");
+
+      // Tell the server of our new state so the opponent can see it.  In the case
+      // that we're previewing, we'll want a return function.
+      var url_cmd = "unpreview_hands";
+      var success_val = undefined;
+      var data_val = undefined;
       if ( current_player_state == "setting tiles" )
       {
-          $.ajax( {
-            url: "/paigow/data/game/{{ game.id }}/preview_hands",
-            context: document.body,
-            data: {
+        url_cmd = "preview_hands";
+        success_val = function( data, textStatus, jqXHR ) { return set_all_tiles_for_preview( this, data, textStatus, jqXHR ); };
+        data_val = {
                 set1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
                 set2: tile_chars_of_jqset( jqset_of_num( 2 ) ),
                 set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
-            },
-            success: function( data, textStatus, jqXHR ) { return set_all_tiles_for_preview( this, data, textStatus, jqXHR ); },
-          } );
+            };
       }
-      else
+      
+      $.ajax( {
+        url: "/paigow/data/game/{{ game.id }}/" + url_cmd,
+        context: document.body,
+        data: data_val,
+        success: success_val
+      } );
+
+      if ( current_player_state != "setting tiles" )
       {
         // we are un-previewing: no need to move tiles around, just rotate the
         // low hands back (the global current_player_state tells this function
@@ -365,6 +408,8 @@
         for ( var s = 1; s <= 3; s++ )
           rotate_low_hands_for_preview( s );
       }
+
+      setTimeout( get_player_state, 1000 );
     }
     
     //  Switch two tiles' positions, animating it.
@@ -461,6 +506,7 @@
       }
     
       $("#preview-hands-button").text( new_text );
+      $("#preview-hands-button").removeClass("disabled");
 
     }
     
@@ -472,7 +518,7 @@
       // we have to restore draggable or whatever needs to be done
       // after all the animation.
       if ( set_num == 3 )
-        set_new_preview_state();
+        setTimeout( set_new_preview_state, 1500 );
     }
 
     function rotate_low_hand_in_set( set_num )
