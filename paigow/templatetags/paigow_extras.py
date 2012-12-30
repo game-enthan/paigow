@@ -91,6 +91,6 @@ def tile_image( context, tile, opponent ):
 @register.simple_tag( takes_context=True )
 def show_hand_label( context, tile1, tile2 ):
   if ( context['player_type'] == "opponent" ):
-    return ""
+    return "--"
   pghand = PGHand.create( tile1, tile2 )
   return pghand.label()

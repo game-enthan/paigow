@@ -277,10 +277,20 @@
 
     //  This is the server's idea of what our opponent's state is.
     var current_opponent_state = "unknown";
+    
+    // Two hands have switched; restore the switch buttons
+    function restore_switch_enabled()
+    {
+      $(".pgset-button-switch").removeClass("disabled");
+    }
 
     //  Click the up or down button for a set
     function switch_click( button )
     {
+      if ($(button).hasClass("disabled"))
+        return;
+      $(".pgset-button-switch").addClass("disabled");
+      
       //  Get the set number: it's the first char of the id.
       var source_set_num = set_num_of_button( button );
 
@@ -296,6 +306,7 @@
       var dest_top = dest.position().top;
       source.animate( { top: dest_top } );
       dest.animate( { top: source_top } );
+      setTimeout( restore_switch_enabled, 500 );
 
       //  Reorder the sets within the deal.
       if ( dest_set_num == 3 )     // goes to the end (1-based, remember)
@@ -384,10 +395,11 @@
     
     function tiles_are_set()
     {
-      // Once the tiles are set, you cannot go back because it will show your
-      // tiles to the other player if they're there.
+      // Once the tiles are set, you cannot do anything else because it will show your
+      // tiles to the other player if they're ready.
       $("#preview-hands-button").addClass("disabled");
       $("#tiles-are-set-button").addClass("disabled");
+      $(".pgset-button-switch").addClass("disabled");
 
       // User has hit "Tiles are Set" so tell the server of our state.
       $.ajax( {
@@ -738,10 +750,13 @@
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
   <table>
     <tr>
-        <td width="50%">
+        <td width="45%">
           {% show_deal pgsets player %}
         </td>
-        <td width="50%">
+        <td width="10%">
+          <!-- TBD: the scoring will go here -->
+        </td>
+        <td width="45%">
           {% show_deal pgsets game|opponent_for_game:player %}
         </td>
     </tr>
