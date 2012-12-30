@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response, redirect
 from django.contrib import messages
 from django.core.context_processors import csrf
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 
 from models.pgtile import PGTile
 from paigow.pghand import PGHand
@@ -316,3 +316,30 @@ def unpreview_hands( request, game_id ):
   pig.player_has_unpreviewed_hands()
   return HttpResponse( "OK" )
 
+#-------------------------------------------------------------------
+# AJAX response for previewing the opponents tiles when both players
+# have finished setting the tiles.
+def get_opponent_tiles( request, game_id ):
+  from models import PGPlayerInGame
+  game = PGGame.objects.get( id = game_id )
+  player = session_player( request )
+  pig = game.player_in_game( player )
+  if ( not pig ):
+    return HttpResponseNotAllowed( "You are not a player in this game, no peeking!" )
+  if ( pig.state() != PGPlayerInGame.READY ):
+    return HttpResponseNotAllowed( "You naughty person you: trying to get the opponents tiles before you've finished setting yours!" )
+  opponents = player.opponents_for_game( game )
+  if ( not opponents ):
+    return HttpResponseNotAllowed( "You are not playing anyone in this game.  How can that be?" )
+  opponent = opponents[0]
+  if ( not opponent ):
+    return HttpResponseNotAllowed( "You are playing a ghost in this game.  How can that be?" )
+  pigo = game.player_in_game( opponent )
+  if ( not pigo ):
+    return HttpResponseNotAllowed( "Your opponent is not a player in this game.  How can that be?" )
+  if ( pigo.state() != PGPlayerInGame.READY ):
+    return HttpResponseNotAllowed( "You naughty person you: trying to get opponents tiles before they have finished setting them!" )
+  
+  # Finally!  Both players are ready.  Return ???
+  print "Game is ON for player " + str ( player )
+  return HttpResponse( "OK" )

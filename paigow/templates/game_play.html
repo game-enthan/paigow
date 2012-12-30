@@ -10,6 +10,16 @@
 {% block header-javascript %}
   <script language="javascript">
 
+    //  Showing failure when communicating with server.
+    function show_ajax_failure( error_msg, errorThrown, textStatus, jqXHR )
+    {
+      if ( textStatus && textStatus != "" )
+        error_msg += "\n\nStatus: '" + textStatus + "'";
+      if ( errorThrown && errorThrown !="" )
+        error_msg += "\n\nHTTP error: '" + errorThrown + "'";
+      alert( error_msg );
+    }
+
     //  Convenience functions for getting ids etc.
     function set_num_of_button( button )  { return parseInt(button.id.substring(0, 1)); }      // first char
 
@@ -241,7 +251,7 @@
             hand: tile_chars_of_jqset( jqset )
         },
         success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
-        error: function( data, textStatus, jqXHR ) { return set_hand_label( this, "<error>|<errr>", "error", undefined ); }
+        error: function( jqXHR, textStatus, errorThrown ) { return set_hand_label( this, "<error>|<error>", "error", undefined ); }
       } );
     }
 
@@ -352,7 +362,16 @@
       // tiles, there is no need to keep polling... AND if we've already finished, time to
       // do the reveal!
       if ( label == "opponent" )
+      {
         current_opponent_state = state;
+        
+        if ( state == "finished setting tiles" )
+        {
+          for ( var os = 4; os <= 6; os++ )
+            rotate_low_hand_in_set( os, true );
+          poll_again = false;
+        }
+      }
       
       // This returns false if it's time to reveal, so we don't have to keep polling.  We would
       // catch this anyway when it's time to poll, but we can stop it here.
@@ -380,30 +399,20 @@
             set3: tile_chars_of_jqset( jqset_of_num( 3 ) )
         },
         success: function( data, textStatus, jqXHR ) { tiles_are_set_success( this, data, textStatus, jqXHR ); },
-        error: function( jqXHR, textStatus, errorThrown ) { tiles_are_set_error( this, errorThrown, textStatus, jqXHR ); }
+        error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to tell the servers that the tiles are set.", errorThrown, textStatus, jqXHR ); }
       } );
 
       current_player_state = "finished setting tiles";
-      
-      // Check to see if it's time to reveal.
-      check_game_state( true );
     }
-
-    function tiles_are_set_error( context, errorThrown, textStatus, jqXHR )
-    {
-      var error_msg = "Error trying to tell the servers that the tiles are set."
-      if ( textStatus && textStatus != "" )
-        error_msg += "\n\nStatus: '" + textStatus + "'";
-      if ( errorThrown && errorThrown !="" )
-        error_msg += "\n\nHTTP error: '" + errorThrown + "'";
-      alert( error_msg );
-    }
-
+    
     function tiles_are_set_success( context, data, textStatus, jqXHR )
     {
       // ajax call for setting tiles has returned so the server knows our state
       // is new, so we can get it.
       get_player_state();
+      
+      // Check to see if it's time to reveal.
+      check_game_state( true );
     }
     
     function preview_hands()
@@ -435,7 +444,8 @@
         url: "/paigow/data/game/{{ game.id }}/" + url_cmd,
         context: document.body,
         data: data_val,
-        success: success_val
+        success: success_val,
+        error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to tell the server that we are previewing.", errorThrown, textStatus, jqXHR ); }
       } );
 
       // If we're coming back from preview (or tile-setting), we don't re-arrange hands
@@ -553,7 +563,7 @@
     
     function rotate_low_hands_for_preview( set_num )
     {
-      rotate_low_hand_in_set( set_num );
+      rotate_low_hand_in_set( set_num, false );
 
       // finish it all up... this is skanky.  After the third set,
       // we have to restore draggable or whatever needs to be done
@@ -562,13 +572,13 @@
         setTimeout( set_new_preview_state, 1500 );
     }
 
-    function rotate_low_hand_in_set( set_num )
+    function rotate_low_hand_in_set( set_num, force_rotate )
     {
       // Rotage the second two tiles as well.
       var jqtile2 = jqtile_of_nums( set_num, 2 );
       var jqtile3 = jqtile_of_nums( set_num, 3 );
 
-      if ( current_player_state == "setting tiles" )
+      if ( (current_player_state == "setting tiles") || force_rotate )
       {
         rotate_for_preview( jqtile2, '+=20px', '-=25px', true );
         rotate_for_preview( jqtile3, '-=35px', '+=30px', true );
@@ -629,11 +639,23 @@
       if ( !g_already_revealed )
       {
         g_already_revealed = true;
-        alert( "time to rumble!" );
+        
+        // Get the opponent's tile values so we can show them.
+        $.ajax( {
+          url: "/paigow/data/game/{{ game.id }}/opponent_tiles",
+          context: document.body,
+          success: function( data, textStatus, jqXHR ) { get_opponent_tiles_success( this, data, textStatus, jqXHR ); },
+          error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to get the opponent's tiles for comparing hands.", errorThrown, textStatus, jqXHR ); }
+        } );
       }
 
       return someone_is_still_setting_tiles;
     }
+    
+    function get_opponent_tiles_success( context, data, textStatus, jqXHR )
+    {
+    }
+    
 
   </script>
 {% endblock %}
