@@ -319,7 +319,7 @@ def unpreview_hands( request, game_id ):
 #-------------------------------------------------------------------
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
-def get_opponent_tiles( request, game_id ):
+def get_opponent_tiles( request, game_id, pgtile_size ):
   from models import PGPlayerInGame
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
@@ -340,6 +340,13 @@ def get_opponent_tiles( request, game_id ):
   if ( pigo.state() != PGPlayerInGame.READY ):
     return HttpResponseNotAllowed( "You naughty person you: trying to get opponents tiles before they have finished setting them!" )
   
-  # Finally!  Both players are ready.  Return ???
-  print "Game is ON for player " + str ( player )
-  return HttpResponse( "OK" )
+  # Finally!  Both players are ready.  Return the background-sprite image locations
+  # exactly as they would appear in the style.
+  ret_val = "|"
+  sets = pigo.sets()
+  for pgset in sets:
+    tiles = pgset.tiles
+    for tile in tiles:
+      ret_val += tile.background_position_css_value( pgtile_size ) + ";"
+    ret_val += "|"
+  return HttpResponse( ret_val )

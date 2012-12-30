@@ -38,7 +38,7 @@ class PGDeal( models.Model ):
   
   # The deal shows as the ordering
   def __unicode__( self ):
-    return self.deck
+    return "Deal " + str( self.deal_number ) + "in game " + str( self.game )
   
   
   # Create it with an array of tiles and the game/deal#

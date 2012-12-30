@@ -87,6 +87,10 @@ class PGPlayerInGame(models.Model):
   def state( self ):
     return self.deal_state
   
+  def sets( self ):
+    from paigow.pgset import PGSet
+    return [ PGSet.create_with_tile_chars(self.set1), PGSet.create_with_tile_chars(self.set2), PGSet.create_with_tile_chars(self.set3) ]
+  
   # player has been dealt sets, remember these when they set it
   def set_dealt_sets( self, sets ):
     self.set1 = sets[0].tile_chars()
@@ -103,8 +107,9 @@ class PGPlayerInGame(models.Model):
     self.save()
     
   def tiles_were_requested( self ):
-    self.deal_state = PGPlayerInGame.SETTING_TILES
-    self.save()
+    if ( self.deal_state == PGPlayerInGame.NOT_READY ):
+      self.deal_state = PGPlayerInGame.SETTING_TILES
+      self.save()
   
   def player_is_ready( self, set1, set2, set3 ):
     from paigow.pgset import PGSet

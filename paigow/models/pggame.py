@@ -153,6 +153,10 @@ class PGGame( models.Model ):
     # remember this deal
     deal = PGDeal.create( tiles, self, self.current_deal_number )
     deal.save()
+    
+    # game is not about to deal anymore
+    self.game_state = PGGame.SETTING_TILES
+    self.save()
   
   
   def sets_for_player( self, player ):

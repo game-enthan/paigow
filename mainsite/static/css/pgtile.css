@@ -5,17 +5,15 @@
 .pgtile {
   float:left;
   margin-right:5px;
-
-}
-
-.pgtile-player {
   background-image:url('/static/pgtiles.jpg');
   src:url('/static/img_trans.gif');
 }
 
+.pgtile-player {
+}
+
 .pgtile-opponent {
-  background-color:black;
-  src:url('/static/img_trans.gif');
+	background-position: 0px 0px;
 }
 
 .pgtile-div {

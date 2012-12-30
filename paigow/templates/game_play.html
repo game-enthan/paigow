@@ -642,7 +642,7 @@
         
         // Get the opponent's tile values so we can show them.
         $.ajax( {
-          url: "/paigow/data/game/{{ game.id }}/opponent_tiles",
+          url: "/paigow/data/game/{{ game.id }}/opponent_tiles/{{ pgtile_size }}",
           context: document.body,
           success: function( data, textStatus, jqXHR ) { get_opponent_tiles_success( this, data, textStatus, jqXHR ); },
           error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to get the opponent's tiles for comparing hands.", errorThrown, textStatus, jqXHR ); }
@@ -652,8 +652,26 @@
       return someone_is_still_setting_tiles;
     }
     
+    function expose_tile_value( jqtile, css_val )
+    {
+      var jqimg = $(jqtile.children("img")[0]);
+      jqimg.fadeOut( 200, function () { jqimg.css( { 'background-position': css_val } ) } );
+      jqimg.fadeIn();
+    }
+    
     function get_opponent_tiles_success( context, data, textStatus, jqXHR )
     {
+      // The return values are the sprite background-locations of each tile.
+      // Each set is separated by vertical bar, and each tile is separated by semicolon:
+      // |-200px -250px;-400px 0px;-200px -250px;-400px 0px;|<next set>|<next-set>|"
+      var sets_array = data.split("|");
+      for ( set_num = 4; set_num <= 6; set_num++ )
+      {
+        var set_vals = sets_array[ set_num - 3 ];
+        var tiles_array = set_vals.split(";");
+        for ( t = 0; t < 4; t++ )
+          expose_tile_value( jqtile_of_nums( set_num, t ), tiles_array[t] );
+      }
     }
     
 
@@ -688,10 +706,6 @@
   $(".pgset-player").droppable( { 
       disabled: true
     } );
-
-  //$(".paigow321-deal").droppable( {
-  //    disabled: true
-  //  } );
 
   // Make the switch buttons active
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );

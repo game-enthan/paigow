@@ -62,7 +62,6 @@ class PGTile( models.Model ):
   sprite_left = models.PositiveSmallIntegerField( default = 0 )
   sprite_top = models.PositiveSmallIntegerField( default = 0 )
   
-  
   # ----------------------------------------------------------
   # methods
   
@@ -87,6 +86,16 @@ class PGTile( models.Model ):
     else:
       return tiles[1]
   
+  # return the background-sprite css value for background-position.
+  def background_position_css_value( self, tile_size ):
+    divisor = 1.0
+    if ( tile_size == "medium" ):
+      divisor = 2.0
+    elif ( tile_size == "small" ):
+      divisor = 4.0
+    ret_val = "-" + str(self.sprite_left/divisor) + "px -" + str(self.sprite_top/divisor) + "px"
+    return ret_val
+  
   # return the tile with the given rank, taking into account whether
   # or not it's the first one.
   @classmethod
@@ -98,6 +107,11 @@ class PGTile( models.Model ):
   def with_char( cls, tile_char ):
     return cls.objects.get( tile_char__exact = tile_char )
   
+  # return a blank tile (not saved in database)
+  @classmethod
+  def blank_tile( cls ):
+    return PGTile( tile_char = ' ', tile_rank = 99, pair_rank = 99, tile_value = 99, sprite_left = 0, sprite_top = 0 )
+
   # convenience to allow creation of tiles by name.
   # * double-underscore means that what follows is an
   #   adjustment of the field, so below it will query
@@ -214,6 +228,11 @@ class PGTileTest(TestCase):
     tile3 = PGTile.with_char( "b" )
     self.assertTrue( tile1 == tile2 )
     self.assertTrue( tile1 != tile3 )
+  
+  def test_sprite_values( self ):
+    tile1 = PGTile.with_name( "teen" )
+    self.assertEqual( tile1.background_position_css_value("large"), "-0.0px -250.0px" )
+    self.assertEqual( tile1.background_position_css_value("medium"), "-0.0px -125.0px" )
 
 
 # run the test when invoked as a test (this is boilerplate
