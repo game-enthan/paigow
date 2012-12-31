@@ -704,21 +704,21 @@
       if ( set_num > 4 )
         setTimeout( function() { expose_opponent_hand_chained( set_num-1, sets_array ); }, 4000 );
       else
-        setTimeout( get_score, 4000 );
+        setTimeout( get_score_in_deal, 4000 );
     }
       
-    function get_score()
+    function get_score_in_deal()
     {
         // Get the opponent's tile values so we can show them.
         $.ajax( {
           url: "/paigow/data/game/{{ game.id }}/score_in_deal",
           context: document.body,
-          success: function( data, textStatus, jqXHR ) { get_score_success( this, data, textStatus, jqXHR ); },
-          error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to score the hands.", errorThrown, textStatus, jqXHR ); }
+          success: function( data, textStatus, jqXHR ) { get_score_in_deal_success( this, data, textStatus, jqXHR ); },
+          error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to score the deal.", errorThrown, textStatus, jqXHR ); }
         } );
     }
     
-    function get_score_success( context, data, textStatus, jqXHR )
+    function get_score_in_deal_success( context, data, textStatus, jqXHR )
     {
       var text = "Score:\n\n3-point hand: ";
       ch = data[0];
@@ -801,11 +801,11 @@
   <br> -->
 
   <!-- player action buttons, down along the left edge. -->
-          <div class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}">
-            <span id="preview-hands"><button id="preview-hands-button" type="button" class="btn btn-mini btn-primary pgset-action-button">Preview Hands</button></span>
-            <br><br>
-            <span id="tiles-are-set"><button id="tiles-are-set-button" type="button" class="btn btn-mini btn-primary pgset-action-button disabled">Tiles are set</button></span>
-          </div>
+  <div class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}">
+    <span id="preview-hands"><button id="preview-hands-button" type="button" class="btn btn-mini btn-primary pgset-action-button">Preview Hands</button></span>
+    <br><br>
+    <span id="tiles-are-set"><button id="tiles-are-set-button" type="button" class="btn btn-mini btn-primary pgset-action-button disabled">Tiles are set</button></span>
+  </div>
 
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
   <table>
@@ -813,10 +813,23 @@
         <td width="45%">
           {% show_deal pgsets player %}
         </td>
-        <td width="10%">
-          <!-- TBD: the scoring will go here -->
+        <td xwidth="10%" valign="top">
+          <table width="100%" height="100%">
+            <tr>
+              <td height="20px" align="center" valign="top">scoring</td>
+            </tr>
+            <tr>
+              <td align="center">
+                <div style="position:relative">
+                  <div id="pgscore-in-deal-0" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }} pgset-{{ pgtile_size }}-1">--</div>
+                  <div id="pgscore-in-deal-1" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }} pgset-{{ pgtile_size }}-2">--</div>
+                  <div id="pgscore-in-deal-2" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }} pgset-{{ pgtile_size }}-3">--</div>
+                </div>
+              </td>
+            </tr>
+          </table>
         </td>
-        <td width="45%">
+        <td xwidth="45%">
           {% show_deal pgsets game|opponent_for_game:player %}
         </td>
     </tr>

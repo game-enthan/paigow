@@ -64,6 +64,12 @@
 	font-size: 18px;
 }
 
+.pgscore-in-deal {
+	position: absolute;
+	text-align: center;
+	font-weight: bold;
+}	
+
 .pgtile-ease-in-out {
   -webkit-transition: all 1s ease-in-out;
   -moz-transition: all 1s ease-in-out; 
@@ -144,12 +150,12 @@
 }
 
 .paigow321-deal-medium {
-	width: 420px;
+	width: 330px;
 	height: 500px;
 }
 
 .player-deal-label-medium {
-  left: 45px;
+  left: 25px;
 }
 
 .pgset-action-buttons-medium {
@@ -175,7 +181,7 @@
 .pgset-medium {
 	height: 140px;
 	width: 350px;
-	left: 20px;
+	left: 0px;
 }
 
 .pgset-medium-1 {
@@ -209,11 +215,13 @@
 	top: 205px;
 }
 
- .pgset-button-switch-medium-2 {
+.pgset-button-switch-medium-2 {
 	top: 395px;
 }
 
-
+.pgscore-in-deal-medium {
+	font-size: 24px;
+}
 
 /* ------------------------ Small -----------------------	*/
 

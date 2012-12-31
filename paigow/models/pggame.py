@@ -201,15 +201,15 @@ class PGGame( models.Model ):
     from models import PGPlayerInGame    
     pig = self.player_in_game( player )
     if ( not pig ):
-      return "twiddling thumbs"
+      return "not there"
     if (pig.state() == PGPlayerInGame.NOT_READY):
       return "not seated"
     elif (pig.state() == PGPlayerInGame.SETTING_TILES):
-      return "setting tiles"
+      return "thinking..."
     elif (pig.state() == PGPlayerInGame.PREVIEW_HANDS):
-      return "previewing hands"
+      return "almost..."
     else:
-      return "finished setting tiles"
+      return "tiles are set"
 
 # ----------------------------------------------------
 # Test PGGame class
