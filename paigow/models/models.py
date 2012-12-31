@@ -89,7 +89,7 @@ class PGPlayerInGame(models.Model):
   
   def sets( self ):
     from paigow.pgset import PGSet
-    return [ PGSet.create_with_tile_chars(self.set1), PGSet.create_with_tile_chars(self.set2), PGSet.create_with_tile_chars(self.set3) ]
+    return [ self.set(1), self.set(2), self.set(3) ]
   
   # player has been dealt sets, remember these when they set it
   def set_dealt_sets( self, sets ):
@@ -97,6 +97,19 @@ class PGPlayerInGame(models.Model):
     self.set2 = sets[1].tile_chars()
     self.set3 = sets[2].tile_chars()
     self.save()
+  
+  def set( self, set_num ):
+    from paigow.pgset import PGSet    
+    if set_num == 1:
+      pgset = self.set1
+    elif set_num == 2:
+      pgset = self.set2
+    elif set_num == 3:
+      pgset = self.set3
+    else:
+      print "PGPlayerInSet asked for invalid set number " + str( set_num )
+      raise ValueError
+    return PGSet.create_with_tile_chars( pgset )
   
   def player_is_previewing_hands( self ):
     self.deal_state = PGPlayerInGame.PREVIEW_HANDS
@@ -113,11 +126,11 @@ class PGPlayerInGame(models.Model):
   
   def which_set_is_this( self, test_set ):
     from paigow.pgset import PGSet
-    if PGSet.create_with_tile_chars( self.set1 ).can_be_rearranged_to( test_set ):
+    if self.set(1).can_be_rearranged_to( test_set ):
       return 1
-    if PGSet.create_with_tile_chars( self.set2 ).can_be_rearranged_to( test_set ):
+    if self.set(2).can_be_rearranged_to( test_set ):
       return 2
-    if PGSet.create_with_tile_chars( self.set3 ).can_be_rearranged_to( test_set ):
+    if self.set(3).can_be_rearranged_to( test_set ):
       return 3
     return 0
   
@@ -136,4 +149,14 @@ class PGPlayerInGame(models.Model):
       self.save()
     else:
       print "Player " + str( self.player) + " is ready in game " + str( self.game ) + " but the sets do not compute!"
+  
+  def background_position_css_value( self, pgtile_size ):
+    from paigow.pgset import PGSet
+    ret_val = "|"
+    sets = self.sets()
+    for pgset in sets:
+      for tile in pgset.tiles:
+        ret_val += tile.background_position_css_value( pgtile_size ) + ";"
+      ret_val += "|"
+    return ret_val
 

@@ -321,32 +321,19 @@ def unpreview_hands( request, game_id ):
 # have finished setting the tiles.
 def get_opponent_tiles( request, game_id, pgtile_size ):
   from models import PGPlayerInGame
-  game = PGGame.objects.get( id = game_id )
-  player = session_player( request )
-  pig = game.player_in_game( player )
-  if ( not pig ):
-    return HttpResponseNotAllowed( "You are not a player in this game, no peeking!" )
-  if ( pig.state() != PGPlayerInGame.READY ):
-    return HttpResponseNotAllowed( "You naughty person you: trying to get the opponents tiles before you've finished setting yours!" )
-  opponents = player.opponents_for_game( game )
-  if ( not opponents ):
-    return HttpResponseNotAllowed( "You are not playing anyone in this game.  How can that be?" )
-  opponent = opponents[0]
-  if ( not opponent ):
-    return HttpResponseNotAllowed( "You are playing a ghost in this game.  How can that be?" )
-  pigo = game.player_in_game( opponent )
-  if ( not pigo ):
-    return HttpResponseNotAllowed( "Your opponent is not a player in this game.  How can that be?" )
-  if ( pigo.state() != PGPlayerInGame.READY ):
-    return HttpResponseNotAllowed( "You naughty person you: trying to get opponents tiles before they have finished setting them!" )
-  
-  # Finally!  Both players are ready.  Return the background-sprite image locations
-  # exactly as they would appear in the style.
-  ret_val = "|"
-  sets = pigo.sets()
-  for pgset in sets:
-    tiles = pgset.tiles
-    for tile in tiles:
-      ret_val += tile.background_position_css_value( pgtile_size ) + ";"
-    ret_val += "|"
-  return HttpResponse( ret_val )
+  from paigow.session_utils import opponent_in_session_game
+  pigo = opponent_in_session_game( request, game_id )
+  if not pigo:
+    return HttpResponseNotAllowed( "Bad Request" )
+  return HttpResponse( pigo.background_position_css_value( pgtile_size ) )
+
+#-------------------------------------------------------------------
+# AJAX response for previewing the opponents tiles when both players
+# have finished setting the tiles.
+def data_opponent_hand_label( request, game_id, set_num ):
+  from models import PGPlayerInGame
+  from paigow.session_utils import opponent_in_session_game
+  pigo = opponent_in_session_game( request, game_id )
+  if not pigo:
+    return HttpResponseNotAllowed( "Bad Request" )
+  return HttpResponse( pigo.set(int(set_num)).hand_labels() )

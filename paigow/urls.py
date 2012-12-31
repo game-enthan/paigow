@@ -24,7 +24,18 @@ urlpatterns = patterns('',
   
   # given the chars representing four tiles for a set, return
   # the labels for the two hands separated by vertical bar.
-  url(r'^data/hand/', 'paigow.views.data_hand_label' ),
+  # No game is necessary, since this provides the tile chars
+  # with it (done during tile manipulation, where no database
+  # actions occur so the database doesn't reflect what the user
+  # sees).
+  url(r'^data/player/hands$', 'paigow.views.data_hand_label' ),
+  
+  # given the set index into the opponent's deal, return the labels
+  # (names) of the hands.  This checks that both the player and
+  # the opponent have finished setting the tiles.  This needs the
+  # game and hand, since the tiles are not provided -- the browser
+  # does not have the user tile values, only the pictures..
+  url(r'^data/game/([0-9]+)/opponent/hands/([0-9])$', 'paigow.views.data_opponent_hand_label' ),
   
   # given the game, return the state of the
   # opponent as a string that is shown, preceded by a

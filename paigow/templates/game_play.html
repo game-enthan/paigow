@@ -23,10 +23,11 @@
     //  Convenience functions for getting ids etc.
     function set_num_of_button( button )  { return parseInt(button.id.substring(0, 1)); }      // first char
 
-    function set_num_of_set( pgset )
+    function set_num_of_set( jqset )
     {
-      var parent = $(pgset).parent();
+      var parent = jqset.parent();
       var jqsets = parent.find(".pgset");
+      var pgset = jqset[0];
       var set_num = jqsets.index( pgset ) + 1;   // 1-based
       if ( /opponent/.test(pgset.id) )
         set_num += 3;
@@ -44,7 +45,6 @@
       var jqdeal = $("#paigow321-deal-" + player_type);
       var jqsets = jqdeal.find(".pgset");
       return $(jqsets[ set_num-1 ] );      // 1-based
-      //return $( "#" + set_id_of_num( set_num ) );
     }
 
     function jqset_of_tile( pgtile ) { return $(pgtile).parent(); }
@@ -242,14 +242,24 @@
     
     function update_hand_labels( jqset )
     {
-      //  Time to update the labels: send a request to get the new values.
-      var new_tiles = tiles_of_jqset( jqset );
+      var set_num = set_num_of_set( jqset );
+      var url;
+      var data;
+      if ( set_num <= 3 )
+      {
+        url = "/paigow/data/player/hands";
+        data = { hand: tile_chars_of_jqset( jqset ) }
+      }
+      else
+      {
+        url = "/paigow/data/game/{{ game.id }}/opponent/hands/" + (set_num-3);
+        data = {}
+      }
+        
       $.ajax( {
-        url: "/paigow/data/hand/",
-        context: jqset[0],
-        data: {
-            hand: tile_chars_of_jqset( jqset )
-        },
+        url: url,
+        data: data,
+        context: jqset,
         success: function( data, textStatus, jqXHR ) { return set_hand_label( this, data, textStatus, jqXHR ); },
         error: function( jqXHR, textStatus, errorThrown ) { return set_hand_label( this, "<error>|<error>", "error", undefined ); }
       } );
@@ -259,14 +269,16 @@
     //  by ajax in drop_tiles above.
     function set_hand_label( context, data, textStatus, jqXHR )
     {
+      var jqset = context;
+
       //  The response is the two labels, with a vertical bar in between.
       var hands = data.split("|");
 
       //  The context is the set div we were dragging in.
-      var set_num = set_num_of_set( context );
+      var set_num = set_num_of_set( jqset );
 
       //  Get the labels for this div, and assign by index.
-      var labels = $(context).find(".pghand-labels");
+      var labels = jqset.find(".pghand-labels");
       $(labels[0]).text( hands[0] );
       $(labels[1]).text( hands[1] );
     }
@@ -683,6 +695,7 @@
         var tiles_array = set_vals.split(";");
         for ( t = 0; t < 4; t++ )
           expose_tile_value( jqtile_of_nums( set_num, t ), tiles_array[t] );
+        update_hand_labels( jqset_of_num( set_num ) );
       }
     }
     

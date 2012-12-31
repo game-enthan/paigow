@@ -42,6 +42,8 @@ class PGHand:
   
   # return the label for this hand
   def label( self ):
+    if self.is_gee_joon():
+      return "gee joon"
     if self.is_pair():
       return "" + self.high_tile.name + " bo"
     if self.is_wong():
@@ -53,6 +55,8 @@ class PGHand:
     return str(self.numerical_value())
   
   # convenience functions for  naming and comparisons.
+  def is_gee_joon( self ):
+    return self.is_pair() and self.high_tile.tile_value == 3
   def is_pair( self ):
     return self.high_tile == self.low_tile
   def is_wong( self ):

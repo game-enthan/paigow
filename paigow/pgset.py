@@ -54,6 +54,14 @@ class PGSet:
     ordering_str = str( self.tiles.index(tile0) ) + str( self.tiles.index(tile1) ) + str( self.tiles.index(tile2) ) + str( self.tiles.index(tile3) )
     return ordering_str
   
+  # return the hand label for the hands, separated by "|"
+  def hand_labels( self ):
+    from paigow.pghand import PGHand
+    high_hand = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
+    low_hand = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
+    return high_hand.label() + "|" + low_hand.label()
+  
+  
   # utility to sort the tiles alphabetically for comparison
   @classmethod
   def sort_tile_chars( self, tile_chars ):
