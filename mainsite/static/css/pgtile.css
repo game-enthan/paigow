@@ -28,6 +28,11 @@
   left: 25px;
 }
 
+.player-deal-state {
+  position: absolute;
+  top: 0px;
+}
+
 .player-name {
 	font-weight: bold;
 	font-size: 18px;
@@ -150,12 +155,16 @@
 }
 
 .paigow321-deal-medium {
-	width: 330px;
-	height: 500px;
+	width: 300px;
+	height: 560px;
 }
 
 .player-deal-label-medium {
   left: 25px;
+}
+
+.player-deal-state-medium {
+  right: 30px;
 }
 
 .pgset-action-buttons-medium {
@@ -212,11 +221,11 @@
 }
 
 .pgset-button-switch-medium-1 {
-	top: 205px;
+	top: 190px;
 }
 
 .pgset-button-switch-medium-2 {
-	top: 395px;
+	top: 370px;
 }
 
 .pgscore-in-deal-medium {

@@ -87,6 +87,19 @@ class PGPlayerInGame(models.Model):
   def state( self ):
     return self.deal_state
   
+  @classmethod
+  def state_ui( cls, state ):
+    if ( state == PGPlayerInGame.NOT_READY ):
+      return "absent"
+    elif ( state == PGPlayerInGame.SETTING_TILES ):
+      return "scheming..."
+    elif ( state == PGPlayerInGame.PREVIEW_HANDS ):
+      return "deciding..."
+    elif ( state == PGPlayerInGame.READY ):
+      return "tiles are set"
+    else:
+      raise ValueError
+  
   def sets( self ):
     from paigow.pgset import PGSet
     return [ self.set(1), self.set(2), self.set(3) ]

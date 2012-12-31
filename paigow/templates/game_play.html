@@ -285,7 +285,7 @@
 
     //  This is our state as per button-pushing, which may be a little ahead
     // of what the server thinks (and may not agree if the server goes down).
-    var current_player_state = "setting tiles";
+    var current_player_state = "{{ player_current_state }}";
 
     //  This is the server's idea of what our opponent's state is.
     var current_opponent_state = "unknown";
@@ -388,7 +388,7 @@
       {
         current_opponent_state = state;
         
-        if ( state == "finished setting tiles" )
+        if ( state == "{{ tiles_are_set_state}}" )
         {
           for ( var os = 4; os <= 6; os++ )
             rotate_low_hand_in_set( os, true );
@@ -426,7 +426,7 @@
         error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to tell the servers that the tiles are set.", errorThrown, textStatus, jqXHR ); }
       } );
 
-      current_player_state = "finished setting tiles";
+      current_player_state = "{{ tiles_are_set_state }}";
     }
     
     function tiles_are_set_success( context, data, textStatus, jqXHR )
@@ -454,7 +454,7 @@
       var url_cmd = "unpreview_hands";
       var success_val = undefined;
       var data_val = undefined;
-      if ( current_player_state == "setting tiles" )
+      if ( current_player_state == "{{ setting_tiles_state }}" )
       {
         url_cmd = "preview_hands";
         success_val = function( data, textStatus, jqXHR ) { set_all_tiles_for_preview( this, data, textStatus, jqXHR ); };
@@ -474,7 +474,7 @@
 
       // If we're coming back from preview (or tile-setting), we don't re-arrange hands
       // so we can start rotating now.
-      if ( current_player_state != "setting tiles" )
+      if ( current_player_state != "{{ setting_tiles_state }}" )
       {
         // we are un-previewing: no need to move tiles around, just rotate the
         // low hands back (the global current_player_state tells this function
@@ -504,7 +504,7 @@
     
     function set_all_tiles_for_preview( context, data, textStatus, jqXRH )
     {
-      if ( current_player_state == "setting tiles" )
+      if ( current_player_state == "{{ setting_tiles_state }}" )
       {
         // The return values show where the tiles should appear if the dealer
         // turned over our set hands: high hand upright to the left, and
@@ -561,7 +561,7 @@
       
       var new_text;
       
-      if ( current_player_state == "setting tiles" )
+      if ( current_player_state == "{{ setting_tiles_state }}" )
       {
         current_player_state = "previewing hands";
         new_text = "Un-preview Hands";
@@ -574,7 +574,7 @@
       else
       {
         new_text = "Preview Hands";
-        current_player_state = "setting tiles";
+        current_player_state = "{{ setting_tiles_state }}";
         $("#tiles-are-set-button").addClass("disabled");
 
         setTimeout( restore_draggable_to_tiles, 1000 );
@@ -602,7 +602,7 @@
       var jqtile2 = jqtile_of_nums( set_num, 2 );
       var jqtile3 = jqtile_of_nums( set_num, 3 );
 
-      if ( (current_player_state == "setting tiles") || force_rotate )
+      if ( (current_player_state == "{{ setting_tiles_state }}") || force_rotate )
       {
         rotate_for_preview( jqtile2, '+=20px', '-=25px', true );
         rotate_for_preview( jqtile3, '-=35px', '+=30px', true );
@@ -654,7 +654,7 @@
     function check_game_state( reveal_if_ready )
     {
       //  Find out if someone is still setting tiles.  If they are, or we're just checking, return that state.
-      var someone_is_still_setting_tiles = ( current_player_state != "finished setting tiles" ) || ( current_opponent_state != "finished setting tiles" );
+      var someone_is_still_setting_tiles = ( current_player_state != "{{ tiles_are_set_state}}" ) || ( current_opponent_state != "{{ tiles_are_set_state}}" );
       if ( someone_is_still_setting_tiles || !reveal_if_ready )
         return someone_is_still_setting_tiles;
       
@@ -720,31 +720,27 @@
     
     function get_score_in_deal_success( context, data, textStatus, jqXHR )
     {
-      var text = "Score:\n\n3-point hand: ";
-      ch = data[0];
-      if ( ch == 'W' )
-        text += "WIN";
-      else if ( ch == 'L' )
-        text += "LOSE";
-      else
-        text += "PUSH";
-      text += "\n2-point hand: ";
-      ch = data[1];
-      if ( ch == 'W' )
-        text += "WIN";
-      else if ( ch == 'L' )
-        text += "LOSE";
-      else
-        text += "PUSH";
-      text += "\n1-point hand: ";
-      ch = data[2];
-      if ( ch == 'W' )
-        text += "WIN";
-      else if ( ch == 'L' )
-        text += "LOSE";
-      else
-        text += "PUSH";
-      alert( text );
+      for ( var set_num = 1; set_num <= 3; set_num++ )
+      {
+        var ch = data[set_num-1]
+        var points = 4 - set_num
+        var jqscore = $("#pgscore-in-deal-" + (set_num-1))
+        if ( ch == 'W' )
+        {
+          jqscore.css( { color: "ForestGreen" } );
+          jqscore.text( "Win 3" );
+        }
+        else if ( ch == 'L' )
+        {
+          jqscore.css( { color: "Crimson" } );
+          jqscore.text( "Lose" );
+        }
+        else
+        {
+          jqscore.css( { color: "Silver" } );
+          jqscore.text( "Push" );
+        }
+      }
     }
 
   </script>

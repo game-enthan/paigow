@@ -11,8 +11,9 @@ from paigow.pghand import PGHand
 from models.pggame import PGGame
 from models.pgplayer import PGPlayer
 from paigow.pgset import PGSet
+from models import PGPlayerInGame
 
-from paigow.session_utils import session_player
+from paigow.session_utils import session_player, opponent_in_session_game, player_in_session_game
 
 
 #-------------------------------------------------------------------
@@ -59,6 +60,11 @@ def request_context( request, params ):
     params['playername'] = player.name
     params['opponents'] = player.all_possible_opponents()
   params['player'] = player
+  
+  # set up the states
+  params['player_current_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.SETTING_TILES )
+  params['tiles_are_set_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.READY )
+  params['setting_tiles_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.SETTING_TILES )
 
   return RequestContext( request, params )
 
@@ -320,8 +326,6 @@ def unpreview_hands( request, game_id ):
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
 def get_opponent_tile_background_position_css_value( request, game_id, pgtile_size ):
-  from models import PGPlayerInGame
-  from paigow.session_utils import opponent_in_session_game
   pigo = opponent_in_session_game( request, game_id )
   if not pigo:
     return HttpResponseNotAllowed( "Bad Request" )
@@ -331,8 +335,6 @@ def get_opponent_tile_background_position_css_value( request, game_id, pgtile_si
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
 def data_opponent_hand_label( request, game_id, set_num ):
-  from models import PGPlayerInGame
-  from paigow.session_utils import opponent_in_session_game
   pigo = opponent_in_session_game( request, game_id )
   if not pigo:
     return HttpResponseNotAllowed( "Bad Request" )
@@ -341,8 +343,6 @@ def data_opponent_hand_label( request, game_id, set_num ):
 #-------------------------------------------------------------------
 # AJAX response for result of the three hands
 def score_in_deal( request, game_id ):
-  from models import PGPlayerInGame
-  from paigow.session_utils import opponent_in_session_game, player_in_session_game
   
   # get the player-in-game so we can get their hands.  Note that if
   # we try to get an opponent but either the player or the the
