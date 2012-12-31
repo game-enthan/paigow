@@ -680,25 +680,72 @@
     {
       var jqimg = $(jqtile.children("img")[0]);
       jqimg.fadeOut( 200, function () { jqimg.css( { 'background-position': css_val } ) } );
-      jqimg.fadeIn();
+      jqimg.fadeIn(1000);
     }
     
     function get_opponent_tiles_success( context, data, textStatus, jqXHR )
     {
-      // The return values are the sprite background-locations of each tile.
-      // Each set is separated by vertical bar, and each tile is separated by semicolon:
-      // |-200px -250px;-400px 0px;-200px -250px;-400px 0px;|<next set>|<next-set>|"
       var sets_array = data.split("|");
-      for ( set_num = 4; set_num <= 6; set_num++ )
-      {
-        var set_vals = sets_array[ set_num - 3 ];
-        var tiles_array = set_vals.split(";");
-        for ( t = 0; t < 4; t++ )
-          expose_tile_value( jqtile_of_nums( set_num, t ), tiles_array[t] );
-        update_hand_labels( jqset_of_num( set_num ) );
-      }
+      // We can't do setTimeout in a loop, with a loop variable, because the
+      // lambda expression evaluates its arguments using local variables at the
+      // time of running, and by then they have changed (for instance, set_num is
+      // 3 when the loop ends, and the timeout function always gets 3).
+      // Instead, have changed timeouts with new values.
+      setTimeout( function() { expose_opponent_hand_chained( 6, sets_array ); }, 2000 );
+    }
+
+    function expose_opponent_hand_chained( set_num, sets_array )
+    {
+      var set_vals = sets_array[ set_num - 3 ];
+      var tiles_array = set_vals.split(";");
+      for ( var t = 0; t < 4; t++ )
+        expose_tile_value( jqtile_of_nums( set_num, t ), tiles_array[t] );
+      setTimeout( function() { update_hand_labels( jqset_of_num( set_num ) ) }, 2000 );
+      if ( set_num > 4 )
+        setTimeout( function() { expose_opponent_hand_chained( set_num-1, sets_array ); }, 4000 );
+      else
+        setTimeout( get_score, 4000 );
+    }
+      
+    function get_score()
+    {
+        // Get the opponent's tile values so we can show them.
+        $.ajax( {
+          url: "/paigow/data/game/{{ game.id }}/score_in_deal",
+          context: document.body,
+          success: function( data, textStatus, jqXHR ) { get_score_success( this, data, textStatus, jqXHR ); },
+          error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to score the hands.", errorThrown, textStatus, jqXHR ); }
+        } );
     }
     
+    function get_score_success( context, data, textStatus, jqXHR )
+    {
+      var text = "Score:\n\n3-point hand: ";
+      ch = data[0];
+      if ( ch == 'W' )
+        text += "WIN";
+      else if ( ch == 'L' )
+        text += "LOSE";
+      else
+        text += "PUSH";
+      text += "\n2-point hand: ";
+      ch = data[1];
+      if ( ch == 'W' )
+        text += "WIN";
+      else if ( ch == 'L' )
+        text += "LOSE";
+      else
+        text += "PUSH";
+      text += "\n1-point hand: ";
+      ch = data[2];
+      if ( ch == 'W' )
+        text += "WIN";
+      else if ( ch == 'L' )
+        text += "LOSE";
+      else
+        text += "PUSH";
+      alert( text );
+    }
 
   </script>
 {% endblock %}

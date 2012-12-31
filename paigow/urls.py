@@ -58,7 +58,11 @@ urlpatterns = patterns('',
   
   # the player is getting the opponent's hand to show, now
   # that both players are finished setting the tiles.
-  url(r'^data/game/([0-9]+)/opponent_tiles/(.*)', 'paigow.views.get_opponent_tiles' ),
+  url(r'^data/game/([0-9]+)/opponent_tiles/(.*)', 'paigow.views.get_opponent_tile_background_position_css_value' ),
+  
+  # after both player and opponent are finished, this returns the score
+  # in this deal (three letters, W, dot or L for 3, 2, 1 hands)
+  url(r'^data/game/([0-9]+)/score_in_deal', 'paigow.views.score_in_deal' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',

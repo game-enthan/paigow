@@ -319,7 +319,7 @@ def unpreview_hands( request, game_id ):
 #-------------------------------------------------------------------
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
-def get_opponent_tiles( request, game_id, pgtile_size ):
+def get_opponent_tile_background_position_css_value( request, game_id, pgtile_size ):
   from models import PGPlayerInGame
   from paigow.session_utils import opponent_in_session_game
   pigo = opponent_in_session_game( request, game_id )
@@ -337,3 +337,32 @@ def data_opponent_hand_label( request, game_id, set_num ):
   if not pigo:
     return HttpResponseNotAllowed( "Bad Request" )
   return HttpResponse( pigo.set(int(set_num)).hand_labels() )
+
+#-------------------------------------------------------------------
+# AJAX response for result of the three hands
+def score_in_deal( request, game_id ):
+  from models import PGPlayerInGame
+  from paigow.session_utils import opponent_in_session_game, player_in_session_game
+  
+  # get the player-in-game so we can get their hands.  Note that if
+  # we try to get an opponent but either the player or the the
+  # opponent is not finished, we will get None and return bad request
+  pigo = opponent_in_session_game( request, game_id )
+  if not pigo:
+    return HttpResponseNotAllowed( "Bad Request" )
+  pig = player_in_session_game( request, game_id )
+  if not pig:
+    return HttpResponseNotAllowed( "Bad Request" )
+  
+  # for each set, return W for win, . for push and L for loss
+  ret_val = ""
+  player_sets = pig.sets()
+  opponent_sets = pigo.sets()
+  for player_set, opponent_set in zip(player_sets, opponent_sets):
+    if ( player_set > opponent_set ):
+      ret_val += "W"
+    elif ( player_set < opponent_set):
+      ret_val += "L"
+    else:
+      ret_val += "."
+  return HttpResponse(ret_val)

@@ -39,16 +39,23 @@ class PGSet:
     tile3, tile4 = low_hand.high_tile.char(), low_hand.low_tile.char()
     return "" + tile1 + tile2 + tile3 + tile4
   
+  # return the high and low hands.
+  def high_and_low_hands( self ):
+    from paigow.pghand import PGHand
+    hand1 = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
+    hand2 = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
+    if ( hand1 >= hand2 ):
+      return hand1, hand2
+    else:
+      return hand2, hand1
+  
   # the user has set the first and second tile to a specific hand, and the third and fourth.
   # Keep the hands intact, but switch the hands and the tiles within them to the correct
   # high/low hand, and within that the the high/low tile.  Return the re-ordering from 
   # zero to three.
   def tile_ordering_for_set_hands( self ):
     from paigow.pghand import PGHand
-    high_hand = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
-    low_hand = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
-    if ( low_hand > high_hand ):
-      high_hand, low_hand = low_hand, high_hand
+    high_hand, low_hand = self.high_and_low_hands()
     tile0, tile1 = high_hand.high_tile, high_hand.low_tile
     tile2, tile3 = low_hand.high_tile, low_hand.low_tile
     ordering_str = str( self.tiles.index(tile0) ) + str( self.tiles.index(tile1) ) + str( self.tiles.index(tile2) ) + str( self.tiles.index(tile3) )
@@ -61,6 +68,27 @@ class PGSet:
     low_hand = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
     return high_hand.label() + "|" + low_hand.label()
   
+  # return win/tie/lose against a second set.  Makes sure the hands are in high/low order,
+  # and within the hands the tiles are in high/low order (but does not make different
+  # hands that are already there).  These are numerical comparisons:
+  # > means win
+  # == means push
+  # < means lose
+  # note that we are defining some in terms of others: each depends on one or more above it
+  def __lt__( self, other ):
+    self_high, self_low = self.high_and_low_hands()
+    other_high, other_low = other.high_and_low_hands()
+    return self_high < other_high and self_low < other_low
+  def __eq__( self, other ):
+    return not (self < other or other < self)
+  def __ne__( self, other ):
+    return not (self == other)
+  def __le__( self, other ):
+    return self < other or self == other
+  def __ge__( self, other ):
+    return other < self or other == self
+  def __gt__( self, other ):
+    return other < self
   
   # utility to sort the tiles alphabetically for comparison
   @classmethod

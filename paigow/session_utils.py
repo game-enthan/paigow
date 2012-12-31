@@ -11,6 +11,25 @@ def session_player( request ):
 
 #-------------------------------------------------------------------
 # convenience
+# return the PGPlayerInGame with the current request session id
+def player_in_session_game( request, game_id ):
+  from models import PGPlayerInGame
+  from models import PGGame
+  try:
+    
+    game = PGGame.objects.get( id = game_id )
+    player = session_player( request )
+    if ( not player ):
+      raise ValueError
+    return game.player_in_game( player )
+  
+  except:
+    print "Malformed request: no player or pig in session"
+  
+  return None
+  
+#-------------------------------------------------------------------
+# convenience
 # return the single opponent for the player in the game
 def session_opponent( request, game ):
   
