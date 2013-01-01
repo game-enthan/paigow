@@ -52,19 +52,23 @@ def request_context( request, params ):
   
   # setup players and possible opponents
   player = session_player( request )
+  params['player'] = player
   if ( not player ):
     request.session['player_id'] = None
     params['playername'] = None
     params['opponents'] = None
+    params['opponent'] = None
   else:
     params['playername'] = player.name
     params['opponents'] = player.all_possible_opponents()
-  params['player'] = player
+    if ( 'game' in params ):
+      params['opponent'] = player.opponent_for_game( params['game'] )
+  
   
   # set up the states
-  params['player_current_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.SETTING_TILES )
   params['tiles_are_set_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.READY )
   params['setting_tiles_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.SETTING_TILES )
+  params['preview_hands_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.PREVIEW_HANDS )
 
   return RequestContext( request, params )
 
@@ -226,6 +230,11 @@ def play_game( request, game_id, params = {} ):
   if ( not game ):
     messages.add_message( request, messages.ERROR, "WTF?  That game has disappeared into the ether (which doesn't exist)" )
     return goto_home( request )
+  params['game'] = game
+  
+  # deal if it's not already dealt
+  if ( game.game_state == PGGame.ABOUT_TO_DEAL ):
+    game.deal_tiles()
   
   # set the score for the other player.
   players_in_game = game.players()
@@ -235,28 +244,26 @@ def play_game( request, game_id, params = {} ):
     messages.add_message( request, messages.ERROR, "I'm sorry, you are not allowed in that game, it's only for VIPs" )
     return goto_home( request )
   
-  you_in_game = PGPlayerInGame.objects.filter( game = game, player = player )
+  # this sets up pig, don't get it fgirst
+  params['pgsets'] = game.sets_for_player( session_player( request ) )
 
   # set the game and score for you
-  params['game'] = game
-  params['score_you'] = you_in_game[0].score
+  pig = game.player_in_game( player )
+  params['score_player'] = pig.score
   
   # set up the opponent for the template
-  params['opponent'] = session_player( request ).opponents_for_game( game )[0]
+  opponent = session_player( request ).opponent_for_game( game )
   
   # get your opponent's score
-  other_player_in_game = PGPlayerInGame.objects.filter( game = game, player = params['opponent'] )
+  pigo = game.player_in_game( opponent )
   params['score_opponent'] = -1
-  if ( other_player_in_game[0] ):
-    params['score_opponent'] = other_player_in_game[0].score
+  if ( pigo ):
+    params['score_opponent'] = pigo.score
   
-  # deal if it's not already dealt
-  if ( game.game_state == PGGame.ABOUT_TO_DEAL ):
-    game.deal_tiles()
-  
-  # create the hands for this player
-  params['pgsets'] = game.sets_for_player( session_player( request ) )
+  # create the hands for this player (sets_for_player should be called first)
   params['pgtile_size'] = "medium"
+  params['current_player_state'] = PGPlayerInGame.state_ui( pig.state() )
+  
   
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
@@ -276,10 +283,10 @@ def data_hand_label( request, params = {} ):
 def data_opponent_state( request, game_id ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
-  opponents = player.opponents_for_game( game )
+  opponent = player.opponent_for_game( game )
   status = "|"
-  if ( opponents and opponents[0] ):
-    status += game.state_for_player( opponents[0] )
+  if ( opponent ):
+    status += game.state_for_player( opponent )
   else:
     status += "error"
   return HttpResponse( status )
@@ -355,14 +362,17 @@ def score_in_deal( request, game_id ):
     return HttpResponseNotAllowed( "Bad Request" )
   
   # for each set, return W for win, . for push and L for loss
-  ret_val = ""
-  player_sets = pig.sets()
-  opponent_sets = pigo.sets()
-  for player_set, opponent_set in zip(player_sets, opponent_sets):
-    if ( player_set > opponent_set ):
-      ret_val += "W"
-    elif ( player_set < opponent_set):
-      ret_val += "L"
-    else:
-      ret_val += "."
+  ret_val = pig.win_lose_string_against( pigo )
   return HttpResponse(ret_val)
+
+#-------------------------------------------------------------------
+# AJAX response for the score of the game
+def game_score( request, game_id ):
+  pigo = opponent_in_session_game( request, game_id )
+  if not pigo:
+    return HttpResponseNotAllowed( "Bad Request" )
+  pig = player_in_session_game( request, game_id )
+  if not pig:
+    return HttpResponseNotAllowed( "Bad Request" )
+  
+  return HttpResponse( str( pig.score() ) + " - " + str( pigo.score() ) )

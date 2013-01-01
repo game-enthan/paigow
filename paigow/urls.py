@@ -64,6 +64,9 @@ urlpatterns = patterns('',
   # in this deal (three letters, W, dot or L for 3, 2, 1 hands)
   url(r'^data/game/([0-9]+)/score_in_deal', 'paigow.views.score_in_deal' ),
   
+  # get the score of the game (not just the deal)
+  url(r'^data/game/([0-9]+)/score$', 'paigow.views.game_score' ),
+  
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',
     ListView.as_view(

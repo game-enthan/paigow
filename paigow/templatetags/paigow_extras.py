@@ -19,9 +19,8 @@ def title():
 def opponent_for_game( value, arg, autoescape = None ):
   player = arg
   game = value
-  opponents = player.opponents_for_game( game )
-  if ( opponents ):
-    opponent = opponents[0]
+  opponent = player.opponent_for_game( game )
+  if ( opponent ):
     return opponent
   return "unknown"
 
@@ -35,9 +34,8 @@ def state_for_player( value, arg, autoescape = None ):
 def state_for_opponent( value, arg, autoescape = None ):
   player = arg
   game = value
-  opponents = player.opponents_for_game( game )
-  if ( opponents ):
-    opponent = opponents[0]
+  opponent = player.opponent_for_game( game )
+  if ( opponent ):
     return game.state_for_player( opponent )
   else:
     return "unknown state"

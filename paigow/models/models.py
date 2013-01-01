@@ -81,8 +81,8 @@ class PGPlayerInGame(models.Model):
     return self.player_score
   
   def add_to_score( self, new_points ):
-    self.score += new_points
-    save()
+    self.player_score += new_points
+    self.save()
   
   def state( self ):
     return self.deal_state
@@ -160,6 +160,7 @@ class PGPlayerInGame(models.Model):
       self.set3 = set3
       self.deal_state = PGPlayerInGame.READY
       self.save()
+      self.game.player_has_set_his_tiles( self.player )
     else:
       print "Player " + str( self.player) + " is ready in game " + str( self.game ) + " but the sets do not compute!"
   
@@ -172,4 +173,34 @@ class PGPlayerInGame(models.Model):
         ret_val += tile.background_position_css_value( pgtile_size ) + ";"
       ret_val += "|"
     return ret_val
-
+  
+  def win_lose_string_against( self, pigo ):
+    # only do it if both are ready.
+    if ( self.state() != PGPlayerInGame.READY or pigo.state() != PGPlayerInGame.READY ):
+      raise ValueError
+    
+    # for each set, return W for win, . for push and L for loss
+    ret_val = ""
+    player_sets = self.sets()
+    opponent_sets = pigo.sets()
+    for player_set, opponent_set in zip(player_sets, opponent_sets):
+      if ( player_set > opponent_set ):
+        ret_val += "W"
+      elif ( player_set < opponent_set):
+        ret_val += "L"
+      else:
+        ret_val += "."
+    return ret_val
+  
+  def record_score_char_for_set( self, pigo, ch, num_points ):
+    if ch == 'W':
+      self.add_to_score( num_points )
+    elif ch == 'L':
+      pigo.add_to_score( num_points )
+  
+  def record_scores_against( self, pigo ):
+    wl_str = self.win_lose_string_against( pigo )
+    num_points = 1
+    for ch in wl_str:
+      self.record_score_char_for_set( pigo, ch, num_points )
+      num_points = num_points + 1

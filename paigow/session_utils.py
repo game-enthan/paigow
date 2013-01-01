@@ -38,14 +38,9 @@ def session_opponent( request, game ):
     print "Malformed request: no player in session"
     raise ValueError
   
-  opponents = player.opponents_for_game( game )
-  if ( not opponents ):
-    print "Malformed request: no opponents for player '" + str( player ) + "' in game '" + str( game ) + "'"
-    raise ValueError
-  
-  opponent = opponents[0]
+  opponent = player.opponent_for_game( game )
   if ( not opponent ):
-    print "Malformed request: no first opponent for player '" + str( player ) + "' in game '" + str( game ) + "'"
+    print "Malformed request: no opponent for player '" + str( player ) + "' in game '" + str( game ) + "'"
     raise ValueError
   
   return opponent

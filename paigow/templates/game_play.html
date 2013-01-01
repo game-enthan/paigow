@@ -10,6 +10,13 @@
 {% block header-javascript %}
   <script language="javascript">
 
+    //  This is our state as per button-pushing, which may be a little ahead
+    //  of what the server thinks (and may not agree if the server goes down).
+    var current_player_state = "{{ setting_tiles_state }}";
+
+    //  This is the server's idea of what our opponent's state is.
+    var current_opponent_state = "unknown";
+    
     //  Showing failure when communicating with server.
     function show_ajax_failure( error_msg, errorThrown, textStatus, jqXHR )
     {
@@ -21,14 +28,14 @@
     }
 
     //  Convenience functions for getting ids etc.
-    function set_num_of_button( button )  { return parseInt(button.id.substring(0, 1)); }      // first char
+    function set_num_of_button( button )  { return parseInt(button.id.substring(0, 1)); }      //  first char
 
     function set_num_of_set( jqset )
     {
       var parent = jqset.parent();
       var jqsets = parent.find(".pgset");
       var pgset = jqset[0];
-      var set_num = jqsets.index( pgset ) + 1;   // 1-based
+      var set_num = jqsets.index( pgset ) + 1;   //  1-based
       if ( /opponent/.test(pgset.id) )
         set_num += 3;
       return set_num;
@@ -44,7 +51,7 @@
       }
       var jqdeal = $("#paigow321-deal-" + player_type);
       var jqsets = jqdeal.find(".pgset");
-      return $(jqsets[ set_num-1 ] );      // 1-based
+      return $(jqsets[ set_num-1 ] );      //  1-based
     }
 
     function jqset_of_tile( pgtile ) { return $(pgtile).parent(); }
@@ -53,7 +60,7 @@
 
     function tiles_of_jqset( jqset ) { return jqset.find('.pgtile-div'); }
 
-    function tile_num( pgtile ) { return tiles_of_jqset( jqset_of_tile(pgtile) ).index( pgtile ); }    // index in tile list
+    function tile_num( pgtile ) { return tiles_of_jqset( jqset_of_tile(pgtile) ).index( pgtile ); }    //  index in tile list
 
     function jqtile_of_nums( set_num, tile_num ) { return $(tiles_of_jqset( jqset_of_num( set_num ) )[tile_num] ); }
 
@@ -283,14 +290,7 @@
       $(labels[1]).text( hands[1] );
     }
 
-    //  This is our state as per button-pushing, which may be a little ahead
-    // of what the server thinks (and may not agree if the server goes down).
-    var current_player_state = "{{ player_current_state }}";
-
-    //  This is the server's idea of what our opponent's state is.
-    var current_opponent_state = "unknown";
-    
-    // Two hands have switched; restore the switch buttons
+    //  Two hands have switched; restore the switch buttons
     function restore_switch_enabled()
     {
       $(".pgset-button-switch").removeClass("disabled");
@@ -321,7 +321,7 @@
       setTimeout( restore_switch_enabled, 500 );
 
       //  Reorder the sets within the deal.
-      if ( dest_set_num == 3 )     // goes to the end (1-based, remember)
+      if ( dest_set_num == 3 )     //  goes to the end (1-based, remember)
       {
         $(source.parent()).append( source );
       }
@@ -331,14 +331,14 @@
       }
     }
 
-    // Poll the server for the opponent's state
+    //  Poll the server for the opponent's state
     function get_opponent_state()
     {
       get_xxx_state( "opponent", true )
     }
     
-    // Ask the server for the player's state (we know it, but to have only one place
-    // where the strings are used, we have the server give it to us.
+    //  Ask the server for the player's state (we know it, but to have only one place
+    //  where the strings are used, we have the server give it to us.
     function get_player_state()
     {
       get_xxx_state( "player", false )
@@ -346,8 +346,8 @@
 
     function get_xxx_state( label, keep_polling )
     {
-      // If the game is revealed, no reason to poll.
-      if ( !check_game_state( false ) )
+      //  If the game is revealed, no reason to poll.
+      if ( !check_deal_state( false ) )
         return;
 
       $.ajax( {
@@ -381,9 +381,9 @@
       }
       $("#state_" + label).text( state );
       
-      // If this is the opponent and the returned state is that they finished setting the
-      // tiles, there is no need to keep polling... AND if we've already finished, time to
-      // do the reveal!
+      //  If this is the opponent and the returned state is that they finished setting the
+      //  tiles, there is no need to keep polling... AND if we've already finished, time to
+      //  do the reveal!
       if ( label == "opponent" )
       {
         current_opponent_state = state;
@@ -396,24 +396,24 @@
         }
       }
       
-      // This returns false if it's time to reveal, so we don't have to keep polling.  We would
-      // catch this anyway when it's time to poll, but we can stop it here.
-      var still_waiting = check_game_state( true );
+      //  This returns false if it's time to reveal, so we don't have to keep polling.  We would
+      //  catch this anyway when it's time to poll, but we can stop it here.
+      var still_waiting = check_deal_state( true );
 
-      // Ask again in 5 seconds
+      //  Ask again in 5 seconds
       if ( poll_again && still_waiting )
         setTimeout( get_opponent_state, 5000 );
     }
     
     function tiles_are_set()
     {
-      // Once the tiles are set, you cannot do anything else because it will show your
-      // tiles to the other player if they're ready.
+      //  Once the tiles are set, you cannot do anything else because it will show your
+      //  tiles to the other player if they're ready.
       $("#preview-hands-button").addClass("disabled");
       $("#tiles-are-set-button").addClass("disabled");
       $(".pgset-button-switch").addClass("disabled");
 
-      // User has hit "Tiles are Set" so tell the server of our state.
+      //  User has hit "Tiles are Set" so tell the server of our state.
       $.ajax( {
         url: "/paigow/data/game/{{ game.id }}/tiles_are_set",
         context: document.body,
@@ -426,31 +426,34 @@
         error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to tell the servers that the tiles are set.", errorThrown, textStatus, jqXHR ); }
       } );
 
-      current_player_state = "{{ tiles_are_set_state }}";
+      set_current_player_state( "{{ tiles_are_set_state }}" );
     }
     
     function tiles_are_set_success( context, data, textStatus, jqXHR )
     {
-      // ajax call for setting tiles has returned so the server knows our state
-      // is new, so we can get it.
+      //  ajax call for setting tiles has returned so the server knows our state
+      //  is new, so we can get it.
       get_player_state();
       
-      // Check to see if it's time to reveal.
-      check_game_state( true );
+      //  Make sure the buttons are in the right state
+      //  set_buttons_from_current_state();
+
+      //  Check to see if it's time to reveal.
+      check_deal_state( true );
     }
     
     function preview_hands()
     {
-      // We get clicks whether or not disabled since we're doing the button stuff
-      // manually.  Ignore clicks while we're disabled.  Then don't allow us to
-      // be clicked in the middle, because it screws up the animation.  When all
-      // the movement is done, we'll be re-enabled.
+      //  We get clicks whether or not disabled since we're doing the button stuff
+      //  manually.  Ignore clicks while we're disabled.  Then don't allow us to
+      //  be clicked in the middle, because it screws up the animation.  When all
+      //  the movement is done, we'll be re-enabled.
       if ( $("#preview-hands-button").hasClass("disabled") )
         return;
       $("#preview-hands-button").addClass("disabled");
 
-      // Tell the server of our new state so the opponent can see it.  In the case
-      // that we're previewing, we'll want a return function.
+      //  Tell the server of our new state so the opponent can see it.  In the case
+      //  that we're previewing, we'll want a return function.
       var url_cmd = "unpreview_hands";
       var success_val = undefined;
       var data_val = undefined;
@@ -472,19 +475,51 @@
         error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to tell the server that we are previewing.", errorThrown, textStatus, jqXHR ); }
       } );
 
-      // If we're coming back from preview (or tile-setting), we don't re-arrange hands
-      // so we can start rotating now.
+      //  If we're coming back from preview (or tile-setting), we don't re-arrange hands
+      //  so we can start rotating now.
       if ( current_player_state != "{{ setting_tiles_state }}" )
       {
-        // we are un-previewing: no need to move tiles around, just rotate the
-        // low hands back (the global current_player_state tells this function
-        // how it should rotate).
+        //  we are un-previewing: no need to move tiles around, just rotate the
+        //  low hands back (the global current_player_state tells this function
+        //  how it should rotate).
         for ( var s = 1; s <= 3; s++ )
           rotate_low_hands_for_preview( s );
       }
+    }
+    
+    //  delay while we rotate: if we set it to draggable while we rotate, some bad stuff happens
+    function enable_disable_tile_draggable( enable_disable )
+    {
+       $(".pgtile-div-player").each( function() { $(this).draggable( enable_disable ) } );
+    }
 
-      // Whatever we did, we have a new player state.
-      setTimeout( get_player_state, 1000 );
+    function set_current_player_state( new_state )
+    {
+      current_player_state = new_state;
+      if ( current_player_state == "{{ setting_tiles_state }}" )
+      {
+        $("#preview-hands-button").removeClass("disabled");
+        $("#preview-hands-button").text( "Preview Hands" );
+        $("#tiles-are-set-button").addClass("disabled");
+        $(".pgset-button-switch").removeClass("disabled");
+        setTimeout( function() { enable_disable_tile_draggable( "enable" ) }, 2000 );
+      }
+      else if ( current_player_state == "{{ preview_hands_state }}" )
+      {
+        $("#preview-hands-button").removeClass("disabled");
+        $("#preview-hands-button").text( "Unpreview Hands" );
+        $("#tiles-are-set-button").removeClass("disabled");
+        $(".pgset-button-switch").removeClass("disabled");
+        enable_disable_tile_draggable( "disable" );
+      }
+      else if ( current_player_state == "{{ tiles_are_set_state }}" )
+      {
+        $("#preview-hands-button").text( "Next Deal" );
+        $("#preview-hands-button").addClass("disabled");
+        $("#tiles-are-set-button").addClass("disabled");
+        $(".pgset-button-switch").addClass("disabled");
+        enable_disable_tile_draggable( "disable" );
+      }
     }
     
     //  Switch two tiles' positions, animating it.
@@ -506,9 +541,9 @@
     {
       if ( current_player_state == "{{ setting_tiles_state }}" )
       {
-        // The return values show where the tiles should appear if the dealer
-        // turned over our set hands: high hand upright to the left, and
-        // low hand horizontal to the right.
+        //  The return values show where the tiles should appear if the dealer
+        //  turned over our set hands: high hand upright to the left, and
+        //  low hand horizontal to the right.
         var reorder_array = data.split("|");
         for ( var r = 1; r <= 3; r++ )
           reorder_tiles_in_hands( r, reorder_array[r] );
@@ -520,17 +555,17 @@
       var jqset = jqset_of_num( set_num );
       var lefts = lefts_of_jqset( jqset );
 
-      // We re-order the tiles in each hand first; we can tell
-      // if we need to reorder by the relative location of the index
-      // returned by the server.
+      //  We re-order the tiles in each hand first; we can tell
+      //  if we need to reorder by the relative location of the index
+      //  returned by the server.
       if (reorder_str.indexOf('1') < reorder_str.indexOf('0'))
         switch_tiles( jqset, 0, 1, lefts );
       if (reorder_str.indexOf('3') < reorder_str.indexOf('2'))
         switch_tiles( jqset, 2, 3, lefts );
 
-      // Something about simultaneous animation of the same tiles
-      // doesn't work.  The default duration is 400 ms, so wait
-      // 500 msec and then reorder the hands if necessary.
+      //  Something about simultaneous animation of the same tiles
+      //  doesn't work.  The default duration is 400 ms, so wait
+      //  500 msec and then reorder the hands if necessary.
       setTimeout( function() { reorder_hands_in_set( set_num, reorder_str ); }, 500 );
     }
 
@@ -539,7 +574,7 @@
       var jqset = jqset_of_num( set_num );
       var lefts = lefts_of_jqset( jqset );
 
-      // Now re-order the hands.
+      //  Now re-order the hands.
       if (reorder_str.indexOf('3') < reorder_str.indexOf('0'))
       {
         switch_tiles( jqset, 0, 2, lefts );
@@ -547,58 +582,34 @@
         update_hand_labels( jqset );
       }
       
-      // After the reordering, we'll rotate.
+      //  After the reordering, we'll rotate.
       setTimeout( function() { rotate_low_hands_for_preview( set_num ) }, 500 );
     }
     
-    function restore_draggable_to_tiles( jqtile )
+    function toggle_preview_state()
     {
-       $(".pgtile-div-player").each( function() { $(this).draggable( "enable" ) } );
-    }
-
-    function set_new_preview_state()
-    {
-      
-      var new_text;
-      
       if ( current_player_state == "{{ setting_tiles_state }}" )
-      {
-        current_player_state = "previewing hands";
-        new_text = "Un-preview Hands";
-        $("#tiles-are-set-button").removeClass("disabled");
-
-        // Make sure all tile are no longer draggable; this will be
-        // restored if the user un-previews
-        $(".pgtile-div-player").each( function() { $(this).draggable( "disable" ) } );
-      }
+        new_state = "{{ preview_hands_state }}";
       else
-      {
-        new_text = "Preview Hands";
-        current_player_state = "{{ setting_tiles_state }}";
-        $("#tiles-are-set-button").addClass("disabled");
-
-        setTimeout( restore_draggable_to_tiles, 1000 );
-      }
-    
-      $("#preview-hands-button").text( new_text );
-      $("#preview-hands-button").removeClass("disabled");
-
+        new_state = "{{ setting_tiles_state }}";
+      
+      set_current_player_state( new_state );
     }
     
     function rotate_low_hands_for_preview( set_num )
     {
       rotate_low_hand_in_set( set_num, false );
 
-      // finish it all up... this is skanky.  After the third set,
-      // we have to restore draggable or whatever needs to be done
-      // after all the animation.
+      //  finish it all up... this is skanky.  After the third set,
+      //  we have to restore draggable or whatever needs to be done
+      //  after all the animation.
       if ( set_num == 3 )
-        setTimeout( set_new_preview_state, 1500 );
+        setTimeout( toggle_preview_state, 1500 );
     }
 
     function rotate_low_hand_in_set( set_num, force_rotate )
     {
-      // Rotage the second two tiles as well.
+      //  Rotage the second two tiles as well.
       var jqtile2 = jqtile_of_nums( set_num, 2 );
       var jqtile3 = jqtile_of_nums( set_num, 3 );
 
@@ -629,42 +640,42 @@
       }
 
       //  We have to wait until the rotation is finished before moving it,
-      // or they'll interfere with each other.
-      setTimeout( function() { finish_unpreview( jqtile, left_amt, top_amt, rotating ); }, 500 );
+      //  or they'll interfere with each other.
+      setTimeout( function() { finish_unpreview( jqtile, left_amt, top_amt, rotating ); }, 1000 );
     }
     
     function finish_unpreview( jqtile, left_amt, top_amt, rotating )
     {
-      // If we had previewed, we had added this class an it effects
-      // the animate motion.  Make sure it's gone
+      //  If we had previewed, we had added this class an it effects
+      //  the animate motion.  Make sure it's gone
       jqtile.removeClass("pgtile-ease-in-out");
       
-      // This class makes it un-draggable for some reason.  Remove it too.
+      //  This class makes it un-draggable for some reason.  Remove it too.
       if (!rotating)
         jqtile.removeClass("unrotated");
   
-      // Now we want to move it to the right place
+      //  Now we want to move it to the right place
       jqtile.animate( { left: left_amt, top: top_amt } );
     }
     
     //  Called in all the places were we either want just check for reveal, or actually
-    // do the reveal.  The parameter says which.  Return true if the game is still going
-    // on, false if it's time to reveal.
+    //  do the reveal.  The parameter says which.  Return true if the game is still going
+    //  on, false if it's time to reveal.
     var g_already_revealed = false;
-    function check_game_state( reveal_if_ready )
+    function check_deal_state( reveal_if_ready )
     {
       //  Find out if someone is still setting tiles.  If they are, or we're just checking, return that state.
       var someone_is_still_setting_tiles = ( current_player_state != "{{ tiles_are_set_state}}" ) || ( current_opponent_state != "{{ tiles_are_set_state}}" );
       if ( someone_is_still_setting_tiles || !reveal_if_ready )
         return someone_is_still_setting_tiles;
       
-      // Time to reveal!  Make sure we only do it once (that should already be taken care of
-      // by our clients logic, but make sure.
+      //  Time to reveal!  Make sure we only do it once (that should already be taken care of
+      //  by our clients logic, but make sure.
       if ( !g_already_revealed )
       {
         g_already_revealed = true;
         
-        // Get the opponent's tile values so we can show them.
+        //  Get the opponent's tile values so we can show them.
         $.ajax( {
           url: "/paigow/data/game/{{ game.id }}/opponent_tiles/{{ pgtile_size }}",
           context: document.body,
@@ -686,12 +697,12 @@
     function get_opponent_tiles_success( context, data, textStatus, jqXHR )
     {
       var sets_array = data.split("|");
-      // We can't do setTimeout in a loop, with a loop variable, because the
-      // lambda expression evaluates its arguments using local variables at the
-      // time of running, and by then they have changed (for instance, set_num is
-      // 3 when the loop ends, and the timeout function always gets 3).
-      // Instead, have changed timeouts with new values.
-      setTimeout( function() { expose_opponent_hand_chained( 6, sets_array ); }, 2000 );
+      //  We can't do setTimeout in a loop, with a loop variable, because the
+      //  lambda expression evaluates its arguments using local variables at the
+      //  time of running, and by then they have changed (for instance, set_num is
+      //  3 when the loop ends, and the timeout function always gets 3).
+      //  Instead, have changed timeouts with new values.
+      setTimeout( function() { expose_opponent_hand_chained( 6, sets_array ); }, 1000 );
     }
 
     function expose_opponent_hand_chained( set_num, sets_array )
@@ -700,16 +711,16 @@
       var tiles_array = set_vals.split(";");
       for ( var t = 0; t < 4; t++ )
         expose_tile_value( jqtile_of_nums( set_num, t ), tiles_array[t] );
-      setTimeout( function() { update_hand_labels( jqset_of_num( set_num ) ) }, 2000 );
+      setTimeout( function() { update_hand_labels( jqset_of_num( set_num ) ) }, 1000 );
       if ( set_num > 4 )
-        setTimeout( function() { expose_opponent_hand_chained( set_num-1, sets_array ); }, 4000 );
+        setTimeout( function() { expose_opponent_hand_chained( set_num-1, sets_array ); }, 2000 );
       else
-        setTimeout( get_score_in_deal, 4000 );
+        setTimeout( get_score_in_deal, 2000 );
     }
       
     function get_score_in_deal()
     {
-        // Get the opponent's tile values so we can show them.
+        //  Get the opponent's tile values so we can show them.
         $.ajax( {
           url: "/paigow/data/game/{{ game.id }}/score_in_deal",
           context: document.body,
@@ -723,26 +734,46 @@
       for ( var set_num = 1; set_num <= 3; set_num++ )
       {
         var ch = data[set_num-1]
-        var points = 4 - set_num
         var jqscore = $("#pgscore-in-deal-" + (set_num-1))
         if ( ch == 'W' )
         {
           jqscore.css( { color: "ForestGreen" } );
-          jqscore.text( "Win 3" );
+          jqscore.text( "W  I  N" );
         }
         else if ( ch == 'L' )
         {
           jqscore.css( { color: "Crimson" } );
-          jqscore.text( "Lose" );
+          jqscore.text( "L  O  S  E" );
         }
         else
         {
-          jqscore.css( { color: "Silver" } );
-          jqscore.text( "Push" );
+          jqscore.css( { color: "SlateGray" } );
+          jqscore.text( "P  U  S  H" );
         }
       }
-    }
+      
+      setTimeout( update_game_score, 2000 )
+      
+      //  Now we can do the next dea.
+      $("#preview-hands-button").removeClass("disabled");
 
+    }
+    
+    function update_game_score()
+    {
+      $.ajax( {
+        url: "/paigow/data/game/{{ game.id }}/score",
+        context: document.body,
+        success: function( data, textStatus, jqXHR ) { update_game_score_success( this, data, textStatus, jqXHR ); },
+        error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to get the game score.", errorThrown, textStatus, jqXHR ); }
+      } );
+    }
+    
+    function update_game_score_success( context, data, textStatus, jqXHR )
+    {
+      $("#game_score").text( data );
+    }
+    
   </script>
 {% endblock %}
 
@@ -775,17 +806,20 @@
       disabled: true
     } );
 
-  // Make the switch buttons active
+  //  Make the switch buttons active
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
   
-  // Make the "tiles-are-set" button active
+  //  Make the "tiles-are-set" button active
   $("#tiles-are-set").click( function( button ) { return tiles_are_set( this ); } );
   
-  // Make the "tiles-are-set" button active
+  //  Make the "tiles-are-set" button active
   $("#preview-hands-button").click( function( button ) { return preview_hands( this ); } );
   
   //  Start polling for the opponent state
   get_opponent_state();
+
+  set_current_player_state( "{{ current_player_state }}" )
+
 
 {% endblock %}
 
@@ -806,13 +840,13 @@
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
   <table>
     <tr>
-        <td width="45%">
+        <td width="48%">
           {% show_deal pgsets player %}
         </td>
-        <td xwidth="10%" valign="top">
+        <td xwidth="8%" valign="top">
           <table width="100%" height="100%">
             <tr>
-              <td height="20px" align="center" valign="top">scoring</td>
+              <td id="game_score" height="20px" align="center" valign="top">{{ score_player }} - {{ score_opponent }}</td>
             </tr>
             <tr>
               <td align="center">
@@ -825,7 +859,7 @@
             </tr>
           </table>
         </td>
-        <td xwidth="45%">
+        <td xwidth="46%">
           {% show_deal pgsets game|opponent_for_game:player %}
         </td>
     </tr>

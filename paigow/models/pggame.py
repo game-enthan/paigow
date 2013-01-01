@@ -112,6 +112,7 @@ class PGGame( models.Model ):
     pig = PGPlayerInGame.create( self, player )
     pig.save()
   
+  
   # Get the deal given the deal number
   def deal( self, deal_number ):
     from pgdeal import PGDeal
@@ -203,7 +204,28 @@ class PGGame( models.Model ):
     if ( not pig ):
       raise ValueError
     return pig.state_ui( pig.state() )
-
+  
+  def player_has_set_his_tiles( self, player ):
+    from models import PGPlayerInGame
+    
+    # if we're already finished with the game, don't bother.
+    if ( self.game_state != PGGame.SETTING_TILES ):
+      return
+    
+    # if the opponent is not ready, nothing to do
+    pigo = self.player_in_game( player.opponent_for_game( self ) )
+    if not pigo:
+      raise ValueError
+    if ( pigo.state() != PGPlayerInGame.READY ):
+      return
+    
+    # both are ready!  Add the score
+    pig = self.player_in_game( player )
+    if not pig:
+      raise ValueError
+    pig.record_scores_against( pigo )
+    
+      
 # ----------------------------------------------------
 # Test PGGame class
 
