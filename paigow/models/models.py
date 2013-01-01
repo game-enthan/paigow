@@ -200,7 +200,7 @@ class PGPlayerInGame(models.Model):
   
   def record_scores_against( self, pigo ):
     wl_str = self.win_lose_string_against( pigo )
-    num_points = 1
+    num_points = 3
     for ch in wl_str:
       self.record_score_char_for_set( pigo, ch, num_points )
-      num_points = num_points + 1
+      num_points = num_points - 1
