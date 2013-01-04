@@ -84,7 +84,7 @@ class PGHand:
     if other.is_pair():
       if not self.is_pair():
         return True                                 # other is a pair, we are not
-      return other.high_tile < self.high_tile       # both pairs: higher tile wins
+      return self.high_tile < other.high_tile       # both pair, check high tile
     elif self.is_pair():
       return False;                                 # we are pair, other is not
     # neither is pair...
@@ -93,7 +93,7 @@ class PGHand:
     if other.is_wong():
       if not self.is_wong():
         return True                                 # other is wong, we are not
-      return other.high_tile < self.high_tile       # both wongs, check high tile
+      return self.high_tile < other.high_tile       # both wong, check high tile
     elif self.is_wong():
       return False                                 # we are wong, other is not
     # neither is wong...
@@ -102,16 +102,16 @@ class PGHand:
     if other.is_gong():
       if not self.is_gong():
         return True                                 # other is gong, we are not
-      return other.high_tile < self.high_tile       # both gong, check high tile
+      return self.high_tile < other.high_tile       # both gong, check high tile
     elif self.is_gong():
       return False                                 # we are gong, other is not
-    # neither is wong...
+    # neither is gong...
     
     # check high nine
     if other.is_high_nine():
       if not self.is_high_nine():
-        return True                                 # other is wong, we are not
-      return other.high_tile < self.high_tile       # both wongs, check high tile
+        return True                                 # other is high nine, we are not
+      return self.high_tile < other.high_tile       # both high nine, check high tile
     elif self.is_high_nine():
       return False                                 # we are high nine, other is not
     # neither is high nine
@@ -186,6 +186,11 @@ class PGHandTest( TestCase ):
     self.assertFalse( hand2 <= hand1 )
     self.assertTrue( hand2 > hand3 )
     self.assertTrue( hand2 > hand4 )
+    mixed_seven = PGTile.with_name( "mixed seven" )
+    hand1 = PGHand.create( teen, mixed_five )
+    hand2 = PGHand.create( teen, mixed_seven )
+    self.assertTrue( hand2 > hand1 )
+    self.assertTrue( hand1 < hand2 )
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

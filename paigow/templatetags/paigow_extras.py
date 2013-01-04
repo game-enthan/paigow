@@ -19,26 +19,10 @@ def title():
 def opponent_for_game( value, arg, autoescape = None ):
   player = arg
   game = value
-  opponent = player.opponent_for_game( game )
+  opponent = player.opponent_for_deal( game, 1 )
   if ( opponent ):
     return opponent
   return "unknown"
-
-@register.filter(needs_autoescape=True)
-def state_for_player( value, arg, autoescape = None ):
-  player = arg
-  game = value
-  return game.state_for_player( player )
-
-@register.filter(needs_autoescape=True)
-def state_for_opponent( value, arg, autoescape = None ):
-  player = arg
-  game = value
-  opponent = player.opponent_for_game( game )
-  if ( opponent ):
-    return game.state_for_player( opponent )
-  else:
-    return "unknown state"
 
 @register.inclusion_tag( "pgdeal.html", takes_context=True )
 def show_deal( context, pgsets, deal_owner ):
@@ -51,7 +35,7 @@ def show_deal( context, pgsets, deal_owner ):
     context['is_opponent'] = True
   
   # this is the status of the player ("setting tiles" etc)
-  context['player_state'] = context['game'].state_for_player( deal_owner )
+  context['player_state'] = context['game'].state_for_player( deal_owner, context['deal_number'] )
 
   # this is called for both the player and the opponent, and will
   # show or hide the tiles and commands depending.

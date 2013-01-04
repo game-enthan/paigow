@@ -220,7 +220,6 @@ def add_game( request, params = {} ):
 #-------------------------------------------------------------------
 # User clicked a URL that corresponds to a game.
 def play_game( request, game_id, deal_number_str, params = {} ):
-  # import pdb; pdb.set_trace()
   
   from models.pgtile import PGTile
   from pghand import PGHand
@@ -278,7 +277,7 @@ def next_deal( request, game_id, deal_number, params = {} ):
   if ( game.state() == PGGame.COMPARING_HANDS ):
     game.game_state = PGGame.ABOUT_TO_DEAL
     game.deal_tiles()
-    game.assure_players_for_deal()
+    game.assure_players_for_deal( game.current_deal_number )
   return redirect( '/paigow/game/' + str( game_id ) + '/' + str( game.current_deal_number )  )
 
 #-------------------------------------------------------------------
@@ -299,7 +298,7 @@ def data_opponent_state( request, game_id, deal_number ):
   opponent = player.opponent_for_deal( game, deal_number )
   status = "|"
   if ( opponent ):
-    status += game.state_for_player( opponent )
+    status += game.state_for_player( opponent, deal_number )
   else:
     status += "error"
   return HttpResponse( status )
@@ -309,7 +308,7 @@ def data_opponent_state( request, game_id, deal_number ):
 def data_player_state( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
-  status = "|" + game.state_for_player( player )
+  status = "|" + game.state_for_player( player, deal_number )
   return HttpResponse( status )
 
 #-------------------------------------------------------------------

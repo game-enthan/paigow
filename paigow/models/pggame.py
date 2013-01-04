@@ -104,7 +104,7 @@ class PGGame( models.Model ):
   def players( self ):
     players = []
     from pgplayerindeal import PGPlayerInDeal
-    pigs = PGPlayerInDeal.objects.filter( game = self, deal_number = self.current_deal_number ).order_by( 'player__id' )
+    pigs = PGPlayerInDeal.objects.filter( game = self, deal_number = 1 ).order_by( 'player__id' )
     for pgpid_player in pigs:
       players.append( pgpid_player.player )
     return players
@@ -123,8 +123,7 @@ class PGGame( models.Model ):
     if ( self.current_deal_number != 1 ):
       raise RuntimeError
     
-    pgpid_player = PGPlayerInDeal.create( self, player, self.current_deal_number )
-    pgpid_player.save()
+    pgpid_player = self.assure_player_in_deal( player, self.current_deal_number )
   
   
   # Get the deal given the deal number
@@ -148,7 +147,7 @@ class PGGame( models.Model ):
     if ( not pigs ):
       return None
     return pigs[0]
-    
+  
   # shuffle the deck and save it as the current deal
   def deal_tiles( self ):
     
@@ -174,13 +173,44 @@ class PGGame( models.Model ):
     self.save()
   
   
-  # make sure this player has this deal
+  # make sure this player has this deal; if they don't, create it and
+  # give them the sets.
   def assure_player_in_deal( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
-    try:
-      pgpid_player = PGPlayerInDeal.objects.get( game = self, player = player, deal_number = deal_number )
-    except ObjectDoesNotExist:
+    from paigow.pgset import PGSet
+    
+    pgpid_player = self.player_in_deal( player, deal_number )
+    
+    if not pgpid_player:
       pgpid_player = PGPlayerInDeal.create(  self, player, deal_number )
+      pgpid_player.save()   # so self.players() will find it.
+      
+      # TBD: remove assumption that there are only two players.  This
+      # decides whether this player gets the first set of tiles or the
+      # second set of tiles.
+      index = 0
+      if ( player != self.players()[0] ):
+        index = 1
+      
+      # Create the hands and fill them.
+      deal = self.deal( deal_number )
+      sets = []
+      for i in range(3):
+        set = PGSet.create( ( deal.tile( index ),
+                              deal.tile( index + 2 ),
+                              deal.tile( index + 4 ),
+                              deal.tile( index + 6 ),
+                            )
+                          )
+        sets.append( set )
+        index += 8
+      
+      # remember what hands were dealt; when it comes time for
+      # the player to say how they set, we want to verify that
+      # they didn't cheat ;)
+      pgpid_player.set_dealt_sets( sets )
+      pgpid_player.save()
+    
     return pgpid_player
 
   def player_in_deal( self, player, deal_number ):
@@ -194,13 +224,12 @@ class PGGame( models.Model ):
   
   # a player has requested the next deal during a game: make sure we have PGPlayerInDeal for those.
   # we don't have to do anything except create it if it doesn't exist.
-  def assure_players_for_deal( self ):
+  def assure_players_for_deal( self, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
     players = self.players()
     for player in players:
-      assure_player_in_current_deal( player, self.current_deal_number)
-    
-    
+      self.assure_player_in_deal( player, self.current_deal_number)
+  
   def score_as_of_deal_for_player( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
     pgpids = PGPlayerInDeal.objects.filter( game = self, player = player )
@@ -215,46 +244,17 @@ class PGGame( models.Model ):
   
   def sets_for_player( self, player, deal_number ):
     
-    from paigow.pgset import PGSet
     from pgplayerindeal import PGPlayerInDeal
 
-    players = self.players()
-    
-    # TBD: remove assumption that there are only two players.  This
-    # decides whether this player gets the first set of tiles or the
-    # second set of tiles.
-    index = 0
-    if ( player != players[0] ):
-      index = 1
-    
-    # Create the hands and fill them.
-    deal = self.deal( deal_number )
-    sets = []
-    for i in range(3):
-      set = PGSet.create( ( deal.tile( index ),
-                            deal.tile( index + 2 ),
-                            deal.tile( index + 4 ),
-                            deal.tile( index + 6 ),
-                          )
-                        )
-      sets.append( set )
-      index += 8
-    
     # remember that this player asked for this deal
     pgpid_player = self.assure_player_in_deal( player, deal_number )
-    
     pgpid_player.tiles_were_requested()
     
-    # remember what hands were dealt; when it comes time for
-    # the player to say how they set, we want to verify that
-    # they didn't cheat ;)
-    pgpid_player.set_dealt_sets( sets )
-    
-    return sets
+    return pgpid_player.sets()
   
-  def state_for_player( self, player ):
+  def state_for_player( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal    
-    pgpid_player = self.player_in_deal( player, self.current_deal_number )
+    pgpid_player = self.player_in_deal( player, deal_number )
     if ( not pgpid_player ):
       raise ValueError
     return pgpid_player.state_ui( pgpid_player.state() )
