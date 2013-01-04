@@ -5,6 +5,7 @@
 from django.db import models
 
 from django.utils import timezone 
+from django.core.exceptions import ObjectDoesNotExist
 
 # ----------------------------------------------------
 # This represents one game, which may or may not be complete.
@@ -23,15 +24,6 @@ class PGGame( models.Model ):
   class Meta:
     app_label = 'paigow'
   
-  # allow creation with default fields
-  @classmethod
-  def create( cls, name ):
-    return cls( 
-      name = name,
-      start_date = timezone.now(),
-      game_state = PGGame.ABOUT_TO_DEAL,
-      current_deal_number = 0 )
-
   # name of the game ( there may be different types of games )
   name = models.CharField( max_length=100 )
   
@@ -68,6 +60,15 @@ class PGGame( models.Model ):
     choices = GAME_STATE_CHOICES,
     default = ABOUT_TO_DEAL )
 
+  # allow creation with default fields
+  @classmethod
+  def create( cls, name ):
+    return cls( 
+      name = name,
+      start_date = timezone.now(),
+      game_state = PGGame.ABOUT_TO_DEAL,
+      current_deal_number = 0 )
+
   # If the Game is in the middle of a deal when the players have to pause,
   # then in order to resume we need to save enough information that they
   # can get exactly the same tiles in the same order.  We could create a
@@ -95,22 +96,35 @@ class PGGame( models.Model ):
   def __unicode__( self ):
     return self.name
   
+  def state( self ):
+    return self.game_state
+  
   # Return the all the players for this single game.  Always order them by
   # player IDs to make sure the list is already returned in the same order.
   def players( self ):
     players = []
-    from models import PGPlayerInGame
-    pigs = PGPlayerInGame.objects.filter( game = self ).order_by( 'player__id' )
-    for pig in pigs:
-      players.append( pig.player )
+    from pgplayerindeal import PGPlayerInDeal
+    pigs = PGPlayerInDeal.objects.filter( game = self, deal_number = self.current_deal_number ).order_by( 'player__id' )
+    for pgpid_player in pigs:
+      players.append( pgpid_player.player )
     return players
   
   # Add a player to this game
   def add_player( self, player ):
     from pgplayer import PGPlayer
-    from models import PGPlayerInGame
-    pig = PGPlayerInGame.create( self, player )
-    pig.save()
+    from pgplayerindeal import PGPlayerInDeal
+    
+    # we can only add players when we have a deal.  If there hasn't been any deal,
+    # make one now.  This should only happen when adding the first player.
+    if ( self.current_deal_number == 0 ):
+      self.deal_tiles()
+    
+    # We can only add players during the first deal.
+    if ( self.current_deal_number != 1 ):
+      raise RuntimeError
+    
+    pgpid_player = PGPlayerInDeal.create( self, player, self.current_deal_number )
+    pgpid_player.save()
   
   
   # Get the deal given the deal number
@@ -129,8 +143,8 @@ class PGGame( models.Model ):
     return self.deal( self.current_deal_number )
   
   def player_in_game( self, player ):
-    from models import PGPlayerInGame
-    pigs = PGPlayerInGame.objects.filter( game = self, player = player )
+    from pgplayerindeal import PGPlayerInDeal
+    pigs = PGPlayerInDeal.objects.filter( game = self, player = player, deal_number = self.current_deal_number )
     if ( not pigs ):
       return None
     return pigs[0]
@@ -159,12 +173,32 @@ class PGGame( models.Model ):
     self.game_state = PGGame.SETTING_TILES
     self.save()
   
+  def player_in_deal( self, player, deal_number ):
+    from pgplayerindeal import PGPlayerInDeal
+    try:
+      pgpid = PGPlayerInDeal.objects.get( game = self, player = player, deal_number = deal_number )
+      return pgpid
+    except:
+      print "Cannot get pgpid for player '" + str(player) + "' in game '" + str(self) + "' for deal " + str(deal_number)
+      return None
   
-  def sets_for_player( self, player ):
+  def score_as_of_deal_for_player( self, player, deal_number ):
+    from pgplayerindeal import PGPlayerInDeal
+    pgpids = PGPlayerInDeal.objects.filter( game = self, player = player )
+    score = 0
+    for pgpid in pgpids:
+      if ( pgpid.deal_number < deal_number ):
+        score = score + pgpid.score()
+    return score
+  
+  def score_for_player( self, player ):
+    return self.score_as_of_deal_for_player( self, player, self.current_deal_number + 1 )
+  
+  def sets_for_player( self, player, deal_number ):
     
     from paigow.pgset import PGSet
-    from models import PGPlayerInGame
-  
+    from pgplayerindeal import PGPlayerInDeal
+
     players = self.players()
     
     # TBD: remove assumption that there are only two players.  This
@@ -175,7 +209,7 @@ class PGGame( models.Model ):
       index = 1
     
     # Create the hands and fill them.
-    deal = self.current_deal()
+    deal = self.deal( deal_number )
     sets = []
     for i in range(3):
       set = PGSet.create( ( deal.tile( index ),
@@ -188,42 +222,49 @@ class PGGame( models.Model ):
       index += 8
     
     # remember that this player asked for this deal
-    pig = PGPlayerInGame.objects.get( game = self, player = player )
-    pig.tiles_were_requested()
+    try:
+      pgpid_player = PGPlayerInDeal.objects.get( game = self, player = player, deal_number = deal_number )
+    except ObjectDoesNotExist:
+      pgpid_player = PGPlayerInDeal.create(  self, player, deal_number )
+    
+    pgpid_player.tiles_were_requested()
     
     # remember what hands were dealt; when it comes time for
     # the player to say how they set, we want to verify that
     # they didn't cheat ;)
-    pig.set_dealt_sets( sets )
+    pgpid_player.set_dealt_sets( sets )
     
     return sets
   
   def state_for_player( self, player ):
-    from models import PGPlayerInGame    
-    pig = self.player_in_game( player )
-    if ( not pig ):
+    from pgplayerindeal import PGPlayerInDeal    
+    pgpid_player = self.player_in_deal( player, self.current_deal_number )
+    if ( not pgpid_player ):
       raise ValueError
-    return pig.state_ui( pig.state() )
+    return pgpid_player.state_ui( pgpid_player.state() )
   
   def player_has_set_his_tiles( self, player ):
-    from models import PGPlayerInGame
+    from pgplayerindeal import PGPlayerInDeal
     
     # if we're already finished with the game, don't bother.
     if ( self.game_state != PGGame.SETTING_TILES ):
       return
     
     # if the opponent is not ready, nothing to do
-    pigo = self.player_in_game( player.opponent_for_game( self ) )
-    if not pigo:
+    pgpid_opponent = self.player_in_game( player.opponent_for_game( self ) )
+    if not pgpid_opponent:
       raise ValueError
-    if ( pigo.state() != PGPlayerInGame.READY ):
+    if ( pgpid_opponent.state() != PGPlayerInDeal.READY ):
       return
     
-    # both are ready!  Add the score
-    pig = self.player_in_game( player )
-    if not pig:
+    # both are ready!  We'are comparing hands, and add the score
+    self.game_state = PGGame.COMPARING_HANDS
+    self.save()
+    
+    pgpid_player = self.player_in_game( player )
+    if not pgpid_player:
       raise ValueError
-    pig.record_scores_against( pigo )
+    pgpid_player.record_scores_against( pgpid_opponent )
     
       
 # ----------------------------------------------------
@@ -268,10 +309,8 @@ class PGGameTest( TestCase ):
     self.assertEqual( players1[0], players2[0] )
     self.assertEqual( players1[1], players2[1] )
 
-  def test_deal_x( self ):
+  def test_deal( self ):
     from pgdeal import PGDeal
-    self.assertEqual( self.test_game.current_deal_number, 0 )
-    self.test_game.deal_tiles();
     self.assertEqual( self.test_game.current_deal_number, 1 )
     tiles_in_deal = PGDeal.objects.filter( game = self.test_game, deal_number = 1 )
     self.assertEqual( tiles_in_deal.count(), 1 )
@@ -279,10 +318,10 @@ class PGGameTest( TestCase ):
   def test_sets_for_player( self ):
     from paigow.pgset import PGSet
     from pgplayer import PGPlayer
-    self.test_game.deal_tiles()
-    sets = self.test_game.sets_for_player( self.player1 )
+    from pgplayerindeal import PGPlayerInDeal
+    sets = self.test_game.sets_for_player( self.player1, self.test_game.current_deal_number )
     self.assertEqual( len(sets), 3 )
-    sets = self.test_game.sets_for_player( self.player2 )
+    sets = self.test_game.sets_for_player( self.player2, self.test_game.current_deal_number )
     self.assertEqual( len(sets), 3 )
 
 

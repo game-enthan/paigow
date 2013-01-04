@@ -11,9 +11,9 @@ def session_player( request ):
 
 #-------------------------------------------------------------------
 # convenience
-# return the PGPlayerInGame with the current request session id
-def player_in_session_game( request, game_id ):
-  from models import PGPlayerInGame
+# return the PGPlayerInDeal with the current request session id
+def player_in_session_deal( request, game_id, deal_number ):
+  from models import PGPlayerInDeal
   from models import PGGame
   try:
     
@@ -21,7 +21,7 @@ def player_in_session_game( request, game_id ):
     player = session_player( request )
     if ( not player ):
       raise ValueError
-    return game.player_in_game( player )
+    return game.player_in_deal( player, deal_number )
   
   except:
     print "Malformed request: no player or pig in session"
@@ -49,8 +49,8 @@ def session_opponent( request, game ):
 #-------------------------------------------------------------------
 # convenience
 # return the opponent's player-in-game only if the game is finished
-def opponent_in_session_game( request, game_id ):
-  from models import PGPlayerInGame
+def opponent_in_session_deal( request, game_id, deal_number ):
+  from models import PGPlayerInDeal
   from models import PGGame
   
   # if any of these values don't exist it will raise and we'll return None
@@ -59,20 +59,20 @@ def opponent_in_session_game( request, game_id ):
     game = PGGame.objects.get( id = game_id )
     player = session_player( request )
     opponent = session_opponent( request, game )
-    pig = game.player_in_game( player )
-    if ( not pig ):
+    pgpid = game.player_in_deal( player, deal_number )
+    if ( not pgpid ):
       print "Malformed request: client is not a player in game '" + str( game ) + "'"
       raise ValueError    
-    if ( pig.state() != PGPlayerInGame.READY ):
+    if ( pgpid.state() != PGPlayerInDeal.READY ):
       print "Malformed request: player '" + str( player ) + "' in game '" + str( game ) + "' is requesting tiles before setting theirs!"
       raise ValueError
-    pigo = game.player_in_game( opponent )
-    if ( not pigo ):
+    pgpido = game.player_in_deal( opponent, deal_number )
+    if ( not pgpido ):
       print "Malformed request: opponent '" + str( opponent ) + "' in game '" + str( game ) + "' is not playing!"
       raise ValueError
-    if ( pigo.state() != PGPlayerInGame.READY ):
+    if ( pgpido.state() != PGPlayerInDeal.READY ):
       print "Malformed request: opponent '" + str( opponent ) + "' in game '" + str( game ) + "' has not yet finished setting their tiles!"
-    return pigo
+    return pgpido
     
   except:
     

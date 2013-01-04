@@ -22,7 +22,9 @@ class PGSet:
   def __unicode__( self ):
     return "Set: " + self.tile_chars()
   
-  # return the four-char string for the tiles
+  def __str__(self):
+    return unicode(self).encode('utf-8')  # return the four-char string for the tiles
+  
   def tile_chars( self ):
     return "" + self.tiles[0].char() + self.tiles[1].char() + self.tiles[2].char() + self.tiles[3].char()
   
@@ -118,6 +120,14 @@ class PGSet:
                     PGTile.with_char(tile_chars[1]),
                     PGTile.with_char(tile_chars[2]),
                     PGTile.with_char(tile_chars[3]) ) )
+
+  @classmethod
+  def create_with_tile_names( cls, tile_names ):
+    return PGSet.create( ( 
+                    PGTile.with_name(tile_names[0]),
+                    PGTile.with_name(tile_names[1]),
+                    PGTile.with_name(tile_names[2]),
+                    PGTile.with_name(tile_names[3]) ) )
 
 
 # ----------------------------------------------------

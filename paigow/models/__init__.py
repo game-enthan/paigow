@@ -13,11 +13,11 @@ from pgtile   import PGTile
 from pggame   import PGGame
 from pgplayer import PGPlayer
 from pgdeal   import PGDeal
+from pgplayerindeal import PGPlayerInDeal
 
 from pgtile   import PGTileTest
 from pggame   import PGGameTest
 from pgplayer import PGPlayerTest
 from pgdeal   import PGDealTest
+from pgplayerindeal import PGPlayerInDealTest
 
-# eventually we want to split this out into individual models
-from models import PGPlayerInGame

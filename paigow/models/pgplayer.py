@@ -54,8 +54,8 @@ class PGPlayer( models.Model ):
   # return all the games that this player is part of, ordered by the start
   # date of the games.
   def games( self ):
-    from paigow.models import PGPlayerInGame
-    pgpigs = PGPlayerInGame.objects.filter( player = self ).order_by('game__start_date')
+    from pgplayerindeal import PGPlayerInDeal
+    pgpigs = PGPlayerInDeal.objects.filter( player = self, deal_number = 1 ).order_by('game__start_date')
     for pgpig in pgpigs:
       yield pgpig.game
 

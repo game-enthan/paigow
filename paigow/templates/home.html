@@ -22,11 +22,11 @@
   {% if games %}
       {% for game in games %}
         <tr>
-          <td><a href="game/{{game.id}}">{{ game.name }}</a></td>
+          <td><a href="game/{{ game.id }}/{{ game.current_deal_number }}">{{ game.name }}</a></td>
           <td>{{ game|opponent_for_game:player }}</td>
           <td>TBD</td>
           <td>{{ game.start_date }}</td>
-          <td>{{ game.finish_date}}</td>
+          <td>{{ game.finish_date }}</td>
         </tr>
       {% endfor %}
   {% endif %}

@@ -10,10 +10,10 @@ from models.pgtile import PGTile
 from paigow.pghand import PGHand
 from models.pggame import PGGame
 from models.pgplayer import PGPlayer
+from models.pgplayerindeal import PGPlayerInDeal
 from paigow.pgset import PGSet
-from models import PGPlayerInGame
 
-from paigow.session_utils import session_player, opponent_in_session_game, player_in_session_game
+from paigow.session_utils import session_player, opponent_in_session_deal, player_in_session_deal
 
 
 #-------------------------------------------------------------------
@@ -39,6 +39,7 @@ def posted_player_from_id_field( request, field_name ):
 # convenience
 # final setup of the params with stuff common to all views
 def request_context( request, params ):
+  from django.utils.html import escape
   
   # protect against cross-site request forgery
   params.update( csrf( request ) )
@@ -59,16 +60,18 @@ def request_context( request, params ):
     params['opponents'] = None
     params['opponent'] = None
   else:
-    params['playername'] = player.name
+    params['playername'] = escape(player.name)
     params['opponents'] = player.all_possible_opponents()
     if ( 'game' in params ):
       params['opponent'] = player.opponent_for_game( params['game'] )
+      params['title'] = "Pai Gow 321: " + escape(params['game'].name)
+      params['deal_number'] = params['game'].current_deal_number
   
   
   # set up the states
-  params['tiles_are_set_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.READY )
-  params['setting_tiles_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.SETTING_TILES )
-  params['preview_hands_state'] = PGPlayerInGame.state_ui( PGPlayerInGame.PREVIEW_HANDS )
+  params['tiles_are_set_state'] = PGPlayerInDeal.state_ui( PGPlayerInDeal.READY )
+  params['setting_tiles_state'] = PGPlayerInDeal.state_ui( PGPlayerInDeal.SETTING_TILES )
+  params['preview_hands_state'] = PGPlayerInDeal.state_ui( PGPlayerInDeal.PREVIEW_HANDS )
 
   return RequestContext( request, params )
 
@@ -214,11 +217,11 @@ def add_game( request, params = {} ):
 
 #-------------------------------------------------------------------
 # User clicked a URL that corresponds to a game.
-def play_game( request, game_id, params = {} ):
+def play_game( request, game_id, deal_number_str, params = {} ):
+  # import pdb; pdb.set_trace()
   
   from models.pgtile import PGTile
   from pghand import PGHand
-  from paigow.models import PGPlayerInGame
   
   player_id = request.session.get('player_id', False) 
   if ( not player_id ):
@@ -231,10 +234,10 @@ def play_game( request, game_id, params = {} ):
     messages.add_message( request, messages.ERROR, "WTF?  That game has disappeared into the ether (which doesn't exist)" )
     return goto_home( request )
   params['game'] = game
-  
-  # deal if it's not already dealt
-  if ( game.game_state == PGGame.ABOUT_TO_DEAL ):
-    game.deal_tiles()
+
+  # get the deal number
+  deal_number = int( deal_number_str )
+  params['deal_number'] = deal_number
   
   # set the score for the other player.
   players_in_game = game.players()
@@ -245,28 +248,34 @@ def play_game( request, game_id, params = {} ):
     return goto_home( request )
   
   # this sets up pig, don't get it fgirst
-  params['pgsets'] = game.sets_for_player( session_player( request ) )
+  params['pgsets'] = game.sets_for_player( session_player( request ), deal_number )
 
   # set the game and score for you
-  pig = game.player_in_game( player )
-  params['score_player'] = pig.score
+  pid = game.player_in_deal( player, deal_number )
+  params['score_player'] = game.score_as_of_deal_for_player( player, deal_number )
   
   # set up the opponent for the template
   opponent = session_player( request ).opponent_for_game( game )
   
   # get your opponent's score
-  pigo = game.player_in_game( opponent )
+  pido = game.player_in_deal( opponent, deal_number )
   params['score_opponent'] = -1
-  if ( pigo ):
-    params['score_opponent'] = pigo.score
+  if ( pido ):
+    params['score_opponent'] = pido.score
   
   # create the hands for this player (sets_for_player should be called first)
   params['pgtile_size'] = "medium"
-  params['current_player_state'] = PGPlayerInGame.state_ui( pig.state() )
-  
+  params['current_player_state'] = PGPlayerInDeal.state_ui( pid.state() )
   
   return render_to_response( 'game_play.html', request_context( request, params ) )
 
+#-------------------------------------------------------------------
+# User clicked on "Next Deal" in a game.
+def next_deal( request, game_id, deal_number, params = {} ):
+  game = PGGame.objects.get( id = game_id )
+  if ( game.state() == PGGame.COMPARING_HANDS ):
+    game.deal_tiles()
+  return redirect( '/paigow/game/' + str( game_id ) + '/' + str( game.current_deal_number )  )
 
 #-------------------------------------------------------------------
 # AJAX response for the label for a hand
@@ -280,7 +289,7 @@ def data_hand_label( request, params = {} ):
 
 #-------------------------------------------------------------------
 # AJAX response for the opponent state
-def data_opponent_state( request, game_id ):
+def data_opponent_state( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
   opponent = player.opponent_for_game( game )
@@ -293,7 +302,7 @@ def data_opponent_state( request, game_id ):
 
 #-------------------------------------------------------------------
 # AJAX response for the opponent state
-def data_player_state( request, game_id ):
+def data_player_state( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
   status = "|" + game.state_for_player( player )
@@ -301,7 +310,7 @@ def data_player_state( request, game_id ):
 
 #-------------------------------------------------------------------
 # AJAX response for setting the hands
-def tiles_are_set( request, game_id ):
+def tiles_are_set( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
   pig = game.player_in_game( player )
@@ -310,7 +319,7 @@ def tiles_are_set( request, game_id ):
   
 #-------------------------------------------------------------------
 # AJAX response for previewing the set hands
-def preview_hands( request, game_id ):
+def preview_hands( request, game_id, deal_number ):
   new_set1 = PGSet.create_with_tile_chars( request.GET['set1'] ).tile_ordering_for_set_hands()
   new_set2 = PGSet.create_with_tile_chars( request.GET['set2'] ).tile_ordering_for_set_hands()
   new_set3 = PGSet.create_with_tile_chars( request.GET['set3'] ).tile_ordering_for_set_hands()
@@ -322,7 +331,7 @@ def preview_hands( request, game_id ):
 
 #-------------------------------------------------------------------
 # AJAX response for previewing the set hands
-def unpreview_hands( request, game_id ):
+def unpreview_hands( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
   pig = game.player_in_game( player )
@@ -332,8 +341,8 @@ def unpreview_hands( request, game_id ):
 #-------------------------------------------------------------------
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
-def get_opponent_tile_background_position_css_value( request, game_id, pgtile_size ):
-  pigo = opponent_in_session_game( request, game_id )
+def get_opponent_tile_background_position_css_value( request, game_id, deal_number, pgtile_size ):
+  pigo = opponent_in_session_deal( request, game_id, deal_number )
   if not pigo:
     return HttpResponseNotAllowed( "Bad Request" )
   return HttpResponse( pigo.background_position_css_value( pgtile_size ) )
@@ -341,38 +350,39 @@ def get_opponent_tile_background_position_css_value( request, game_id, pgtile_si
 #-------------------------------------------------------------------
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
-def data_opponent_hand_label( request, game_id, set_num ):
-  pigo = opponent_in_session_game( request, game_id )
+def data_opponent_hand_label( request, game_id, deal_number, set_num ):
+  pigo = opponent_in_session_deal( request, game_id, deal_number )
   if not pigo:
     return HttpResponseNotAllowed( "Bad Request" )
   return HttpResponse( pigo.set(int(set_num)).hand_labels() )
 
 #-------------------------------------------------------------------
 # AJAX response for result of the three hands
-def score_in_deal( request, game_id ):
+def score_in_deal( request, game_id, deal_number ):
   
   # get the player-in-game so we can get their hands.  Note that if
   # we try to get an opponent but either the player or the the
   # opponent is not finished, we will get None and return bad request
-  pigo = opponent_in_session_game( request, game_id )
-  if not pigo:
+  pgpido = opponent_in_session_deal( request, game_id, deal_number )
+  if not pgpido:
     return HttpResponseNotAllowed( "Bad Request" )
-  pig = player_in_session_game( request, game_id )
-  if not pig:
+  pgpid = player_in_session_deal( request, game_id, deal_number )
+  if not pgpid:
     return HttpResponseNotAllowed( "Bad Request" )
   
   # for each set, return W for win, . for push and L for loss
-  ret_val = pig.win_lose_string_against( pigo )
+  ret_val = pgpid.win_lose_string_against( pgpido )
   return HttpResponse(ret_val)
 
 #-------------------------------------------------------------------
 # AJAX response for the score of the game
-def game_score( request, game_id ):
-  pigo = opponent_in_session_game( request, game_id )
-  if not pigo:
+def game_score( request, game_id, deal_number_str ):
+  deal_number = int( deal_number_str )
+  game = PGGame.with_id( game_id )
+  player = session_player( request )
+  if not player:
     return HttpResponseNotAllowed( "Bad Request" )
-  pig = player_in_session_game( request, game_id )
-  if not pig:
+  opponent = opponent_in_session_deal( request, game_id, deal_number )
+  if not opponent:
     return HttpResponseNotAllowed( "Bad Request" )
-  
-  return HttpResponse( str( pig.score() ) + " - " + str( pigo.score() ) )
+  return HttpResponse( str( game.score_as_of_deal_for_player( player, deal_number+1 ) ) + " - " + str( game.score_as_of_deal_for_player( opponent, deal_number+1 ) ) )

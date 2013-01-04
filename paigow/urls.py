@@ -20,7 +20,10 @@ urlpatterns = patterns('',
   url(r'^logout$', 'paigow.views.logout' ),
   url(r'^game/new$', 'paigow.views.new_game' ),
   url(r'^game/add$', 'paigow.views.add_game' ),
-  url(r'^game/([0-9]+)$', 'paigow.views.play_game' ),
+  url(r'^game/([0-9]+)/([0-9]+)$', 'paigow.views.play_game' ),
+  
+  # deal the next set of tiles for the game
+  url(r'^game/([0-9]+)/([0-9]+)/next_deal$', 'paigow.views.next_deal' ),
   
   # given the chars representing four tiles for a set, return
   # the labels for the two hands separated by vertical bar.
@@ -35,37 +38,37 @@ urlpatterns = patterns('',
   # the opponent have finished setting the tiles.  This needs the
   # game and hand, since the tiles are not provided -- the browser
   # does not have the user tile values, only the pictures..
-  url(r'^data/game/([0-9]+)/opponent/hands/([0-9])$', 'paigow.views.data_opponent_hand_label' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/opponent/hands/([0-9])$', 'paigow.views.data_opponent_hand_label' ),
   
   # given the game, return the state of the
   # opponent as a string that is shown, preceded by a
   # vertical bar (to distinguish from errors of some sort).
   # first param: game ID; player ID is in request session.
-  url(r'^data/game/([0-9]+)/opponent_state/', 'paigow.views.data_opponent_state' ),
-  url(r'^data/game/([0-9]+)/player_state/', 'paigow.views.data_player_state' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/opponent_state/', 'paigow.views.data_opponent_state' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/player_state/', 'paigow.views.data_player_state' ),
   
   # given the game, mark the player as having set
   # their hands and are ready to compare.
-  url(r'^data/game/([0-9]+)/tiles_are_set', 'paigow.views.tiles_are_set' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/tiles_are_set', 'paigow.views.tiles_are_set' ),
   
   # the player has set their tiles and wants a preview
   # of the hands.  This will return the three sets with
   # the same hands, but switched if necessary to put the
   # high-low in the right order, and within each hand, the
   # tiles are switched if necessary to high-low.
-  url(r'^data/game/([0-9]+)/preview_hands', 'paigow.views.preview_hands' ),
-  url(r'^data/game/([0-9]+)/unpreview_hands', 'paigow.views.unpreview_hands' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/preview_hands', 'paigow.views.preview_hands' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/unpreview_hands', 'paigow.views.unpreview_hands' ),
   
   # the player is getting the opponent's hand to show, now
   # that both players are finished setting the tiles.
-  url(r'^data/game/([0-9]+)/opponent_tiles/(.*)', 'paigow.views.get_opponent_tile_background_position_css_value' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/opponent_tiles/(.*)', 'paigow.views.get_opponent_tile_background_position_css_value' ),
   
   # after both player and opponent are finished, this returns the score
   # in this deal (three letters, W, dot or L for 3, 2, 1 hands)
-  url(r'^data/game/([0-9]+)/score_in_deal', 'paigow.views.score_in_deal' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/score_in_deal', 'paigow.views.score_in_deal' ),
   
   # get the score of the game (not just the deal)
-  url(r'^data/game/([0-9]+)/score$', 'paigow.views.game_score' ),
+  url(r'^data/game/([0-9]+)/([0-9]+)/score$', 'paigow.views.game_score' ),
   
   # /tile or /tiles/ : show all the tiles
   url(r'^tiles[/]*$',

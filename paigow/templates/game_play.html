@@ -5,7 +5,7 @@
   <link rel="stylesheet" type="text/css" href="{% static "css/pgtile.css" %}" />
 {% endblock %}
 
-{% block content_title %}<p><span class="lead"><strong>{{ game.name }}</strong></span>{% endblock %}
+{% block content_title %}<!-- <p><span class="lead"><strong>{{ game.name }}</strong></span>-->{% endblock %}
 
 {% block header-javascript %}
   <script language="javascript">
@@ -259,7 +259,7 @@
       }
       else
       {
-        url = "/paigow/data/game/{{ game.id }}/opponent/hands/" + (set_num-3);
+        url = "/paigow/data/game/{{ game.id }}/{{ deal_number}}/opponent/hands/" + (set_num-3);
         data = {}
       }
         
@@ -351,7 +351,7 @@
         return;
 
       $.ajax( {
-        url: "/paigow/data/game/{{ game.id }}/" + label + "_state",
+        url: "/paigow/data/game/{{ game.id }}/{{ deal_number}}/" + label + "_state",
         context: document.body,
         success: function( data, textStatus, jqXHR ) { return get_player_state_success( this, data, textStatus, jqXHR, label, keep_polling ); },
         error: function( jqXHR, textStatus, errorThrown ) { return get_player_state_error( this, jqXHR, textStatus, errorThrown, label, keep_polling ); }
@@ -415,7 +415,7 @@
 
       //  User has hit "Tiles are Set" so tell the server of our state.
       $.ajax( {
-        url: "/paigow/data/game/{{ game.id }}/tiles_are_set",
+        url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/tiles_are_set",
         context: document.body,
         data: {
             set1: tile_chars_of_jqset( jqset_of_num( 1 ) ),
@@ -451,6 +451,15 @@
       if ( $("#preview-hands-button").hasClass("disabled") )
         return;
       $("#preview-hands-button").addClass("disabled");
+      
+      //  If we are going to the next deal, it's a redirect.  If this user's tiles are
+      //  set, then the "Next Deal" button is enabled only if the hands are being compared
+      //  and he's seen the score.
+      if ( current_player_state == "{{ tiles_are_set_state }}" )
+      {
+        location.href = "/paigow/game/{{ game.id }}/{{ deal_number }}/next_deal";
+        return;
+      }
 
       //  Tell the server of our new state so the opponent can see it.  In the case
       //  that we're previewing, we'll want a return function.
@@ -468,7 +477,7 @@
             };
       }
       $.ajax( {
-        url: "/paigow/data/game/{{ game.id }}/" + url_cmd,
+        url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/" + url_cmd,
         context: document.body,
         data: data_val,
         success: success_val,
@@ -677,7 +686,7 @@
         
         //  Get the opponent's tile values so we can show them.
         $.ajax( {
-          url: "/paigow/data/game/{{ game.id }}/opponent_tiles/{{ pgtile_size }}",
+          url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/opponent_tiles/{{ pgtile_size }}",
           context: document.body,
           success: function( data, textStatus, jqXHR ) { get_opponent_tiles_success( this, data, textStatus, jqXHR ); },
           error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to get the opponent's tiles for comparing hands.", errorThrown, textStatus, jqXHR ); }
@@ -722,7 +731,7 @@
     {
         //  Get the opponent's tile values so we can show them.
         $.ajax( {
-          url: "/paigow/data/game/{{ game.id }}/score_in_deal",
+          url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/score_in_deal",
           context: document.body,
           success: function( data, textStatus, jqXHR ) { get_score_in_deal_success( this, data, textStatus, jqXHR ); },
           error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to score the deal.", errorThrown, textStatus, jqXHR ); }
@@ -762,7 +771,7 @@
     function update_game_score()
     {
       $.ajax( {
-        url: "/paigow/data/game/{{ game.id }}/score",
+        url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/score",
         context: document.body,
         success: function( data, textStatus, jqXHR ) { update_game_score_success( this, data, textStatus, jqXHR ); },
         error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to get the game score.", errorThrown, textStatus, jqXHR ); }
