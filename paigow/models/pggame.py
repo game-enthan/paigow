@@ -173,6 +173,16 @@ class PGGame( models.Model ):
     self.game_state = PGGame.SETTING_TILES
     self.save()
   
+  
+  # make sure this player has this deal
+  def assure_player_in_deal( self, player, deal_number ):
+    from pgplayerindeal import PGPlayerInDeal
+    try:
+      pgpid_player = PGPlayerInDeal.objects.get( game = self, player = player, deal_number = deal_number )
+    except ObjectDoesNotExist:
+      pgpid_player = PGPlayerInDeal.create(  self, player, deal_number )
+    return pgpid_player
+
   def player_in_deal( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
     try:
@@ -182,6 +192,15 @@ class PGGame( models.Model ):
       print "Cannot get pgpid for player '" + str(player) + "' in game '" + str(self) + "' for deal " + str(deal_number)
       return None
   
+  # a player has requested the next deal during a game: make sure we have PGPlayerInDeal for those.
+  # we don't have to do anything except create it if it doesn't exist.
+  def assure_players_for_deal( self ):
+    from pgplayerindeal import PGPlayerInDeal
+    players = self.players()
+    for player in players:
+      assure_player_in_current_deal( player, self.current_deal_number)
+    
+    
   def score_as_of_deal_for_player( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
     pgpids = PGPlayerInDeal.objects.filter( game = self, player = player )
@@ -222,10 +241,7 @@ class PGGame( models.Model ):
       index += 8
     
     # remember that this player asked for this deal
-    try:
-      pgpid_player = PGPlayerInDeal.objects.get( game = self, player = player, deal_number = deal_number )
-    except ObjectDoesNotExist:
-      pgpid_player = PGPlayerInDeal.create(  self, player, deal_number )
+    pgpid_player = self.assure_player_in_deal( player, deal_number )
     
     pgpid_player.tiles_were_requested()
     
@@ -243,7 +259,7 @@ class PGGame( models.Model ):
       raise ValueError
     return pgpid_player.state_ui( pgpid_player.state() )
   
-  def player_has_set_his_tiles( self, player ):
+  def player_has_set_his_tiles( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
     
     # if we're already finished with the game, don't bother.
@@ -251,7 +267,7 @@ class PGGame( models.Model ):
       return
     
     # if the opponent is not ready, nothing to do
-    pgpid_opponent = self.player_in_game( player.opponent_for_game( self ) )
+    pgpid_opponent = self.player_in_game( player.opponent_for_deal( self, deal_number ) )
     if not pgpid_opponent:
       raise ValueError
     if ( pgpid_opponent.state() != PGPlayerInDeal.READY ):

@@ -162,7 +162,7 @@ class PGPlayerInDeal(models.Model):
       self.set3 = set3_chars
       self.deal_state = PGPlayerInDeal.READY
       self.save()
-      self.game.player_has_set_his_tiles( self.player )
+      self.game.player_has_set_his_tiles( self.player, self.deal_number )
     else:
       #print "Player " + str( self.player) + " is ready in game " + str( self.game ) + " but the sets do not compute!"
       raise ValueError

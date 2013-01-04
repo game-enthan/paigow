@@ -276,7 +276,9 @@ def play_game( request, game_id, deal_number_str, params = {} ):
 def next_deal( request, game_id, deal_number, params = {} ):
   game = PGGame.objects.get( id = game_id )
   if ( game.state() == PGGame.COMPARING_HANDS ):
+    game.game_state = PGGame.ABOUT_TO_DEAL
     game.deal_tiles()
+    game.assure_players_for_deal()
   return redirect( '/paigow/game/' + str( game_id ) + '/' + str( game.current_deal_number )  )
 
 #-------------------------------------------------------------------
@@ -315,8 +317,8 @@ def data_player_state( request, game_id, deal_number ):
 def tiles_are_set( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
-  pig = game.player_in_game( player )
-  pig.player_is_ready( request.GET['set1'], request.GET['set2'], request.GET['set3'] )
+  pgpid = game.player_in_deal( player, deal_number )
+  pgpid.player_is_ready( request.GET['set1'], request.GET['set2'], request.GET['set3'] )
   return HttpResponse( "OK" )
   
 #-------------------------------------------------------------------
