@@ -31,14 +31,14 @@ def player_in_session_deal( request, game_id, deal_number ):
 #-------------------------------------------------------------------
 # convenience
 # return the single opponent for the player in the game
-def session_opponent( request, game ):
+def session_opponent( request, game, deal_number ):
   
   player = session_player( request )
   if ( not player ):
     print "Malformed request: no player in session"
     raise ValueError
   
-  opponent = player.opponent_for_game( game )
+  opponent = player.opponent_for_deal( game, deal_number )
   if ( not opponent ):
     print "Malformed request: no opponent for player '" + str( player ) + "' in game '" + str( game ) + "'"
     raise ValueError
@@ -58,7 +58,7 @@ def opponent_in_session_deal( request, game_id, deal_number ):
     
     game = PGGame.objects.get( id = game_id )
     player = session_player( request )
-    opponent = session_opponent( request, game )
+    opponent = session_opponent( request, game, deal_number )
     pgpid = game.player_in_deal( player, deal_number )
     if ( not pgpid ):
       print "Malformed request: client is not a player in game '" + str( game ) + "'"

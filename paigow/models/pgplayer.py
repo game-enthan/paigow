@@ -42,14 +42,17 @@ class PGPlayer( models.Model ):
   def all_possible_opponents( self ):
     return PGPlayer.objects.exclude( id = self.id )
     
-  # return the opponent for this game
-  def opponent_for_game( self, game ):
+  # return the opponent for this deal
+  def opponent_for_deal( self, game, deal_number ):
     players = game.players()
     for player in players:
       if ( player != self ):
         return player
     return None
   
+  # return the opponent for this game
+  def opponent_for_game( self, game ):
+    return self.opponent_for_deal( game, 1 )
   
   # return all the games that this player is part of, ordered by the start
   # date of the games.
@@ -108,12 +111,12 @@ class PGPlayerTest( TestCase ):
     test_game = PGGame.create( "New Game" )
     test_game.save()
     test_game.add_player( self.test_player )
-    self.assertIsNone( self.test_player.opponent_for_game( test_game ) )
+    self.assertIsNone( self.test_player.opponent_for_deal( test_game, 1 ) )
     other_guy = PGPlayer.create( "other_guy", "foo@bar.com", "xxx" )
     other_guy.save()
     test_game.add_player( other_guy )
-    self.assertEqual( self.test_player.opponent_for_game( test_game ), other_guy )
-    self.assertEqual( other_guy.opponent_for_game( test_game ), self.test_player )
+    self.assertEqual( self.test_player.opponent_for_deal( test_game, 1 ), other_guy )
+    self.assertEqual( other_guy.opponent_for_deal( test_game, 1 ), self.test_player )
 
 # run the test in the correct situation; this is boilerplat
 # for all modules that have tests, don't try to figure it out.

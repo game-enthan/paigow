@@ -13,7 +13,10 @@ from models.pgplayer import PGPlayer
 from models.pgplayerindeal import PGPlayerInDeal
 from paigow.pgset import PGSet
 
-from paigow.session_utils import session_player, opponent_in_session_deal, player_in_session_deal
+from paigow.session_utils import session_player, session_opponent, opponent_in_session_deal, player_in_session_deal
+
+# put this at the beginning of any function to start debugging it, if we have a local django server
+#  import pdb; pdb.set_trace()
 
 
 #-------------------------------------------------------------------
@@ -63,9 +66,8 @@ def request_context( request, params ):
     params['playername'] = escape(player.name)
     params['opponents'] = player.all_possible_opponents()
     if ( 'game' in params ):
-      params['opponent'] = player.opponent_for_game( params['game'] )
+      params['opponent'] = player.opponent_for_deal( params['game'], params['deal_number'] )
       params['title'] = "Pai Gow 321: " + escape(params['game'].name)
-      params['deal_number'] = params['game'].current_deal_number
   
   
   # set up the states
@@ -255,7 +257,7 @@ def play_game( request, game_id, deal_number_str, params = {} ):
   params['score_player'] = game.score_as_of_deal_for_player( player, deal_number )
   
   # set up the opponent for the template
-  opponent = session_player( request ).opponent_for_game( game )
+  opponent = session_player( request ).opponent_for_deal( game, deal_number )
   
   # get your opponent's score
   pido = game.player_in_deal( opponent, deal_number )
@@ -292,7 +294,7 @@ def data_hand_label( request, params = {} ):
 def data_opponent_state( request, game_id, deal_number ):
   game = PGGame.objects.get( id = game_id )
   player = session_player( request )
-  opponent = player.opponent_for_game( game )
+  opponent = player.opponent_for_deal( game, deal_number )
   status = "|"
   if ( opponent ):
     status += game.state_for_player( opponent )
@@ -382,7 +384,7 @@ def game_score( request, game_id, deal_number_str ):
   player = session_player( request )
   if not player:
     return HttpResponseNotAllowed( "Bad Request" )
-  opponent = opponent_in_session_deal( request, game_id, deal_number )
+  opponent = session_opponent( request, game, deal_number )
   if not opponent:
     return HttpResponseNotAllowed( "Bad Request" )
   return HttpResponse( str( game.score_as_of_deal_for_player( player, deal_number+1 ) ) + " - " + str( game.score_as_of_deal_for_player( opponent, deal_number+1 ) ) )
