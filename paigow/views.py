@@ -259,10 +259,8 @@ def play_game( request, game_id, deal_number_str, params = {} ):
   opponent = session_player( request ).opponent_for_deal( game, deal_number )
   
   # get your opponent's score
-  pido = game.player_in_deal( opponent, deal_number )
-  params['score_opponent'] = -1
-  if ( pido ):
-    params['score_opponent'] = pido.score
+  #pido = game.player_in_deal( opponent, deal_number )
+  params['score_opponent'] = game.score_as_of_deal_for_player( opponent, deal_number )
   
   # create the hands for this player (sets_for_player should be called first)
   params['pgtile_size'] = "medium"
