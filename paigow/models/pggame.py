@@ -102,9 +102,12 @@ class PGGame( models.Model ):
   # Return the all the players for this single game.  Always order them by
   # player IDs to make sure the list is already returned in the same order.
   def players( self ):
+    return self.players_in_deal( 1 )
+  
+  def players_in_deal( self, deal_number ):
     players = []
     from pgplayerindeal import PGPlayerInDeal
-    pigs = PGPlayerInDeal.objects.filter( game = self, deal_number = 1 ).order_by( 'player__id' )
+    pigs = PGPlayerInDeal.objects.filter( game = self, deal_number = deal_number ).order_by( 'player__id' )
     for pgpid_player in pigs:
       players.append( pgpid_player.player )
     return players
@@ -182,6 +185,9 @@ class PGGame( models.Model ):
     pgpid_player = self.player_in_deal( player, deal_number )
     
     if not pgpid_player:
+      print "cannot find player " + str(player) + "in game " + str(self) + ", creating"
+      is_second_player = len(self.players_in_deal( deal_number )) > 0
+      print "... is second player: " + str(is_second_player)
       pgpid_player = PGPlayerInDeal.create(  self, player, deal_number )
       pgpid_player.save()   # so self.players() will find it.
       
@@ -189,7 +195,7 @@ class PGGame( models.Model ):
       # decides whether this player gets the first set of tiles or the
       # second set of tiles.
       index = 0
-      if ( player != self.players()[0] ):
+      if ( is_second_player ):
         index = 1
       
       # Create the hands and fill them.
@@ -240,7 +246,7 @@ class PGGame( models.Model ):
     return score
   
   def score_for_player( self, player ):
-    return self.score_as_of_deal_for_player( self, player, self.current_deal_number + 1 )
+    return self.score_as_of_deal_for_player( player, self.current_deal_number + 1 )
   
   def sets_for_player( self, player, deal_number ):
     
