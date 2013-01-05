@@ -66,8 +66,10 @@ def request_context( request, params ):
     params['playername'] = escape(player.name)
     params['opponents'] = player.all_possible_opponents()
     if ( 'game' in params ):
-      params['opponent'] = player.opponent_for_deal( params['game'], params['deal_number'] )
-      params['title'] = "Pai Gow 321: " + escape(params['game'].name)
+      game = params['game']
+      params['opponent'] = player.opponent_for_deal( game, params['deal_number'] )
+      params['title'] = "Pai Gow 321: " + escape( game.name )
+      params['game_state'] = game.state()
   
   
   # set up the states
@@ -214,7 +216,7 @@ def add_game( request, params = {} ):
   
   messages.add_message( request, messages.INFO, "Game \"" + game.name + "\" created." )
   
-  return goto_home ( request, params )
+  return redirect ( "/paigow/game/" + str(game.id) + "/1" )
 
 
 #-------------------------------------------------------------------

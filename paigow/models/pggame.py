@@ -288,7 +288,15 @@ class PGGame( models.Model ):
       raise ValueError
     pgpid_player.record_scores_against( pgpid_opponent )
     
-      
+    # is the game over?
+    self.check_game_over()
+  
+  def check_game_over( self ):
+    for player in self.players():
+      if self.score_for_player( player ) >= 21:
+        self.game_state = PGGame.GAME_OVER
+        break
+
 # ----------------------------------------------------
 # Test PGGame class
 
