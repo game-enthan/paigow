@@ -81,6 +81,10 @@ class PGGame( models.Model ):
   # associated with it.  Each deal for a given game has a unique deal_index
   # ( a small number starting at 1 ) so we can find the specific deal that is
   # currently being played.  This is that number.
+  #
+  # The deal number gets incremented when starting a deal, and stops when the
+  # game is over, so the maximum value you'll see for current_deal_number is
+  # the deal on which one player or another won.
   current_deal_number = models.PositiveSmallIntegerField()
   
   # convenience
@@ -228,6 +232,48 @@ class PGGame( models.Model ):
       #print "Cannot get pgpid for player '" + str(player) + "' in game '" + str(self) + "' for deal " + str(deal_number)
       return None
   
+  # return the state of the deal number
+  def deal_state( self, deal_number ):
+    
+    # if the deal number is negative or zero, return none (error)
+    if ( deal_number <= 0 ):
+      return None
+    
+    # if the deal number is greater than the current deal,
+    # then if the game is over it's over; else none.
+    if ( deal_number > self.current_deal_number ):
+      if ( self.state() == PGGame.GAME_OVER ):
+        return PGGame.GAME_OVER
+      else:
+        return None
+    
+    # get the players state in the deal number 
+    players = self.players_in_deal( deal_number )
+    
+    # if there are no players, we must be about to deal
+    if ( len(players) == 0 ):
+      return PGGame.ABOUT_TO_DEAL
+    
+    # if there is only one player, we're setting tiles
+    if ( len(players) == 1 ):
+      return PGGame.SETTING_TILES
+    
+    # if both players are ready, we're setting tiles, otherwise
+    # if the game is over we're done, otherwise comparing hands.
+    try:
+      from pgplayerindeal import PGPlayerInDeal
+      pgpid0 = self.player_in_deal( players[0], deal_number )
+      pgpid1 = self.player_in_deal( players[1], deal_number )
+      if (pgpid0.state() == PGPlayerInDeal.READY) and (pgpid1.state() == PGPlayerInDeal.READY):
+        if self.state() == PGGame.GAME_OVER:
+          return PGGame.GAME_OVER
+        else:
+          return PGGame.COMPARING_HANDS
+      else:
+        return PGGame.SETTING_TILES
+    except:
+      return None
+  
   # a player has requested the next deal during a game: make sure we have PGPlayerInDeal for those.
   # we don't have to do anything except create it if it doesn't exist.
   def assure_players_for_deal( self, deal_number ):
@@ -280,7 +326,6 @@ class PGGame( models.Model ):
       return
     
     # both are ready!  We'are comparing hands, and add the score
-    self.game_state = PGGame.COMPARING_HANDS
     self.save()
     
     pgpid_player = self.player_in_game( player )
@@ -295,6 +340,7 @@ class PGGame( models.Model ):
     for player in self.players():
       if self.score_for_player( player ) >= 21:
         self.game_state = PGGame.GAME_OVER
+        self.save()
         break
 
 # ----------------------------------------------------

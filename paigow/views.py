@@ -21,15 +21,6 @@ from paigow.session_utils import session_player, session_opponent, opponent_in_s
 
 #-------------------------------------------------------------------
 # convenience
-# return the PGPlayer with the current request session id
-def xsession_player( request ):
-  if 'player_id' in request.session:
-    return PGPlayer.with_id( request.session['player_id'] )
-  else:
-    return None
-
-#-------------------------------------------------------------------
-# convenience
 # return the PGPlayer with the POSTed player ID value
 def posted_player_from_id_field( request, field_name ):
   if field_name in request.POST:
@@ -144,6 +135,10 @@ def register( request, params = {} ):
   if ( not is_good_so_far ):  
     return render_to_response( 'user_login.html', request_context( request, params ) )
   
+  # if they don't hit 'remember me' then don't save the cookie
+  if not request.POST.get('register_remember_me', None):
+    request.session.set_expiry(0)
+  
   # we are good, add this to the players!
   player = PGPlayer.create( username, email, password )
   player.save()
@@ -173,6 +168,10 @@ def login( request, params = {} ):
   if password != request.POST['login_password']:
     messages.add_message(request, messages.ERROR, "Your username and/or password didn't match.")
     return render_to_response( 'user_login.html', request_context( request, params ) )
+  
+  # if they don't hit 'remember me' then don't save the cookie
+  if not request.POST.get('login_remember_me', None):
+    request.session.set_expiry(0)
   
   add_player_to_session( request, players[0], 'login' )
   messages.add_message(request, messages.INFO, username + " is now logged in." )
@@ -272,12 +271,18 @@ def play_game( request, game_id, deal_number_str, params = {} ):
 
 #-------------------------------------------------------------------
 # User clicked on "Next Deal" in a game.
-def next_deal( request, game_id, deal_number, params = {} ):
+def next_deal( request, game_id, deal_number_str, params = {} ):
   game = PGGame.objects.get( id = game_id )
-  if ( game.state() == PGGame.COMPARING_HANDS ):
+  deal_number = int( deal_number_str )
+  game_state = game.deal_state( deal_number )
+  if ( game_state == PGGame.COMPARING_HANDS ) or ( game_state == PGGame.ABOUT_TO_DEAL ):
     game.game_state = PGGame.ABOUT_TO_DEAL
     game.deal_tiles()
     game.assure_players_for_deal( game.current_deal_number )
+  elif ( game_state == PGGame.GAME_OVER ):
+    messages.add_message( request, messages.ERROR, "Game \"" + game.name + "\" is history... get over it, dude." )
+  elif ( game_state == PGGame.SETTING_TILES ):
+    messages.add_message( request, messages.ERROR, "You're not done with this deal, you can't get the next!" )
   return redirect( '/paigow/game/' + str( game_id ) + '/' + str( game.current_deal_number )  )
 
 #-------------------------------------------------------------------
