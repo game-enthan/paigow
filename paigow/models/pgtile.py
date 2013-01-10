@@ -129,24 +129,33 @@ class PGTile( models.Model ):
   def is_gee_joon_tile( self ):
     return self.name == "gee joon"
   
+  # for compact communication, each tile has a unique letter representing it.
   def char( self ):
     return self.tile_char
   
-  # for compact communication, each tile has a unique letter representing it.
+  # for comparing tiles in the game
+  def beats( self, other ):
+    return self.tile_rank > other.tile_rank
+  
+  def is_beaten_by( self, other ):
+    return other.beats( self )
+  
+  def copies( self, other ):
+    return (not self.beats( other )) and (not other.beats( self ))
   
   # overload the math when comparing tiles
-  def __lt__( self, other ):
-    return self.tile_rank < other.tile_rank
-  def __le__( self, other ):
-    return self.tile_rank <= other.tile_rank
-  def __eq__( self, other ):
-    return self.tile_rank == other.tile_rank
-  def __ne__( self, other ):
-    return self.tile_rank != other.tile_rank
-  def __ge__( self, other ):
-    return self.tile_rank >= other.tile_rank
-  def __gt__( self, other ):
-    return self.tile_rank > other.tile_rank
+  #   def __lt__( self, other ):
+  #     return self.tile_rank < other.tile_rank
+  #   def __le__( self, other ):
+  #     return self.tile_rank <= other.tile_rank
+  #   def __eq__( self, other ):
+  #     return self.tile_rank == other.tile_rank
+  #   def __ne__( self, other ):
+  #     return self.tile_rank != other.tile_rank
+  #   def __ge__( self, other ):
+  #     return self.tile_rank >= other.tile_rank
+  #   def __gt__( self, other ):
+  #     return self.tile_rank > other.tile_rank
   
   
   @classmethod
@@ -179,23 +188,19 @@ class PGTileTest(TestCase):
     tile_high = PGTile.with_name( "high ten" )
     tile_low = PGTile.with_name( "mixed nine", True )
     tile_test = PGTile.with_name( "mixed nine", False )
-    self.assertTrue( tile_high > tile_low )
-    self.assertTrue( tile_high >= tile_low )
-    self.assertFalse( tile_high == tile_low )
-    self.assertFalse( tile_high < tile_low )
-    self.assertFalse( tile_high <= tile_low )
-    self.assertFalse( tile_low > tile_test )
-    self.assertTrue( tile_low >= tile_test )
-    self.assertTrue( tile_low == tile_test )
-    self.assertTrue( tile_low <= tile_test )
-    self.assertFalse( tile_low < tile_test )
+    self.assertTrue( tile_high.beats(tile_low) )
+    self.assertFalse( tile_high.is_beaten_by(tile_low) )
+    self.assertFalse( tile_low.beats(tile_high) )
+    self.assertFalse( tile_low.beats(tile_test) )
+    self.assertTrue( tile_low.copies(tile_test) )
+    self.assertFalse( tile_low.is_beaten_by(tile_test) )
   
   def test_with_rank( self ):
     tile1 = PGTile.with_rank( 5, True )
     tile2 = PGTile.with_rank( 5, False )
-    self.assertEqual( tile1, tile2 )
+    self.assertTrue( tile1.copies(tile2) )
     tile2 = PGTile.with_rank( 6, True )
-    self.assertNotEqual( tile1, tile2 )
+    self.assertFalse( tile1.copies(tile2) )
     tile2 = PGTile.with_rank( -1 )
     self.assertIsNone( tile2 )
   
@@ -204,9 +209,9 @@ class PGTileTest(TestCase):
     self.assertIsNotNone( tile1 )
     tile2 = PGTile.with_name( "Mixed Seven", False )
     self.assertIsNotNone( tile2 )
-    self.assertEqual( tile1, tile2 )
+    self.assertTrue( tile1.copies(tile2) )
     tile2 = PGTile.with_name( "high ten", True )
-    self.assertNotEqual( tile1, tile2 )
+    self.assertFalse( tile1.copies(tile2) )
     tile2 = PGTile.with_name( "whatever" )
     self.assertIsNone( tile2 )
   
@@ -226,8 +231,8 @@ class PGTileTest(TestCase):
     tile1 = PGTile.with_char( "A" )
     tile2 = PGTile.with_char( "a" )
     tile3 = PGTile.with_char( "b" )
-    self.assertTrue( tile1 == tile2 )
-    self.assertTrue( tile1 != tile3 )
+    self.assertTrue( tile1.copies(tile2) )
+    self.assertFalse( tile1.copies(tile3) )
   
   def test_sprite_values( self ):
     tile1 = PGTile.with_name( "teen" )

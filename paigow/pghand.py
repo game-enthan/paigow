@@ -24,7 +24,7 @@ class PGHand:
   # when given two tiles, make sure we put them in order.  This makes
   # later comparisons easy.
   def __init__(self, tile1, tile2 ):
-    if ( tile1 >= tile2 ):
+    if ( not tile1.is_beaten_by(tile2) ):
       self.high_tile = tile1
       self.low_tile = tile2
     else:
@@ -59,7 +59,7 @@ class PGHand:
   def is_gee_joon( self ):
     return self.is_pair() and self.high_tile.tile_value == 3
   def is_pair( self ):
-    return self.high_tile == self.low_tile
+    return self.high_tile.copies( self.low_tile )
   def is_wong( self ):
     return self.high_tile.is_teen_or_day() and ( self.low_tile.tile_value == 9 )
   def is_gong( self ):
@@ -77,70 +77,61 @@ class PGHand:
     else:
       return ( self.high_tile.tile_value + self.low_tile.tile_value ) % 10
   
-  # convenience for comparison so math operators work.  We'll start with
-  # __lt__ for less-than, and use that for all other comparisons.
-  def __lt__( self, other ):
+  # comparison operators
+  
+  def high_tile_beats( self, other ):
+    return self.high_tile.beats( other.high_tile )
+  
+  def beats( self, other ):
     
     # check pairs...
     if other.is_pair():
       if not self.is_pair():
-        return True                                 # other is a pair, we are not
-      return self.high_tile < other.high_tile       # both pair, check high tile
+        return False                                # other is a pair, we are not
+      return self.high_tile_beats( other )          # both pair, check high tile
     elif self.is_pair():
-      return False;                                 # we are pair, other is not
+      return True                                   # we are pair, other is not
     # neither is pair...
     
     # check wongs
     if other.is_wong():
       if not self.is_wong():
-        return True                                 # other is wong, we are not
-      return self.high_tile < other.high_tile       # both wong, check high tile
+        return False                                # other is wong, we are not
+      return self.high_tile_beats( other )          # both wong, check high tile
     elif self.is_wong():
-      return False                                 # we are wong, other is not
+      return True                                   # we are wong, other is not
     # neither is wong...
     
     # check gongs
     if other.is_gong():
       if not self.is_gong():
-        return True                                 # other is gong, we are not
-      return self.high_tile < other.high_tile       # both gong, check high tile
+        return False                                # other is gong, we are not
+      return self.high_tile_beats( other )          # both gong, check high tile
     elif self.is_gong():
-      return False                                 # we are gong, other is not
+      return True                                   # we are gong, other is not
     # neither is gong...
     
     # check high nine
     if other.is_high_nine():
       if not self.is_high_nine():
-        return True                                 # other is high nine, we are not
-      return self.high_tile < other.high_tile       # both high nine, check high tile
+        return False                                # other is high nine, we are not
+      return self.high_tile_beats( other )          # both high nine, check high tile
     elif self.is_high_nine():
-      return False                                 # we are high nine, other is not
+      return True                                   # we are high nine, other is not
     # neither is high nine
     
     # check value
     if self.numerical_value() == other.numerical_value():
-      return self.high_tile < other.high_tile                  # same value, return tile comparison
+      return self.high_tile_beats( other )          # same value, return tile comparison
     else:
-      return self.numerical_value() < other.numerical_value()  # different values, compare values
+      return self.numerical_value() > other.numerical_value()  # different values, compare values
   
-  def __le__( self, other ):
-    return self < other or self == other
-    
-  def __eq__( self, other ):
-    if self < other:
-      return False                  # self is less than, can't be equal
-    elif other < self:
-      return False                  # other is less than self, can't be equal
-    return True                     # niether is less than the other, must be equal
+  def is_beaten_by( self, other ):
+    return other.beats( self )
   
-  def __ne__( self, other ):
-    return not (self == other)
+  def copies( self, other ):
+    return ( not self.beats( other ) ) and ( not other.beats( self ) )
   
-  def __ge__( self, other ):
-    return other < self or self == other
-  
-  def __gt__( self, other ):
-    return other < self
 
 # ----------------------------------------------------
 # Test PGHand class
@@ -180,18 +171,16 @@ class PGHandTest( TestCase ):
     hand2 = PGHand.create( teen, mixed_five )
     hand3 = PGHand.create( day, mixed_five )
     hand4 = PGHand.create( teen, day )
-    self.assertTrue( hand2 > hand1 )
-    self.assertTrue( hand2 >= hand1 )
-    self.assertFalse( hand2 == hand1 )
-    self.assertFalse( hand2 < hand1 )
-    self.assertFalse( hand2 <= hand1 )
-    self.assertTrue( hand2 > hand3 )
-    self.assertTrue( hand2 > hand4 )
+    self.assertTrue( hand2.beats(hand1) )
+    self.assertFalse( hand2.copies(hand1) )
+    self.assertFalse( hand2.is_beaten_by(hand1) )
+    self.assertTrue( hand2.beats(hand3) )
+    self.assertTrue( hand2.beats(hand4) )
     mixed_seven = PGTile.with_name( "mixed seven" )
     hand1 = PGHand.create( teen, mixed_five )
     hand2 = PGHand.create( teen, mixed_seven )
-    self.assertTrue( hand2 > hand1 )
-    self.assertTrue( hand1 < hand2 )
+    self.assertTrue( hand2.beats(hand1) )
+    self.assertTrue( hand1.is_beaten_by(hand2) )
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

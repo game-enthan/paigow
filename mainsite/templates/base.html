@@ -13,7 +13,7 @@
   <!-- Le styles, within 'block stylesheet' so it can be overriden -->
   {% block stylesheet %}
   <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap.css" %}" />
-  <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap-responsive.css" %}" />
+  <!-- <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/bootstrap-responsive.css" %}" /> -->
   <link rel="stylesheet" type="text/css" href="{% static "bootstrap/css/docs.css" %}" />
   <link rel="stylesheet" type="text/css" href="{% static "bootstrap/js/google-code-prettify/prettify.css" %}" />
   <style>
@@ -93,7 +93,7 @@
   <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
 
     <!-- Nav bar -->  
-    <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top" style="width:100%">
       <div class="navbar-inner">
         <div class="container">
           <!--  if the window gets too narrow, this puts three horizontal bars on the right
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Container -->
-    <div class="container" id="container">
+    <div class="container" id="container" style="width:90%;margin-left:130px;margin-right:auto;">
     
       {% block messages %}
           {% if messages %}
@@ -164,7 +164,7 @@
     ================================================== -->
     {% block footer %}
       <footer class="footer">
-        <div class="container">
+        <div class="container" style="margin-left:40px;">
           <p class="pull-right"><a href="#">Back to top</a></p>
           Designed and built by Rudi Sherry, with critique (sometimes even constructive) from Dave Wrubel<br>
           Code licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License v2.0</a>, documentation under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.<br>

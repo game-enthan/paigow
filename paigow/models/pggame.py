@@ -185,9 +185,9 @@ class PGGame( models.Model ):
     pgpid_player = self.player_in_deal( player, deal_number )
     
     if not pgpid_player:
-      print "cannot find player " + str(player) + "in game " + str(self) + ", creating"
+      # print "cannot find player " + str(player) + "in game " + str(self) + ", creating"
       is_second_player = len(self.players_in_deal( deal_number )) > 0
-      print "... is second player: " + str(is_second_player)
+      # print "... is second player: " + str(is_second_player)
       pgpid_player = PGPlayerInDeal.create(  self, player, deal_number )
       pgpid_player.save()   # so self.players() will find it.
       
@@ -225,7 +225,7 @@ class PGGame( models.Model ):
       pgpid = PGPlayerInDeal.objects.get( game = self, player = player, deal_number = deal_number )
       return pgpid
     except:
-      print "Cannot get pgpid for player '" + str(player) + "' in game '" + str(self) + "' for deal " + str(deal_number)
+      #print "Cannot get pgpid for player '" + str(player) + "' in game '" + str(self) + "' for deal " + str(deal_number)
       return None
   
   # a player has requested the next deal during a game: make sure we have PGPlayerInDeal for those.

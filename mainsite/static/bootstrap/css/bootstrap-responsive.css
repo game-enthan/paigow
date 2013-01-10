@@ -783,10 +783,12 @@
 }
 
 @media (max-width: 767px) {
+/*
   body {
     padding-right: 20px;
     padding-left: 20px;
   }
+*/
   .navbar-fixed-top,
   .navbar-fixed-bottom,
   .navbar-static-top {
@@ -931,6 +933,14 @@
     position: static;
   }
 }
+
+/* Removing this removes the behavior where the navbar jumps down
+  when the width is less than 980 px.  This is due to the 
+  "position: static" of the navbar-fixed-top... the body padding
+  is 40px so a static position puts it below that.
+  
+  Removing this also removes the changing of the navbar to a menu-based
+  navbar (collapsed?)
 
 @media (max-width: 979px) {
   body {
@@ -1079,7 +1089,7 @@
     padding-left: 10px;
   }
 }
-
+*/
 @media (min-width: 980px) {
   .nav-collapse.collapse {
     height: auto !important;

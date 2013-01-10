@@ -225,7 +225,9 @@ a:hover {
 .navbar-static-top .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
-  width: 940px;
+  width: auto;
+  margin-left:40px;
+  margin-right:40px;
 }
 
 .span12 {
@@ -550,11 +552,13 @@ a:hover {
   float: right;
 }
 
+/*
 .container {
   margin-right: auto;
   margin-left: auto;
   *zoom: 1;
 }
+*/
 
 .container:before,
 .container:after {
@@ -4365,11 +4369,13 @@ input[type="submit"].btn.btn-mini {
           border-radius: 0;
 }
 
+/*
 .navbar-static-top .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
   width: 940px;
 }
+*/
 
 .navbar-fixed-top {
   top: 0;

@@ -70,7 +70,7 @@ from django.test import TestCase
 
 class PGPlayerTest( TestCase ):
   
-  fixtures = [ 'pgplayer.json', ]
+  fixtures = [ 'pgtile.json', 'pgplayer.json', ]
 
   def setUp( self ):
     self.test_player = PGPlayer.objects.create( name = 'Rudi' )

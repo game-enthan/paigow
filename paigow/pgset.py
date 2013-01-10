@@ -28,28 +28,25 @@ class PGSet:
   def tile_chars( self ):
     return "" + self.tiles[0].char() + self.tiles[1].char() + self.tiles[2].char() + self.tiles[3].char()
   
-  # the user has set the first and second tile to a specific hand, and the third and fourth.
-  # Keep the hands intact, but switch the hands and the tiles within them to the correct
-  # high/low hand, and within that the the high/low tile.
-  def tile_chars_for_set_hands( self ):
-    from paigow.pghand import PGHand
-    high_hand = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
-    low_hand = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
-    if ( low_hand > high_hand ):
-      high_hand, low_hand = low_hand, high_hand
-    tile1, tile2 = high_hand.high_tile.char(), high_hand.low_tile.char()
-    tile3, tile4 = low_hand.high_tile.char(), low_hand.low_tile.char()
-    return "" + tile1 + tile2 + tile3 + tile4
-  
   # return the high and low hands.
   def high_and_low_hands( self ):
     from paigow.pghand import PGHand
     hand1 = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
     hand2 = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
-    if ( hand1 >= hand2 ):
-      return hand1, hand2
-    else:
+    if ( hand2.beats( hand1 ) ):
       return hand2, hand1
+    else:
+      return hand1, hand2
+  
+  # the user has set the first and second tile to a specific hand, and the third and fourth.
+  # Keep the hands intact, but switch the hands and the tiles within them to the correct
+  # high/low hand, and within that the the high/low tile.
+  def tile_chars_for_set_hands( self ):
+    from paigow.pghand import PGHand
+    high_hand, low_hand = self.high_and_low_hands()
+    tile1, tile2 = high_hand.high_tile.char(), high_hand.low_tile.char()
+    tile3, tile4 = low_hand.high_tile.char(), low_hand.low_tile.char()
+    return "" + tile1 + tile2 + tile3 + tile4
   
   # the user has set the first and second tile to a specific hand, and the third and fourth.
   # Keep the hands intact, but switch the hands and the tiles within them to the correct

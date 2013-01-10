@@ -34,7 +34,7 @@ body > .navbar {
 body > .navbar .brand {
   padding-right: 0;
   padding-left: 0;
-  margin-left: 20px;
+  xrudimargin-left: 20px;
   float: right;
   font-weight: bold;
   color: #000;
@@ -817,6 +817,7 @@ form.bs-docs-example {
 
 /* Desktop large
 ------------------------- */
+/*
 @media (min-width: 1200px) {
   .bs-docs-container {
     max-width: 970px;
@@ -828,6 +829,7 @@ form.bs-docs-example {
     width: 230px \9; /* Override the previous IE8-9 hack */
   }
 }
+*/
 
 /* Desktop
 ------------------------- */
