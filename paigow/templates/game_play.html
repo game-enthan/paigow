@@ -828,7 +828,17 @@
   //  Start polling for the opponent state
   get_opponent_state();
 
-  set_current_player_state( "{{ current_player_state }}" )
+  //  If the current player state is previewing hands or they're set, we need to do
+  //  the setting all over again to set the DOM state.
+  var saved_state = "{{ current_player_state }}";
+  if ( saved_state != "{{ setting_tiles_state }}" )
+  {
+    preview_hands();
+    if ( saved_state == "{{ tiles_are_set_state }}" )
+      setTimeout( tiles_are_set, 3000 );
+  }
+  else
+    set_current_player_state( "{{ current_player_state }}" );
 
 
 {% endblock %}
