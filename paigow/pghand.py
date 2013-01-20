@@ -20,6 +20,8 @@ class PGHand:
   # so printout shows the hand.
   def __unicode__( self ):
     return str( self.high_tile ) + " / " + str( self.low_tile )
+  def __str__( self ):
+    return unicode(self).encode('utf-8')
  
   # when given two tiles, make sure we put them in order.  This makes
   # later comparisons easy.
@@ -84,6 +86,13 @@ class PGHand:
   
   def beats( self, other ):
     
+    # check gee joon...
+    if self.is_gee_joon():
+      return True
+    elif other.is_gee_joon():
+      return False
+    # neither is gee_joon...
+
     # check pairs...
     if other.is_pair():
       if not self.is_pair():
@@ -181,7 +190,21 @@ class PGHandTest( TestCase ):
     hand2 = PGHand.create( teen, mixed_seven )
     self.assertTrue( hand2.beats(hand1) )
     self.assertTrue( hand1.is_beaten_by(hand2) )
-
+  
+  def test_comparison2( self ):
+    hand11 = PGHand.create( PGTile.with_name( "day", True ),
+                            PGTile.with_name( "mixed nine", True ) )
+    hand12 = PGHand.create( PGTile.with_name( "teen", True ),
+                            PGTile.with_name( "mixed seven", True ) )
+    hand21 = PGHand.create( PGTile.with_name( "low four", True ),
+                            PGTile.with_name( "mixed five", True ) )
+    hand22 = PGHand.create( PGTile.with_name( "long six", True ),
+                            PGTile.with_name( "low ten", True ) ) 
+    self.assertTrue( hand11.beats( hand21 ) )
+    self.assertTrue( hand21.is_beaten_by( hand11 ) )
+    self.assertTrue( hand12.beats( hand22 ) )
+    self.assertTrue( hand22.is_beaten_by( hand12 ) )
+    
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit
 # tests in it).

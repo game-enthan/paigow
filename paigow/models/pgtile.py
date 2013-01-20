@@ -69,6 +69,8 @@ class PGTile( models.Model ):
   # the name of the tile.
   def __unicode__( self ):
     return self.name
+  def __str__( self ):
+    return unicode(self).encode('utf-8')  # return the four-char string for the tiles
   
   # internal function to return a given filter
   @classmethod
@@ -138,10 +140,10 @@ class PGTile( models.Model ):
     return self.tile_rank > other.tile_rank
   
   def is_beaten_by( self, other ):
-    return other.beats( self )
+    return self.tile_rank < other.tile_rank
   
   def copies( self, other ):
-    return (not self.beats( other )) and (not other.beats( self ))
+    return self.tile_rank == other.tile_rank
   
   # overload the math when comparing tiles
   #   def __lt__( self, other ):

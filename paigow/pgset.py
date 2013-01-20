@@ -20,9 +20,13 @@ class PGSet:
     self.tiles = tile_list
   
   def __unicode__( self ):
-    return "Set: " + self.tile_chars()
+    from paigow.pghand import PGHand
+    hand1 = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
+    hand2 = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
+    return "Set: [" + str( hand1 ) + " ] ... [ " + str( hand2 ) + " ]"
   
   def __str__(self):
+    print "str..."
     return unicode(self).encode('utf-8')  # return the four-char string for the tiles
   
   def tile_chars( self ):
@@ -77,7 +81,7 @@ class PGSet:
   def __lt__( self, other ):
     self_high, self_low = self.high_and_low_hands()
     other_high, other_low = other.high_and_low_hands()
-    return self_high < other_high and self_low < other_low
+    return self_high.is_beaten_by(other_high) and self_low.is_beaten_by(other_low)
   def __eq__( self, other ):
     return not (self < other or other < self)
   def __ne__( self, other ):
@@ -150,3 +154,12 @@ class PGSetTest( TestCase ):
     self.assertTrue( set.can_be_rearranged_to( "aBbA" ) )
     self.assertTrue( set.can_be_rearranged_to( "abAB" ) )
     self.assertFalse( set.can_be_rearranged_to( "abAc" ) )
+  
+  def test_comparison( self ):
+    set1 = PGSet.create_with_tile_names( ( "day", "mixed nine", "teen", "mixed seven" ) )
+    high_hand1, low_hand1 = set1.high_and_low_hands()
+    self.assertFalse( low_hand1.beats( high_hand1 ) )
+    set2 = PGSet.create_with_tile_names( ( "low four", "mixed five", "long six", "low ten" ) )
+    high_hand2, low_hand2 = set2.high_and_low_hands()
+    self.assertFalse( low_hand2.beats( high_hand2 ) )
+    self.assertTrue( set1 > set2 )

@@ -294,6 +294,18 @@ class PGGame( models.Model ):
   def score_for_player( self, player ):
     return self.score_as_of_deal_for_player( player, self.current_deal_number + 1 )
   
+  def winner( self ):
+    winner = None
+    if self.check_game_over():
+      max_score = -1
+      players = self.players()
+      for player in players:
+        player_score = self.score_for_player( player )
+        if ( player_score > max_score ):
+          max_score = player_score
+          winner = player
+    return winner
+
   def sets_for_player( self, player, deal_number ):
     
     from pgplayerindeal import PGPlayerInDeal
@@ -319,7 +331,7 @@ class PGGame( models.Model ):
       return
     
     # if the opponent is not ready, nothing to do
-    pgpid_opponent = self.player_in_game( player.opponent_for_deal( self, deal_number ) )
+    pgpid_opponent = self.player_in_deal( player.opponent_for_deal( self, deal_number ), deal_number )
     if not pgpid_opponent:
       raise ValueError
     if ( pgpid_opponent.state() != PGPlayerInDeal.READY ):
@@ -328,7 +340,7 @@ class PGGame( models.Model ):
     # both are ready!  We'are comparing hands, and add the score
     self.save()
     
-    pgpid_player = self.player_in_game( player )
+    pgpid_player = self.player_in_deal( player, deal_number )
     if not pgpid_player:
       raise ValueError
     pgpid_player.record_scores_against( pgpid_opponent )
@@ -337,11 +349,23 @@ class PGGame( models.Model ):
     self.check_game_over()
   
   def check_game_over( self ):
+    if ( self.game_state == PGGame.GAME_OVER ):
+      return True
+    winning_score = 0
+    num_with_max_score = 0
     for player in self.players():
-      if self.score_for_player( player ) >= 21:
-        self.game_state = PGGame.GAME_OVER
-        self.save()
-        break
+      player_score = self.score_for_player( player )
+      if player_score >= 21:
+        if player_score > winning_score:
+          num_with_max_score = 1
+          winning_score = player_score
+        elif player_score == winning_score:
+          num_with_max_score = num_with_max_score + 1
+    if num_with_max_score == 1:
+      self.game_state = PGGame.GAME_OVER
+      self.save()
+      return True
+    return False
 
 # ----------------------------------------------------
 # Test PGGame class
@@ -362,6 +386,13 @@ class PGGameTest( TestCase ):
     self.player2 = PGPlayer.objects.create( name = 'Dave' )
     self.test_game.add_player( self.player1 )
     self.test_game.add_player( self.player2 )
+  
+  def add_deal_to_test_game( self ):
+    #from pgplayer import PGPlayer
+    self.test_game.game_state = PGGame.ABOUT_TO_DEAL
+    self.test_game.deal_tiles()
+    self.test_game.assure_player_in_deal( self.player1, self.test_game.current_deal_number )
+    self.test_game.assure_player_in_deal( self.player2, self.test_game.current_deal_number )
 
 #   def tearDown( self ):
 #     <do something here if necessary>
@@ -399,7 +430,33 @@ class PGGameTest( TestCase ):
     self.assertEqual( len(sets), 3 )
     sets = self.test_game.sets_for_player( self.player2, self.test_game.current_deal_number )
     self.assertEqual( len(sets), 3 )
-
+  
+  def test_game_over_with_winner( self ):
+    from pgplayer import PGPlayer
+    from pgplayerindeal import PGPlayerInDeal
+    self.add_deal_to_test_game()
+    pig1 = self.test_game.player_in_deal( self.player1, self.test_game.current_deal_number )
+    pig2 = self.test_game.player_in_deal( self.player2, self.test_game.current_deal_number )
+    self.assertFalse( self.test_game.check_game_over() )
+    pig1.add_to_score( 21 )
+    pig1.save()
+    self.assertTrue(  self.test_game.check_game_over() )
+  
+  def test_game_over_with_tie( self ):
+    from pgplayer import PGPlayer
+    from pgplayerindeal import PGPlayerInDeal
+    self.add_deal_to_test_game()
+    pig1 = self.test_game.player_in_deal( self.player1, self.test_game.current_deal_number )
+    pig2 = self.test_game.player_in_deal( self.player2, self.test_game.current_deal_number )
+    self.assertFalse( self.test_game.check_game_over() )
+    pig1.add_to_score( 24 )
+    pig1.save()
+    pig2.add_to_score( 24 )
+    pig2.save()
+    self.assertFalse(  self.test_game.check_game_over() )
+    pig2.add_to_score( 1 )
+    pig2.save()
+    self.assertTrue(  self.test_game.check_game_over() )
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

@@ -86,6 +86,7 @@ def home( request, params = {} ):
     return render_to_response( 'user_login.html', request_context( request, params ) )
 
   params['games'] = session_player( request ).games()
+  params['all_opponents_in_all_games'] = session_player( request ).all_opponents_in_all_games()
   return render_to_response( 'home.html', request_context( request, params ) )
 
 
@@ -274,16 +275,26 @@ def play_game( request, game_id, deal_number_str, params = {} ):
 def next_deal( request, game_id, deal_number_str, params = {} ):
   game = PGGame.objects.get( id = game_id )
   deal_number = int( deal_number_str )
-  game_state = game.deal_state( deal_number )
-  if ( game_state == PGGame.COMPARING_HANDS ) or ( game_state == PGGame.ABOUT_TO_DEAL ):
-    game.game_state = PGGame.ABOUT_TO_DEAL
-    game.deal_tiles()
-    game.assure_players_for_deal( game.current_deal_number )
-  elif ( game_state == PGGame.GAME_OVER ):
+  
+  # find out what the state of this deal is.  If the game is over,
+  # show a message a we'll re-show the current tiles.
+  game_deal_state = game.deal_state( deal_number )
+  if ( game_deal_state == PGGame.GAME_OVER ):
     messages.add_message( request, messages.ERROR, "Game \"" + game.name + "\" is history... get over it, dude." )
-  elif ( game_state == PGGame.SETTING_TILES ):
+  
+  # if the deal hasn't finished, then we'll show the error and re-show the tiles
+  elif ( game_deal_state == PGGame.SETTING_TILES ):
     messages.add_message( request, messages.ERROR, "You're not done with this deal, you can't get the next!" )
-  return redirect( '/paigow/game/' + str( game_id ) + '/' + str( game.current_deal_number )  )
+  else:
+    
+    # valid that someone is asking for a deal; if they've caught up, we'll
+    # deal the tiles; otherwise we'll just show whatever deal they have.
+    deal_number += 1
+    if ( game.current_deal_number < deal_number ):
+      game.game_state = PGGame.ABOUT_TO_DEAL
+      game.deal_tiles()
+    game.assure_players_for_deal( deal_number )
+  return redirect( '/paigow/game/' + str( game_id ) + '/' + str( deal_number )  )
 
 #-------------------------------------------------------------------
 # AJAX response for the label for a hand

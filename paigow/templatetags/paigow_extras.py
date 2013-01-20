@@ -15,14 +15,14 @@ def tile_size( context ):
 def title():
   return "Pai Gow"
 
-# @register.filter(needs_autoescape=True)
-# def opponent_for_game( value, arg, autoescape = None ):
-#   player = arg
-#   game = value
-#   opponent = player.opponent_for_deal( game, 1 )
-#   if ( opponent ):
-#     return opponent
-#   return "unknown"
+@register.inclusion_tag( "opponent_summary.html", takes_context=True )
+def show_opponent_summary( context, opponent ):
+  player = session_player( context['request'] )  
+  context['opponent'] = opponent
+  context['games'] = player.games_against_opponent( opponent )
+  wins, losses, in_progress = player.record_against_opponent( opponent )
+  context['record_against_opponent'] = str( wins ) + " - " + str( losses )
+  return context
 
 @register.inclusion_tag( "game_summary.html", takes_context=True )
 def show_game_summary( context, game ):

@@ -167,8 +167,12 @@
   right: 30px;
 }
 
-.pgset-action-buttons-medium {
-    top: 160px;
+.pgset-action-buttons-medium-1 {
+    top: 105px;
+}
+
+.pgset-action-buttons-medium-2 {
+    top: 135px;
 }
 
 .pgtile-div-medium-0 {

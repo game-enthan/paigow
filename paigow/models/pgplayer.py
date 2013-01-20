@@ -62,6 +62,38 @@ class PGPlayer( models.Model ):
     for pgpig in pgpigs:
       yield pgpig.game
 
+  # return all the opponents this player has or is playing against.
+  def all_opponents_in_all_games( self ):
+    opponents = []
+    games = self.games()
+    for game in games:
+      opponent = self.opponent_for_game( game )
+      if not opponent in opponents:
+        opponents.append( opponent )
+    return opponents
+  
+  # return all the games for a given opponent
+  def games_against_opponent( self, opponent ):
+    games = []
+    for game in self.games():
+      if opponent == self.opponent_for_game( game ):
+        games.append( game )
+    return games
+  
+  def record_against_opponent( self, opponent ):
+    wins = 0
+    losses = 0
+    in_progress = 0
+    games = self.games_against_opponent( opponent )
+    for game in games:
+      winner = game.winner()
+      if not winner:
+        in_progress += 1
+      elif winner == self:
+        wins += 1
+      else:
+        losses += 1
+    return wins, losses, in_progress
 
 # ----------------------------------------------------
 # Test PGPlayer class
@@ -75,9 +107,21 @@ class PGPlayerTest( TestCase ):
   def setUp( self ):
     self.test_player = PGPlayer.objects.create( name = 'Rudi' )
     self.test_player.save()
-
-#   def tearDown( self ):
-#     <do something here if necessary>
+  
+  def create_game_for_test( self ):
+    from pggame import PGGame
+    game = PGGame.create( "New Game" )
+    game.save()
+    self.assertNotIn( self.test_player, game.players() )
+    game.add_player( self.test_player )
+    self.assertIn( self.test_player, game.players() )
+    return game
+  
+  def add_opponent_to_game( self, game ):
+    other_guy = PGPlayer.create( "other_guy", "foo@bar.com", "xxx" )
+    other_guy.save()
+    game.add_player( other_guy )
+    return other_guy
   
   def test_name_is_correct( self ):
     '''Name from our instance object database matches what we put in'''
@@ -98,25 +142,36 @@ class PGPlayerTest( TestCase ):
   
   def test_games( self ):
     '''Correctly return a game we're in'''
-    from pggame import PGGame
-    test_game = PGGame.create( "New Game" )
-    test_game.save()
-    self.assertNotIn( self.test_player, test_game.players() )
-    test_game.add_player( self.test_player )
-    self.assertIn( self.test_player, test_game.players() )
+    game = self.create_game_for_test()
 
   def test_opponent( self ):
-    '''Correctly return the opponent in a game'''
+    '''Correctly return the opponent in a game'''    
     from pggame import PGGame
-    test_game = PGGame.create( "New Game" )
-    test_game.save()
-    test_game.add_player( self.test_player )
-    self.assertIsNone( self.test_player.opponent_for_deal( test_game, 1 ) )
-    other_guy = PGPlayer.create( "other_guy", "foo@bar.com", "xxx" )
-    other_guy.save()
-    test_game.add_player( other_guy )
-    self.assertEqual( self.test_player.opponent_for_deal( test_game, 1 ), other_guy )
-    self.assertEqual( other_guy.opponent_for_deal( test_game, 1 ), self.test_player )
+    game = self.create_game_for_test()
+    self.assertIsNone( self.test_player.opponent_for_deal( game, 1 ) )
+    other_guy = self.add_opponent_to_game( game )
+    self.assertEqual( self.test_player.opponent_for_deal( game, 1 ), other_guy )
+    self.assertEqual( other_guy.opponent_for_deal( game, 1 ), self.test_player )
+  
+  def test_opponents_for_game( self ):
+    from pggame import PGGame
+    game = self.create_game_for_test()
+    opponent = self.add_opponent_to_game( game )
+    all_opponents = self.test_player.all_opponents_in_all_games()
+    self.assertIn( opponent, all_opponents )
+    games_against_opponent = self.test_player.games_against_opponent( opponent )
+    self.assertEqual( len( games_against_opponent ), 1 )
+    self.assertEqual( games_against_opponent[0], game )
+    game2 = self.create_game_for_test()
+    opponent2 = self.add_opponent_to_game( game2 )
+    all_opponents = self.test_player.all_opponents_in_all_games()
+    self.assertEqual( len( all_opponents ), 2 )
+    self.assertIn( opponent, all_opponents )
+    self.assertIn( opponent2, all_opponents )
+    game3 = self.create_game_for_test()
+    game3.add_player( opponent )
+    all_opponents = self.test_player.all_opponents_in_all_games()
+    self.assertEqual( len( all_opponents ), 2 )
 
 # run the test in the correct situation; this is boilerplat
 # for all modules that have tests, don't try to figure it out.

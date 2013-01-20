@@ -180,8 +180,8 @@ class PGPlayerInDeal(models.Model):
   def win_lose_string_against( self, pgpid_opponent ):
     # only do it if both are ready.
     if ( self.state() != PGPlayerInDeal.READY or pgpid_opponent.state() != PGPlayerInDeal.READY ):
+      print "Asking for win-lose string when both players aren't ready.  Player state " + str(self.state()) + " opponent_state: " + str(opponent.state()) + "\n"
       raise ValueError
-    
     # for each set, return W for win, . for push and L for loss
     ret_val = ""
     player_sets = self.sets()
