@@ -206,12 +206,13 @@ class PGGame( models.Model ):
       deal = self.deal( deal_number )
       sets = []
       for i in range(3):
-        set = PGSet.create( ( deal.tile( index ),
+        set = PGSet.create( [ deal.tile( index ),
                               deal.tile( index + 2 ),
                               deal.tile( index + 4 ),
                               deal.tile( index + 6 ),
-                            )
+                            ]
                           )
+        #set.auto_set_hands()
         sets.append( set )
         index += 8
       
