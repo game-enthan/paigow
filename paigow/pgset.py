@@ -4,6 +4,8 @@
 
 from models.pgtile import PGTile
 
+sPrinting = False
+
 class PGSet:
   
   # make sure the application name is what we want so any command that
@@ -71,9 +73,10 @@ class PGSet:
     if hand2.beats( hand1 ):
       hand1, hand2 = hand2, hand1
     sum, diff = self.ranking_stats_for_hands( hand1, hand2 )
-    # print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
-    # print"     hand1: " + str(hand1.ranking()) + "  hand2: " + str(hand2.ranking())
-    # print"     sum: " + str(sum) + "  diff: " + str(diff)
+    if sPrinting:
+      print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
+      print"     hand1: " + str(hand1.ranking()) + "  hand2: " + str(hand2.ranking())
+      print"     sum: " + str(sum) + "  diff: " + str(diff)
     return sum, diff
   
   # we have two sets that are not only way. choose between them.
@@ -83,7 +86,7 @@ class PGSet:
     sum2, diff2 = set2.sum_and_diff()
     if diff1 < diff2:
       return True
-    elif diff2 < diff2:
+    elif diff2 < diff1:
       return False
     else:
       return True
@@ -104,6 +107,9 @@ class PGSet:
   def auto_set_hands( self ):
     from paigow.pghand import PGHand
     
+    if sPrinting:
+      print "\n"
+
     picked_ordering = -1
     
     # create sets with the three possible combinations
@@ -113,6 +119,11 @@ class PGSet:
     set1 = PGSet.create( tiles1 )
     set2 = PGSet.create( tiles2 )
     set3 = PGSet.create( tiles3 )
+    
+    if sPrinting:
+      print "set 1: " + str(set1)
+      print "set 2: " + str(set2)
+      print "set 3: " + str(set3)
     
     # convenience vars to test various combinations
     s1beats2 = set1 > set2
@@ -136,6 +147,11 @@ class PGSet:
       ignore1 = s2beats1 or s3beats1
       ignore2 = s1beats2 or s3beats2
       ignore3 = s2beats3 or s1beats3
+      
+      if sPrinting:
+        print "    ignore1: " + ignore1
+        print "    ignore2: " + ignore2
+        print "    ignore3: " + ignore3
       
       if ignore1:
         if self.first_set_is_better( set2, set3 ):
@@ -306,6 +322,9 @@ class PGSetTest( TestCase ):
     self.assertTrue( set1 > set2 )
   
   def test_auto_sort( self ):
+    #sPrinting = True
+    set1 = PGSet.create_with_tile_names( ( "low four", "low ten", "eleven", "low six" ) )
+    self.assertEqual( set1.auto_set_hands(), 2 )
     set1 = PGSet.create_with_tile_names( ( "teen", "low six", "harmony four", "long six" ) )
     self.assertEqual( set1.auto_set_hands(), 2 )
     set1 = PGSet.create_with_tile_names( ( "low four", "mixed nine", "high eight", "mixed eight" ) )
