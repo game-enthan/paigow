@@ -31,11 +31,16 @@ class PGSet:
   def tile_chars( self ):
     return "" + self.tiles[0].char() + self.tiles[1].char() + self.tiles[2].char() + self.tiles[3].char()
   
-  # return the high and low hands.
-  def high_and_low_hands( self ):
+  def hands( self ):
     from paigow.pghand import PGHand
     hand1 = PGHand.create_with_tile_chars( self.tiles[0].char(), self.tiles[1].char() )
     hand2 = PGHand.create_with_tile_chars( self.tiles[2].char(), self.tiles[3].char() )
+    return hand1, hand2
+  
+  # return the high and low hands.
+  def high_and_low_hands( self ):
+    from paigow.pghand import PGHand
+    hand1, hand2 = self.hands()
     if ( hand2.beats( hand1 ) ):
       return hand2, hand1
     else:
@@ -101,6 +106,10 @@ class PGSet:
     if ordering == 2:
       self.switch_tiles( 1, 2 )
     elif ordering == 3:
+      self.switch_tiles( 1, 3 )
+    hand1, hand2 = self.hands()
+    if ( hand2.beats( hand1 ) ):
+      self.switch_tiles( 0, 2 )
       self.switch_tiles( 1, 3 )
     self.reorder_tiles_for_setting()
   
