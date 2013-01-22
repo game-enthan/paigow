@@ -66,108 +66,15 @@ class PGSet:
   
   def sum_and_diff( self ):
     from paigow.pghand import PGHand
-    hand1 = PGHand.create( self.tiles[0], self.tiles[2] )
+    hand1 = PGHand.create( self.tiles[0], self.tiles[1] )
     hand2 = PGHand.create( self.tiles[2], self.tiles[3] )
     if hand2.beats( hand1 ):
       hand1, hand2 = hand2, hand1
     sum, diff = self.ranking_stats_for_hands( hand1, hand2 )
-    #print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
-    #print"     sum: " + str(sum) + "  diff: " + str(diff)
+    # print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
+    # print"     hand1: " + str(hand1.ranking()) + "  hand2: " + str(hand2.ranking())
+    # print"     sum: " + str(sum) + "  diff: " + str(diff)
     return sum, diff
-  
-  #   # this against the others: if win/tie against both, this is the best ordering
-  #   def is_best( self, ov1, ov2 ):
-  #     return ov1 != -1 and ov2 != -1
-  #   
-  #   def index_of_best_hand( self, hand1, hand2, hand3 ):
-  #     r1 = hand1.ranking()
-  #     r2 = hand2.ranking()
-  #     r3 = hand3.ranking()
-  #     if r1 >= r2 and r1 >= r3:
-  #       return 1
-  #     elif r2 >= r1 and r2 >= r3:
-  #       return 2
-  #     elif r3 >= r1 and r3 >= r2:
-  #       return 3
-  #     else:
-  #       return 0
-  #   
-  #   def hands_in_order_and_ranking( self, index1, index2, index3, index4 ):
-  #     from paigow.pghand import PGHand
-  #     hand1 = PGHand.create( self.tiles[index1], self.tiles[index2] )
-  #     hand2 = PGHand.create( self.tiles[index3], self.tiles[index4] )
-  #     if hand2.beats( hand1 ):
-  #       hand1, hand2 = hand2, hand1
-  #     sum, diff = self.ranking_stats_for_hands( hand1, hand2 )
-  #     print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
-  #     print"     sum: " + str(sum) + "  diff: " + str(diff)
-  #     return hand1, hand2, sum, diff
-  #   
-  #   # auto-sort the hand: simplest is the ordering that gives the highest total of rankings;
-  #   # if two are equal, pick the most even.
-  #   def auto_set_hands( self ):
-  #     from paigow.pghand import PGHand
-  #     
-  #     # get the sum and diff of each possible hand ranking
-  #     hand1, hand2, sum1, diff1 = self.hands_in_order_and_ranking( 0, 1, 2, 3 )
-  #     hand3, hand4, sum2, diff2 = self.hands_in_order_and_ranking( 0, 2, 1, 3 )
-  #     hand5, hand6, sum3, diff3 = self.hands_in_order_and_ranking( 0, 3, 1, 2 )
-  #     
-  #     ordering = -1
-  # 
-  #     # see if there is an "only way"
-  #     best_high_index = self.index_of_best_hand( hand1, hand3, hand5 )
-  #     best_low_index = self.index_of_best_hand( hand2, hand4, hand6 )
-  #     if best_high_index > 0 and best_high_index == best_low_index:
-  #       ordering = best_high_index
-  #     
-  #     if ordering == -1:
-  #       # figure out the relative comparisons of each against each other
-  #       o1v2 = self.choose_ordering( sum1, diff1, sum2, diff2 )
-  #       o1v3 = self.choose_ordering( sum1, diff1, sum3, diff3 )
-  #       o2v3 = self.choose_ordering( sum2, diff2, sum3, diff3 )
-  #     
-  #       # see if one ordering is definitely better than the other two
-  #       if self.is_best( o1v2, o1v3 ):
-  #         ordering = 1
-  #       elif self.is_best( -o1v2, o2v3 ):
-  #         ordering = 2
-  #       elif self.is_best( -o1v3, -o2v3 ):
-  #         ordering = 3
-  #     
-  #     if ordering == -1:
-  #       # the only way we're here is if two or more hands have the best
-  #       # total ranking, and the difference between them is the same as well.
-  #       # That means either sum1 or sum2 is one of them (otherwise sum2 would
-  #       # have made it to the best).  Choose the higher of them; if they're
-  #       # the same, choose sum1.
-  #       if sum1 > sum2:
-  #         ordering = 1      # sum1 is at least tied for highest: pick it
-  #       elif sum2 > sum1:
-  #         ordering = 2      # sum2 is at least tied for highest: pick it
-  #       else:
-  #         ordering = 1      # they're tied: pick sum1
-  #     
-  #     # move the tiles according to the ordering we picked.  Ordering 1
-  #     # is the way they already are, no need to do anything.
-  #     if ordering == 2:
-  #       self.switch_tiles( 1, 2 )
-  #     elif ordering == 3:
-  #       self.switch_tiles( 1, 3 )
-  #     
-  #     # now switch hands if necessary
-  #     hand1 = PGHand.create( self.tiles[0], self.tiles[1] )
-  #     hand2 = PGHand.create( self.tiles[2], self.tiles[3] )
-  #     if ( hand2.beats( hand1 ) ):
-  #       self.switch_tiles( 0, 2 )
-  #       self.switch_tiles( 1, 3 )
-  #     
-  #     # now switch the tiles within hands
-  #     if self.tiles[1].beats( self.tiles[0] ):
-  #       self.switch_tiles( 0, 1 )
-  #     if self.tiles[3].beats( self.tiles[2] ):
-  #       self.switch_tiles( 2, 3 )
-  #   
   
   # we have two sets that are not only way. choose between them.
   def first_set_is_better( self, set1, set2 ):
@@ -198,7 +105,7 @@ class PGSet:
     from paigow.pghand import PGHand
     
     picked_ordering = -1
-
+    
     # create sets with the three possible combinations
     tiles1 = [ self.tiles[0], self.tiles[1], self.tiles[2], self.tiles[3] ]
     tiles2 = [ self.tiles[0], self.tiles[2], self.tiles[1], self.tiles[3] ]
@@ -214,7 +121,7 @@ class PGSet:
     s3beats1 = set3 > set1
     s2beats3 = set2 > set3
     s3beats2 = set3 > set2
-
+    
     # see if there is an only-way in there
     if s1beats2 and s1beats3:
       picked_ordering = 1
@@ -223,12 +130,13 @@ class PGSet:
     elif s3beats1 and s3beats2:
       picked_ordering = 3
     else:
+      
       # nope, no only way.  See if there is any set we can remove
       # so we can just compare the other two
       ignore1 = s2beats1 or s3beats1
       ignore2 = s1beats2 or s3beats2
       ignore3 = s2beats3 or s1beats3
-    
+      
       if ignore1:
         if self.first_set_is_better( set2, set3 ):
           picked_ordering = 2
@@ -398,10 +306,10 @@ class PGSetTest( TestCase ):
     self.assertTrue( set1 > set2 )
   
   def test_auto_sort( self ):
-    set1 = PGSet.create_with_tile_names( ( "low four", "mixed nine", "high eight", "mixed eight" ) )
-    self.assertEqual( set1.auto_set_hands(), 2 )
     set1 = PGSet.create_with_tile_names( ( "teen", "low six", "harmony four", "long six" ) )
-    self.assertEqual( set1.auto_set_hands(), 1 ) # 8,0 versus 6,2 is correct
+    self.assertEqual( set1.auto_set_hands(), 2 )
+    set1 = PGSet.create_with_tile_names( ( "low four", "mixed nine", "high eight", "mixed eight" ) )
+    self.assertEqual( set1.auto_set_hands(), 1 )
     set1 = PGSet.create_with_tile_names( ( "teen", "low ten", "eleven", "mixed nine" ) )
     self.assertEqual( set1.auto_set_hands(), 2 )
 
