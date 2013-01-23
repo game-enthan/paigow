@@ -185,6 +185,7 @@ class PGGame( models.Model ):
   def assure_player_in_deal( self, player, deal_number ):
     from pgplayerindeal import PGPlayerInDeal
     from paigow.pgset import PGSet
+    from paigow.pgstrategy import PGStrategy
     
     pgpid_player = self.player_in_deal( player, deal_number )
     
@@ -212,15 +213,25 @@ class PGGame( models.Model ):
                               deal.tile( index + 6 ),
                             ]
                           )
-        set.auto_set_hands()
+        from paigow.pgstrategy import auto_set_numerical
+        auto_set_numerical(set)
         sets.append( set )
         index += 8
+      
+      # if the player is a computer, then set the tiles.
+      #if player.name == "computer":
+      for set in sets:
+        print "set before: " + str(set)
+      sets = PGStrategy.auto_set( sets )
+      for set in sets:
+        print "set after: " + str(set)
       
       # remember what hands were dealt; when it comes time for
       # the player to say how they set, we want to verify that
       # they didn't cheat ;)
       pgpid_player.set_dealt_sets( sets )
       pgpid_player.save()
+      
     
     return pgpid_player
 

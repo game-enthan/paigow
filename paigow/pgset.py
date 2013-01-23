@@ -4,7 +4,11 @@
 
 from models.pgtile import PGTile
 
-sPrinting = False
+# Turn this on for logging
+s_pgset_logging = False
+
+# Different ways we can auto-set
+s_use_numerical_auto_set = False
 
 class PGSet:
   
@@ -54,23 +58,6 @@ class PGSet:
       ranking1, ranking2 = ranking2, ranking1
     return ranking1 + ranking2, ranking1 - ranking2
   
-  def switch_tiles( self, index1, index2 ):
-    temp = self.tiles[index1]
-    self.tiles[index1] = self.tiles[index2]
-    self.tiles[index2] = temp
-  
-  def choose_ordering( self, sum1, diff1, sum2, diff2 ):
-    if diff1 < diff2:
-      return 1
-    elif diff2 < diff1:
-      return -1
-    elif sum1 > sum2:
-      return 1
-    elif sum2 > sum1:
-      return -1
-    else:
-      return 0
-  
   def sum_and_diff( self ):
     from paigow.pghand import PGHand
     hand1 = PGHand.create( self.tiles[0], self.tiles[1] )
@@ -78,135 +65,12 @@ class PGSet:
     if hand2.beats( hand1 ):
       hand1, hand2 = hand2, hand1
     sum, diff = self.ranking_stats_for_hands( hand1, hand2 )
-    if sPrinting:
+    if s_pgset_logging:
       print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
       print"     hand1: " + str(hand1.ranking()) + "  hand2: " + str(hand2.ranking())
       print"     sum: " + str(sum) + "  diff: " + str(diff)
     return sum, diff
   
-  # we have two sets that are not only way. choose between them.
-  def first_set_is_better( self, set1, set2 ):
-    from paigow.pghand import PGHand
-    sum1, diff1 = set1.sum_and_diff()
-    sum2, diff2 = set2.sum_and_diff()
-    if diff1 < diff2:
-      return True
-    elif diff2 < diff1:
-      return False
-    else:
-      return True
-  
-  def reorder_tiles_for_setting( self ):
-    if self.tiles[1].beats( self.tiles[0] ):
-      self.switch_tiles( 0, 1 )
-    if self.tiles[3].beats( self.tiles[2] ):
-      self.switch_tiles( 2, 3 )
-  
-  def reorder_hands_for_setting( self, ordering ):
-    if ordering == 2:
-      self.switch_tiles( 1, 2 )
-    elif ordering == 3:
-      self.switch_tiles( 1, 3 )
-    hand1, hand2 = self.hands()
-    if ( hand2.beats( hand1 ) ):
-      self.switch_tiles( 0, 2 )
-      self.switch_tiles( 1, 3 )
-    self.reorder_tiles_for_setting()
-  
-  def auto_set_hands( self ):
-    from paigow.pghand import PGHand
-    
-    if sPrinting:
-      print "\n"
-
-    picked_ordering = -1
-    
-    # create sets with the three possible combinations
-    tiles1 = [ self.tiles[0], self.tiles[1], self.tiles[2], self.tiles[3] ]
-    tiles2 = [ self.tiles[0], self.tiles[2], self.tiles[1], self.tiles[3] ]
-    tiles3 = [ self.tiles[0], self.tiles[3], self.tiles[1], self.tiles[2] ]
-    set1 = PGSet.create( tiles1 )
-    set2 = PGSet.create( tiles2 )
-    set3 = PGSet.create( tiles3 )
-    
-    if sPrinting:
-      print "set 1: " + str(set1)
-      print "set 2: " + str(set2)
-      print "set 3: " + str(set3)
-    
-    # convenience vars to test various combinations
-    s1beats2 = set1 > set2
-    s2beats1 = set2 > set1
-    s1beats3 = set1 > set3
-    s3beats1 = set3 > set1
-    s2beats3 = set2 > set3
-    s3beats2 = set3 > set2
-    
-    # see if there is an only-way in there
-    if s1beats2 and s1beats3:
-      picked_ordering = 1
-    elif s2beats1 and s2beats3:
-      picked_ordering = 2
-    elif s3beats1 and s3beats2:
-      picked_ordering = 3
-    else:
-      
-      # nope, no only way.  See if there is any set we can remove
-      # so we can just compare the other two
-      ignore1 = s2beats1 or s3beats1
-      ignore2 = s1beats2 or s3beats2
-      ignore3 = s2beats3 or s1beats3
-      
-      if sPrinting:
-        print "    ignore1: " + ignore1
-        print "    ignore2: " + ignore2
-        print "    ignore3: " + ignore3
-      
-      if ignore1:
-        if self.first_set_is_better( set2, set3 ):
-          picked_ordering = 2
-        else:
-          picked_ordering = 3
-      elif ignore2:
-        if self.first_set_is_better( set1, set3 ):
-          picked_ordering = 1
-        else:
-          picked_ordering = 3
-      elif ignore3:
-        if self.first_set_is_better( set1, set2 ):
-          picked_ordering = 1
-        else:
-          picked_ordering = 2
-      else:
-        # bleah, need 3-way comparison, no only ways between.
-        # choose the one with the smallest difference.
-        sum1, diff1 = set1.sum_and_diff()
-        sum2, diff2 = set2.sum_and_diff()
-        sum3, diff3 = set3.sum_and_diff()
-        if diff1 < diff2 and diff1 < diff3:
-          picked_ordering = 1
-        elif diff2 < diff1 and diff2 < diff3:
-          picked_ordering = 2
-        elif diff3 < diff1 and diff3 < diff2:
-          picked_ordering = 3
-        else:
-          # double-bleah: there was evidently a diff tie.
-          # We can't then go to the largest sum because two with a diff
-          # tie, where one sum is larger, would be an only way.  So therefore
-          # the two with the smallest diff must be the same.  Therefore,
-          # since there are two of them, either 1 or 2 has to be it: just
-          # compare those.
-          if self.first_set_is_better( set1, set2 ):
-            picked_ordering = 1
-          else:
-            picked_ordering = 2
-    
-    # we founds something, re-order the tiles for it.
-    if picked_ordering > 0:
-      self.reorder_hands_for_setting( picked_ordering )
-    else:
-      print "WTF? auto_sort didn't find anything?"
-    return picked_ordering
   
   # the user has set the first and second tile to a specific hand, and the third and fourth.
   # Keep the hands intact, but switch the hands and the tiles within them to the correct
@@ -330,16 +194,3 @@ class PGSetTest( TestCase ):
     self.assertFalse( low_hand2.beats( high_hand2 ) )
     self.assertTrue( set1 > set2 )
   
-  def test_auto_sort( self ):
-    #sPrinting = True
-    set1 = PGSet.create_with_tile_names( ( "day", "low ten", "mixed five", "eleven" ) )
-    self.assertEqual( set1.auto_set_hands(), 3 )
-    set1 = PGSet.create_with_tile_names( ( "low four", "low ten", "eleven", "low six" ) )
-    self.assertEqual( set1.auto_set_hands(), 2 )
-    set1 = PGSet.create_with_tile_names( ( "teen", "low six", "harmony four", "long six" ) )
-    self.assertEqual( set1.auto_set_hands(), 2 )
-    set1 = PGSet.create_with_tile_names( ( "low four", "mixed nine", "high eight", "mixed eight" ) )
-    self.assertEqual( set1.auto_set_hands(), 1 )
-    set1 = PGSet.create_with_tile_names( ( "teen", "low ten", "eleven", "mixed nine" ) )
-    self.assertEqual( set1.auto_set_hands(), 2 )
-

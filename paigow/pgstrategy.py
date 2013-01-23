@@ -1,0 +1,221 @@
+# This class implements the strategy for setting tiles and ordering sets.
+# It has a bunch of class methods for figuring this out.
+
+# logging
+s_pgstrategy_logging = False
+
+# Different ways we can auto-set
+s_use_numerical_auto_set = False
+
+from paigow.pgset import PGSet
+
+def ranking_stats_for_hands( hand1, hand2 ):
+  ranking1 = hand1.ranking()
+  ranking2 = hand2.ranking()
+  if ranking2 > ranking1:
+    hand1, hand2 = hand2, hand1
+    ranking1, ranking2 = ranking2, ranking1
+  return ranking1 + ranking2, ranking1 - ranking2
+
+def switch_tiles( set, index1, index2 ):
+  temp = set.tiles[index1]
+  set.tiles[index1] = set.tiles[index2]
+  set.tiles[index2] = temp
+
+def reorder_tiles_within_hands( set ):
+  if set.tiles[1].beats( set.tiles[0] ):
+    switch_tiles( set, 0, 1 )
+  if set.tiles[3].beats( set.tiles[2] ):
+    switch_tiles( set, 2, 3 )
+
+def reorder_hands_for_setting( set, ordering ):
+  if ordering == 2:
+    switch_tiles( set, 1, 2 )
+  elif ordering == 3:
+    switch_tiles( set, 1, 3 )
+  hand1, hand2 = set.hands()
+  if ( hand2.beats( hand1 ) ):
+    switch_tiles( set, 0, 2 )
+    switch_tiles( set, 1, 3 )
+  reorder_tiles_within_hands( set )
+
+def choose_ordering( sum1, diff1, sum2, diff2 ):
+  if diff1 < diff2:
+    return 1
+  elif diff2 < diff1:
+    return -1
+  elif sum1 > sum2:
+    return 1
+  elif sum2 > sum1:
+    return -1
+  else:
+    return 0
+
+def sum_and_diff( set ):
+  from paigow.pghand import PGHand
+  hand1, hand2 = set.hands()
+  if hand2.beats( hand1 ):
+    hand1, hand2 = hand2, hand1
+  sum, diff = ranking_stats_for_hands( hand1, hand2 )
+  if s_pgstrategy_logging:
+    print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
+    print"     hand1: " + str(hand1.ranking()) + "  hand2: " + str(hand2.ranking())
+    print"     sum: " + str(sum) + "  diff: " + str(diff)
+  return sum, diff
+
+# we have two sets that are not only way. choose between them.
+def first_set_is_better( set1, set2 ):
+  from paigow.pghand import PGHand
+  sum1, diff1 = set1.sum_and_diff()
+  sum2, diff2 = set2.sum_and_diff()
+  if diff1 < diff2:
+    return True
+  elif diff2 < diff1:
+    return False
+  else:
+    return True
+
+def auto_set_heuristic( set ):
+  from paigow.pghand import PGHand
+  return auto_set_numerical( set )
+
+def auto_set_numerical( set ):
+  from paigow.pghand import PGHand
+  
+  if s_pgstrategy_logging:
+    print "\n"
+  
+  picked_ordering = -1
+  
+  # create sets with the three possible combinations.  We'll be re-arranging
+  # one of these to create sets so make them editable lists.
+  tiles = set.tiles
+  tiles1 = [ tiles[0], tiles[1], tiles[2], tiles[3] ]
+  tiles2 = [ tiles[0], tiles[2], tiles[1], tiles[3] ]
+  tiles3 = [ tiles[0], tiles[3], tiles[1], tiles[2] ]
+  sets = ( None, PGSet.create( tiles1 ), PGSet.create( tiles2 ), PGSet.create( tiles3 ) )
+  
+  if s_pgstrategy_logging:
+    print "set 1: " + str(sets[1])
+    print "set 2: " + str(sets[2])
+    print "set 3: " + str(sets[3])
+  
+  # convenience vars to test various combinations
+  s1beats2 = sets[1] > sets[2]
+  s2beats1 = sets[2] > sets[1]
+  s1beats3 = sets[1] > sets[3]
+  s3beats1 = sets[3] > sets[1]
+  s2beats3 = sets[2] > sets[3]
+  s3beats2 = sets[3] > sets[2]
+  
+  # see if there is an only-way in there
+  if s1beats2 and s1beats3:
+    picked_ordering = 1
+  elif s2beats1 and s2beats3:
+    picked_ordering = 2
+  elif s3beats1 and s3beats2:
+    picked_ordering = 3
+  else:
+    
+    # nope, no only way.  See if there is any set we can remove
+    # so we can just compare the other two
+    ignore1 = s2beats1 or s3beats1
+    ignore2 = s1beats2 or s3beats2
+    ignore3 = s2beats3 or s1beats3
+    
+    if s_pgstrategy_logging:
+      print "    ignore1: " + ignore1
+      print "    ignore2: " + ignore2
+      print "    ignore3: " + ignore3
+    
+    if ignore1:
+      if first_set_is_better( sets[2], sets[3] ):
+        picked_ordering = 2
+      else:
+        picked_ordering = 3
+    elif ignore2:
+      if first_set_is_better( sets[1], sets[3] ):
+        picked_ordering = 1
+      else:
+        picked_ordering = 3
+    elif ignore3:
+      if first_set_is_better( sets[1], sets[2] ):
+        picked_ordering = 1
+      else:
+        picked_ordering = 2
+    else:
+      # bleah, need 3-way comparison, no only ways between.
+      # choose the one with the smallest difference.
+      sum1, diff1 = sets[1].sum_and_diff()
+      sum2, diff2 = sets[2].sum_and_diff()
+      sum3, diff3 = sets[3].sum_and_diff()
+      if diff1 < diff2 and diff1 < diff3:
+        picked_ordering = 1
+      elif diff2 < diff1 and diff2 < diff3:
+        picked_ordering = 2
+      elif diff3 < diff1 and diff3 < diff2:
+        picked_ordering = 3
+      else:
+        # double-bleah: there was evidently a diff tie.
+        # We can't then go to the largest sum because two with a diff
+        # tie, where one sum is larger, would be an only way.  So therefore
+        # the two with the smallest diff must be the same.  Therefore,
+        # since there are two of them, either 1 or 2 has to be it: just
+        # compare those.
+        if first_set_is_better( sets[1], sets[2] ):
+          picked_ordering = 1
+        else:
+          picked_ordering = 2
+  
+  # we founds something, re-order the tiles for it.
+  if picked_ordering > 0:
+    reorder_hands_for_setting( set, picked_ordering )
+  else:
+    print "WTF? auto_sort didn't find anything?"
+  return picked_ordering
+
+class PGStrategy:
+  
+  class Meta:
+    app_label = 'paigow'
+  
+  @classmethod
+  def auto_set( cls, sets ):
+    for set in sets:
+      if s_use_numerical_auto_set:
+        auto_set_numerical( set )
+      else:
+        auto_set_heuristic( set )
+    return sets
+
+# ----------------------------------------------------
+# Test PGStrategy class
+
+from django.test import TestCase
+
+class PGStrategyTest( TestCase ):
+  
+  # we need the set of tiles in the test database
+  fixtures = [ 'pgtile.json' ]
+  
+  def test_auto_set( self ):
+    #s_pgset_logging = True
+    set = PGSet.create_with_tile_names( ( "day", "low ten", "mixed five", "eleven" ) )
+    self.assertEqual( auto_set_numerical( set ), 3 )
+    set = PGSet.create_with_tile_names( ( "low four", "low ten", "eleven", "low six" ) )
+    self.assertEqual( auto_set_numerical( set ), 2 )
+    set = PGSet.create_with_tile_names( ( "teen", "low six", "harmony four", "long six" ) )
+    self.assertEqual( auto_set_numerical( set ), 2 )
+    set = PGSet.create_with_tile_names( ( "low four", "mixed nine", "high eight", "mixed eight" ) )
+    self.assertEqual( auto_set_numerical( set ), 1 )
+    set = PGSet.create_with_tile_names( ( "teen", "low ten", "eleven", "mixed nine" ) )
+    self.assertEqual( auto_set_numerical( set ), 2 )
+
+    
+    
+# run the test when invoked as a test (this is boilerplate
+# code at the bottom of every python file that has unit
+# tests in it).
+if __name__ == '__main__':
+  unittest.main()
+
