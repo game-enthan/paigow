@@ -212,7 +212,7 @@ class PGGame( models.Model ):
                               deal.tile( index + 6 ),
                             ]
                           )
-        #set.auto_set_hands()
+        set.auto_set_hands()
         sets.append( set )
         index += 8
       

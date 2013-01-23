@@ -332,6 +332,8 @@ class PGSetTest( TestCase ):
   
   def test_auto_sort( self ):
     #sPrinting = True
+    set1 = PGSet.create_with_tile_names( ( "day", "low ten", "mixed five", "eleven" ) )
+    self.assertEqual( set1.auto_set_hands(), 3 )
     set1 = PGSet.create_with_tile_names( ( "low four", "low ten", "eleven", "low six" ) )
     self.assertEqual( set1.auto_set_hands(), 2 )
     set1 = PGSet.create_with_tile_names( ( "teen", "low six", "harmony four", "long six" ) )
