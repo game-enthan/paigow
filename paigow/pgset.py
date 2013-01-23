@@ -139,6 +139,46 @@ class PGSet:
   def can_be_rearranged_to( self, tile_chars ):
     return ( self.sorted_tile_chars() == PGSet.sort_tile_chars( tile_chars ) )
 
+  def ordering_with_tiles( self, i0, i1, i2, i3, tst ):
+    from paigow.pghand import PGHand
+    return tst( PGHand.create( self.tiles[i0], self.tiles[i1] ) ) or \
+           tst( PGHand.create( self.tiles[i2], self.tiles[i3] ) )
+        
+  def ordering_with( self, tst ):
+    if self.ordering_with_tiles( 0, 1, 2, 3, tst ):
+      return 1
+    if self.ordering_with_tiles( 0, 2, 1, 3, tst ):
+      return 2
+    if self.ordering_with_tiles( 0, 3, 1, 2, tst ):
+      return 3
+    return 0
+  
+  # analysis of what it might be set to: return an ordering that has a pair
+  def ordering_with_pair( self ):
+    from paigow.pghand import PGHand
+    return self.ordering_with( PGHand.is_pair )
+  
+  def ordering_with_two_pair( self ):
+    if self.tiles[0].copies(self.tiles[1]) and self.tiles[2].copies(self.tiles[3]):
+      return 1
+    if self.tiles[0].copies(self.tiles[2]) and self.tiles[1].copies(self.tiles[3]):
+      return 2
+    if self.tiles[0].copies(self.tiles[3]) and self.tiles[1].copies(self.tiles[2]):
+      return 3
+    return 0
+  
+  def ordering_with_wong( self ):
+    from paigow.pghand import PGHand
+    return self.ordering_with( PGHand.is_wong )
+  
+  def ordering_with_gong( self ):
+    from paigow.pghand import PGHand
+    return self.ordering_with( PGHand.is_gong )
+  
+  def ordering_with_high_nine( self ):
+    from paigow.pghand import PGHand
+    return self.ordering_with( PGHand.is_high_nine )
+  
   # convenience for creation
   @classmethod
   def create( cls, tile_list ):
@@ -194,3 +234,22 @@ class PGSetTest( TestCase ):
     self.assertFalse( low_hand2.beats( high_hand2 ) )
     self.assertTrue( set1 > set2 )
   
+  def test_analysis( self ):
+    set = PGSet.create_with_tile_names( ( "day", "mixed nine", "low ten", "mixed seven" ) )
+    self.assertEqual( set.ordering_with_two_pair(), 0 )
+    self.assertEqual( set.ordering_with_pair(), 0 )
+    self.assertEqual( set.ordering_with_wong(), 1 )
+    self.assertEqual( set.ordering_with_gong(), 0 )
+    self.assertEqual( set.ordering_with_high_nine(), 3 )
+    set = PGSet.create_with_tile_names( ( "mixed nine", "mixed nine", "low ten", "low ten" ) )
+    self.assertEqual( set.ordering_with_two_pair(), 1 )
+    self.assertEqual( set.ordering_with_pair(), 1 )
+    self.assertEqual( set.ordering_with_wong(), 0 )
+    self.assertEqual( set.ordering_with_gong(), 0 )
+    self.assertEqual( set.ordering_with_high_nine(), 0 )
+    set = PGSet.create_with_tile_names( ( "mixed nine", "low four", "low ten", "teen" ) )
+    self.assertEqual( set.ordering_with_two_pair(), 0 )
+    self.assertEqual( set.ordering_with_pair(), 0 )
+    self.assertEqual( set.ordering_with_wong(), 3 )
+    self.assertEqual( set.ordering_with_gong(), 0 )
+    self.assertEqual( set.ordering_with_high_nine(), 0 )
