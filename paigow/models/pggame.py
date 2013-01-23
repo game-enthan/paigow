@@ -220,11 +220,7 @@ class PGGame( models.Model ):
       
       # if the player is a computer, then set the tiles.
       #if player.name == "computer":
-      for set in sets:
-        print "set before: " + str(set)
-      sets = PGStrategy.auto_set( sets )
-      for set in sets:
-        print "set after: " + str(set)
+      #       sets = PGStrategy.auto_set( sets )
       
       # remember what hands were dealt; when it comes time for
       # the player to say how they set, we want to verify that
