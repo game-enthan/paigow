@@ -66,6 +66,15 @@ def sum_and_diff( set ):
 # we have two sets that are not only way. choose between them.
 def first_set_is_better( set1, set2 ):
   from paigow.pghand import PGHand
+  
+  # we might be called with different sets or different tiles of
+  # the same set: check for only way.
+  if set1 > set2:
+    return True
+  elif set2 > set1:
+    return False
+  
+  # no only way, check sum/diff
   sum1, diff1 = set1.sum_and_diff()
   sum2, diff2 = set2.sum_and_diff()
   if diff1 < diff2:
@@ -94,7 +103,15 @@ def auto_set_numerical( set ):
   tiles2 = [ tiles[0], tiles[2], tiles[1], tiles[3] ]
   tiles3 = [ tiles[0], tiles[3], tiles[1], tiles[2] ]
   sets = ( None, PGSet.create( tiles1 ), PGSet.create( tiles2 ), PGSet.create( tiles3 ) )
+  ordering = picked_ordering_for_sets( sets )
   
+  # we founds something, re-order the tiles for it.
+  if ordering > 0:
+    reorder_hands_for_setting( set, ordering )
+  else:
+    print "WTF? auto_sort didn't find anything?"
+
+def picked_ordering_for_sets( sets ):
   if s_pgstrategy_logging:
     print "set 1: " + str(sets[1])
     print "set 2: " + str(sets[2])
@@ -167,11 +184,6 @@ def auto_set_numerical( set ):
         else:
           picked_ordering = 2
   
-  # we founds something, re-order the tiles for it.
-  if picked_ordering > 0:
-    reorder_hands_for_setting( set, picked_ordering )
-  else:
-    print "WTF? auto_sort didn't find anything?"
   return picked_ordering
 
 class PGStrategy:
@@ -186,6 +198,29 @@ class PGStrategy:
         auto_set_numerical( set )
       else:
         auto_set_heuristic( set )
+    
+    # order the sets
+    ordering_sets = [ None ]
+    ordering_sets.extend( sets )
+    ordering = picked_ordering_for_sets( ordering_sets )
+    if ordering == 1:
+      # first set is the best, find the next-best
+      if first_set_is_better( sets[1], sets[2] ):
+        sets = sets
+      else:
+        sets = [ sets[0], sets[2], sets[1] ]
+    elif ordering == 2:
+      # second set is the best, find the next-best
+      if first_set_is_better( sets[0], sets[2] ):
+        sets = [ sets[1], sets[0], sets[2] ]
+      else:
+        sets = [ sets[1], sets[2], sets[0] ]
+    else:
+      # third set is the best, find the next-best
+      if first_set_is_better( sets[0], sets[1] ):
+        sets = [ sets[2], sets[0], sets[1] ]
+      else:
+        sets = [ sets[2], sets[1], sets[0] ]
     return sets
 
 # ----------------------------------------------------

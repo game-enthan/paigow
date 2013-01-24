@@ -219,15 +219,21 @@ class PGGame( models.Model ):
         index += 8
       
       # if the player is a computer, then set the tiles.
-      #if player.name == "computer":
-      #       sets = PGStrategy.auto_set( sets )
+      if player.name == "computer":
+        sets = PGStrategy.auto_set( sets )
       
       # remember what hands were dealt; when it comes time for
       # the player to say how they set, we want to verify that
       # they didn't cheat ;)
-      pgpid_player.set_dealt_sets( PGStrategy.auto_set( sets ) )
+      pgpid_player.set_dealt_sets( sets )
+      
+      # remember this player is here, needs to be done before player_is_ready
       pgpid_player.save()
       
+      # the computer is done right away, always.
+      if player.name == "computer":
+        pgpid_player.player_is_ready( sets[0].tile_chars(), sets[1].tile_chars(), sets[2].tile_chars() )
+        pgpid_player.save()
     
     return pgpid_player
 
@@ -338,10 +344,16 @@ class PGGame( models.Model ):
     if ( self.game_state != PGGame.SETTING_TILES ):
       return
     
-    # if the opponent is not ready, nothing to do
+    # if the opponent is not ready, nothing to do.  Note thate
+    # we may not have an opponent yet if we're the computer
+    # because we're set as soon as we're in the deal, and the
+    # other play may be about to be in the deal.
     pgpid_opponent = self.player_in_deal( player.opponent_for_deal( self, deal_number ), deal_number )
     if not pgpid_opponent:
-      raise ValueError
+      if player.name == "computer":
+        return
+      else:
+        raise ValueError
     if ( pgpid_opponent.state() != PGPlayerInDeal.READY ):
       return
     
