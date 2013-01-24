@@ -213,8 +213,8 @@ class PGGame( models.Model ):
                               deal.tile( index + 6 ),
                             ]
                           )
-        from paigow.pgstrategy import auto_set_numerical
-        auto_set_numerical(set)
+        #from paigow.pgstrategy import auto_set_numerical
+        #auto_set_numerical(set)
         sets.append( set )
         index += 8
       
@@ -225,7 +225,7 @@ class PGGame( models.Model ):
       # remember what hands were dealt; when it comes time for
       # the player to say how they set, we want to verify that
       # they didn't cheat ;)
-      pgpid_player.set_dealt_sets( sets )
+      pgpid_player.set_dealt_sets( PGStrategy.auto_set( sets ) )
       pgpid_player.save()
       
     

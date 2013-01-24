@@ -406,8 +406,11 @@
         setTimeout( get_opponent_state, 5000 );
     }
     
-    function tiles_are_set()
+    function tiles_are_set( button )
     {
+      if ($(button).hasClass("disabled"))
+        return;
+
       //  Once the tiles are set, you cannot do anything else because it will show your
       //  tiles to the other player if they're ready.
       $("#preview-hands-button").addClass("disabled");
@@ -820,7 +823,7 @@
   $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
   
   //  Make the "tiles-are-set" button active
-  $("#tiles-are-set").click( function( button ) { return tiles_are_set( this ); } );
+  $("#tiles-are-set-button").click( function( button ) { return tiles_are_set( this ); } );
   
   //  Make the "tiles-are-set" button active
   $("#preview-hands-button").click( function( button ) { return preview_hands( this ); } );
