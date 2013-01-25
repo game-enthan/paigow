@@ -87,6 +87,8 @@ def home( request, params = {} ):
 
   params['games'] = session_player( request ).games()
   params['all_opponents_in_all_games'] = session_player( request ).all_opponents_in_all_games()
+  wins, losses = session_player( request ).overall_record()
+  params['overall_record'] = str(wins) + " - " + str(losses)
   return render_to_response( 'home.html', request_context( request, params ) )
 
 

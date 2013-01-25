@@ -94,6 +94,15 @@ class PGPlayer( models.Model ):
       else:
         losses += 1
     return wins, losses, in_progress
+  
+  def overall_record( self ):
+    wins, losses = 0, 0
+    for opponent in self.all_opponents_in_all_games():
+      o_wins, o_losses, o_in_progress = self.record_against_opponent( opponent )
+      wins += o_wins
+      losses += o_losses
+      
+    return wins, losses
 
 # ----------------------------------------------------
 # Test PGPlayer class
