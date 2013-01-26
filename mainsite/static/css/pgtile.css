@@ -73,7 +73,22 @@
 	position: absolute;
 	text-align: center;
 	font-weight: bold;
-}	
+}
+
+.score-in-progress {
+  color: black;
+}
+
+.score-win {
+  color: green;
+	font-weight: bold;
+}
+
+.score-lose {
+  color: red;
+	font-weight: bold;
+}
+
 
 .pgtile-ease-in-out {
   -webkit-transition: all 1s ease-in-out;

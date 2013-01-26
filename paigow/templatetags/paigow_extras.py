@@ -26,11 +26,20 @@ def show_opponent_summary( context, opponent ):
 
 @register.inclusion_tag( "game_summary.html", takes_context=True )
 def show_game_summary( context, game ):
+  from paigow.models.pggame import PGGame
   player = session_player( context['request'] )  
   opponent = player.opponent_for_game( game )
   context['game'] = game
   context['opponent'] = opponent
-  context['score'] = str(game.score_for_player( player )) + " - " + str(game.score_for_player( opponent ))
+  player_score = game.score_for_player( player )
+  opponent_score = game.score_for_player( opponent )
+  context['score'] = str(player_score) + " - " + str(opponent_score)
+  if game.game_state != PGGame.GAME_OVER:
+    context['score_class'] = "score-in-progress"
+  elif player_score > opponent_score:
+    context['score_class'] = "score-win"
+  else:
+    context['score_class'] = "score-lose"
   return context
 
 @register.inclusion_tag( "pgdeal.html", takes_context=True )

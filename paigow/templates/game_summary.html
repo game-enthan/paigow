@@ -1,7 +1,7 @@
 {% load static %}{% load paigow_extras %}
 <tr>
   <td><a href="game/{{ game.id }}/{{ game.current_deal_number }}">{{ game.name }}</a></td>
-  <td>{{ score }}</td>
+  <td><span class="{{ score_class }}">{{ score }}</span></td>
   <td>{{ game.start_date }}</td>
   <td>{{ game.finish_date }}</td>
 </tr>
