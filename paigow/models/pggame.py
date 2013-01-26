@@ -382,6 +382,7 @@ class PGGame( models.Model ):
         elif player_score == winning_score:
           num_with_max_score = num_with_max_score + 1
     if num_with_max_score == 1:
+      self.finish_date = timezone.now()
       self.game_state = PGGame.GAME_OVER
       self.save()
       return True
