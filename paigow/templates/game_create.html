@@ -19,14 +19,11 @@
 
 {% endblock %}
 
+{% block content_title %}<h1>New Game</h1>{% endblock %}
+
 {% block content %}
-  <form class="form-horizontal" method="POST" action="add" onsubmit="return validate_form( this, 'game')" >
+  <form class="form-horizontal" method="POST" action="/paigow/game/add" onsubmit="return validate_form( this, 'game')" >
     {% csrf_token %}
-    <div class="control-group">
-      <div class="controls">
-        <p class="lead">Please enter the game settings for the new game</p>
-      </div>
-    </div>
     <div class="control-group">
       <label class="control-label" for="game_name">Name</label>
       <div class="controls">
@@ -35,15 +32,20 @@
     </div>
     <div class="control-group">
       <label class="control-label" for="game_name">Opponent</label>
-      <div class="controls">
-        <select id="game_opponent" name="game_opponent">
-          {% if opponents %}
-            {% for opponent in opponents %}
-              <option value="{{ opponent.id }}">{{ opponent }}</option>
-            {% endfor %}
+        <div class="controls">
+          {% if opponent %}
+            <span class="lead">{{ opponent.name }}</span>
+            <input type="hidden" id="game_opponent" name="game_opponent" value="{{ opponent.id }}">
+          {% else %}
+            <select id="game_opponent" name="game_opponent">
+              {% if opponents %}
+                {% for opponent in opponents %}
+                  <option value="{{ opponent.id }}">{{ opponent }}</option>
+                {% endfor %}
+              {% endif %}
+            </select>
           {% endif %}
-        </select>
-      </div>
+        </div>
     </div>
     <br>
     <div class="control-group">

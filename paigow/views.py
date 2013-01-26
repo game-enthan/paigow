@@ -82,9 +82,10 @@ def goto_home( request, params = {} ):
 # if they are logged in, show them the home page (TBD).
 def home( request, params = {} ):
   
-  if (not request.session.get('player_id', False)):
+  player = session_player( request )
+  if not player:
     return render_to_response( 'user_login.html', request_context( request, params ) )
-
+  
   params['games'] = session_player( request ).games()
   params['all_opponents_in_all_games'] = session_player( request ).all_opponents_in_all_games()
   wins, losses = session_player( request ).overall_record()
@@ -193,11 +194,28 @@ def logout( request, params = {} ):
 #-------------------------------------------------------------------
 # User clicked 'New Game': return a form so they can create one.
 def new_game( request, params = {} ):
-  
-  if (not request.session.get('player_id', False)):
-    return goto_home( request )
-  
+  #   player = session_player( request )
+  #   if not player:
+  #     return goto_home( request )
   return render_to_response( 'game_create.html', request_context( request, params ) )
+
+
+#-------------------------------------------------------------------
+# User clicked 'New Game': return a form so they can create one.
+def new_game_against( request, opponent_id, params = {} ):
+  player = session_player( request )
+  if not player:
+    print "Error: new game but no player"
+    return goto_home( request )
+  opponents = PGPlayer.objects.filter( id = opponent_id )
+  if not opponents:
+    print "Error: new game but no opponents found id " + str(opponent_id)
+    return goto_home( request )
+  if len(opponents) != 1:
+    print "Error: multiple opponents found for id " + str(opponent_id)
+    return goto_home( request )
+  params['opponent'] = opponents[0]
+  return new_game( request, params )
 
 
 #-------------------------------------------------------------------
@@ -205,9 +223,10 @@ def new_game( request, params = {} ):
 # and go home.
 def add_game( request, params = {} ):
   
-  if (not request.session.get('player_id', False)):
+  player = session_player( request )
+  if not player:
     return goto_home( request )
-
+  
   # create a new game
   game = PGGame.create( request.POST['game_name'] )
   game.save() # must be done before adding player, so we have an ID

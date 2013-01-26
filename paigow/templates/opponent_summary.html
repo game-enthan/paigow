@@ -1,5 +1,9 @@
 {% load static %}{% load paigow_extras %}
-  <p class="lead"><strong>{{ record_against_opponent }}</strong> record against <strong>{{ opponent.name }}</strong></p>
+  <br>
+  <p>
+    <span class="lead"><strong>{{ record_against_opponent }}</strong> record against <strong>{{ opponent.name }}</strong></span>
+    <span class="pull-right" style="margin-right:80px;"><a href="/paigow/game/new/{{ opponent.id }}">Start a new game against {{ opponent.name }}</a></span>
+  </p>
   <table class="table table-striped table-condensed">
     <thead>
       <tr>

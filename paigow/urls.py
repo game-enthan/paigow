@@ -19,6 +19,7 @@ urlpatterns = patterns('',
   url(r'^login$', 'paigow.views.login' ),
   url(r'^logout$', 'paigow.views.logout' ),
   url(r'^game/new$', 'paigow.views.new_game' ),
+  url(r'^game/new/([0-9]+)$', 'paigow.views.new_game_against' ),
   url(r'^game/add$', 'paigow.views.add_game' ),
   url(r'^game/([0-9]+)/([0-9]+)$', 'paigow.views.play_game' ),
   
