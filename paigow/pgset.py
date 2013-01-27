@@ -50,26 +50,9 @@ class PGSet:
     else:
       return hand1, hand2
   
-  def ranking_stats_for_hands( self, hand1, hand2 ):
-    ranking1 = hand1.ranking()
-    ranking2 = hand2.ranking()
-    if ranking2 > ranking1:
-      hand1, hand2 = hand2, hand1
-      ranking1, ranking2 = ranking2, ranking1
-    return ranking1 + ranking2, ranking1 - ranking2
-  
-  def sum_and_diff( self ):
+  def high_hand( self ):
     from paigow.pghand import PGHand
-    hand1 = PGHand.create( self.tiles[0], self.tiles[1] )
-    hand2 = PGHand.create( self.tiles[2], self.tiles[3] )
-    if hand2.beats( hand1 ):
-      hand1, hand2 = hand2, hand1
-    sum, diff = self.ranking_stats_for_hands( hand1, hand2 )
-    if s_pgset_logging:
-      print "\n[ " + str(hand1) + " ] + [ " + str(hand2) + " ]:"
-      print"     hand1: " + str(hand1.ranking()) + "  hand2: " + str(hand2.ranking())
-      print"     sum: " + str(sum) + "  diff: " + str(diff)
-    return sum, diff
+    high_hand, low_hand = self.high_and_low_hands()
   
   
   # the user has set the first and second tile to a specific hand, and the third and fourth.
@@ -123,6 +106,55 @@ class PGSet:
   def __gt__( self, other ):
     return other < self
   
+  # more specific comparisons
+  def has_higher_high_hand_than( self, other ):
+    self_high, self_low = self.high_and_low_hands()
+    other_high, other_low = other.high_and_low_hands()
+    if self_high > other_high:
+      return True
+    elif other_high > self_high:
+      return False
+    else:
+      return False
+  
+  # return the sum and diff of this hand
+  def sum_and_diff( self ):
+    from paigow.pghand import PGHand
+    high_hand, low_hand = self.high_and_low_hands()
+    high_ranking = high_hand.ranking()
+    low_ranking = low_hand.ranking()
+    sum = high_ranking + low_ranking
+    diff = high_ranking - low_ranking
+    return sum, diff
+
+  # return the sum and diff of this hand
+  def hand_ranking_diff( self ):
+    sum, diff = self.sum_and_diff()
+    return diff
+  
+  # return the sum and diff of this hand
+  def hand_ranking_sum( self ):
+    sum, diff = self.sum_and_diff()
+    return sum
+  
+  # more specific comparisons
+  def is_more_even_than( self, other ):
+    if self.hand_ranking_diff() < other.hand_ranking_diff():
+      return True
+    elif other.hand_ranking_diff() < self.hand_ranking_diff():
+      return False
+    else:
+      return True
+  
+  # more specific comparisons
+  def has_higher_sum_than( self, other ):
+    if self.hand_ranking_sum() > other.hand_ranking_sum():
+      return True
+    elif other.hand_ranking_sum() > self.hand_ranking_sum():
+      return False
+    else:
+      return True
+  
   # utility to sort the tiles alphabetically for comparison
   @classmethod
   def sort_tile_chars( self, tile_chars ):
@@ -144,6 +176,11 @@ class PGSet:
     return tst( PGHand.create( self.tiles[i0], self.tiles[i1] ) ) or \
            tst( PGHand.create( self.tiles[i2], self.tiles[i3] ) )
         
+  def has( self, tst ):
+    from paigow.pghand import PGHand
+    hand1, hand2 = self.hands()
+    return tst( hand1 ) or tst( hand2 )
+  
   def ordering_with( self, tst ):
     if self.ordering_with_tiles( 0, 1, 2, 3, tst ):
       return 1
@@ -179,6 +216,10 @@ class PGSet:
     from paigow.pghand import PGHand
     return self.ordering_with( PGHand.is_high_nine )
   
+  def has_pair( self ):
+    from paigow.pghand import PGHand
+    return self.has( PGHand.is_pair )
+    
   # convenience for creation
   @classmethod
   def create( cls, tile_list ):
