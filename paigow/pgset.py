@@ -188,7 +188,7 @@ class PGSet:
       return 2
     if self.ordering_with_tiles( 0, 3, 1, 2, tst ):
       return 3
-    return 0
+    return None
   
   # analysis of what it might be set to: return an ordering that has a pair
   def ordering_with_pair( self ):
@@ -202,7 +202,7 @@ class PGSet:
       return 2
     if self.tiles[0].copies(self.tiles[3]) and self.tiles[1].copies(self.tiles[2]):
       return 3
-    return 0
+    return None
   
   def ordering_with_wong( self ):
     from paigow.pghand import PGHand
@@ -289,20 +289,20 @@ class PGSetTest( TestCase ):
   
   def test_analysis( self ):
     set = PGSet.create_with_tile_names( ( "day", "mixed nine", "low ten", "mixed seven" ) )
-    self.assertEqual( set.ordering_with_two_pair(), 0 )
-    self.assertEqual( set.ordering_with_pair(), 0 )
+    self.assertFalse( set.ordering_with_two_pair() )
+    self.assertFalse( set.ordering_with_pair() )
     self.assertEqual( set.ordering_with_wong(), 1 )
-    self.assertEqual( set.ordering_with_gong(), 0 )
+    self.assertFalse( set.ordering_with_gong() )
     self.assertEqual( set.ordering_with_high_nine(), 3 )
     set = PGSet.create_with_tile_names( ( "mixed nine", "mixed nine", "low ten", "low ten" ) )
     self.assertEqual( set.ordering_with_two_pair(), 1 )
     self.assertEqual( set.ordering_with_pair(), 1 )
-    self.assertEqual( set.ordering_with_wong(), 0 )
-    self.assertEqual( set.ordering_with_gong(), 0 )
-    self.assertEqual( set.ordering_with_high_nine(), 0 )
+    self.assertFalse( set.ordering_with_wong() )
+    self.assertFalse( set.ordering_with_gong() )
+    self.assertFalse( set.ordering_with_high_nine() )
     set = PGSet.create_with_tile_names( ( "mixed nine", "low four", "low ten", "teen" ) )
-    self.assertEqual( set.ordering_with_two_pair(), 0 )
-    self.assertEqual( set.ordering_with_pair(), 0 )
+    self.assertFalse( set.ordering_with_two_pair() )
+    self.assertFalse( set.ordering_with_pair() )
     self.assertEqual( set.ordering_with_wong(), 3 )
-    self.assertEqual( set.ordering_with_gong(), 0 )
-    self.assertEqual( set.ordering_with_high_nine(), 0 )
+    self.assertFalse( set.ordering_with_gong() )
+    self.assertFalse( set.ordering_with_high_nine() )

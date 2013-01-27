@@ -131,6 +131,12 @@ class PGTile( models.Model ):
   def is_gee_joon_tile( self ):
     return self.name == "gee joon"
   
+  def matches_one_of( self, names ):
+    for name in names:
+      if name == self.name:
+        return True
+    return False
+  
   # for compact communication, each tile has a unique letter representing it.
   def char( self ):
     return self.tile_char
