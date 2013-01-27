@@ -147,7 +147,7 @@ def register( request, params = {} ):
   player = PGPlayer.create( username, email, password )
   player.save()
   add_player_to_session( request, player, 'register' )
-  messages.add_message(request, messages.INFO, username + " is now registered and logged in." )
+  #messages.add_message(request, messages.INFO, username + " is now registered and logged in." )
   
   return goto_home( request, params )
 
@@ -178,7 +178,7 @@ def login( request, params = {} ):
     request.session.set_expiry(0)
   
   add_player_to_session( request, players[0], 'login' )
-  messages.add_message(request, messages.INFO, username + " is now logged in." )
+  #messages.add_message(request, messages.INFO, username + " is now logged in." )
   
   return goto_home ( request, params )
 
@@ -235,7 +235,7 @@ def add_game( request, params = {} ):
   game.add_player( session_player( request ) )
   game.add_player( posted_player_from_id_field( request, 'game_opponent' ) )
   
-  messages.add_message( request, messages.INFO, "Game \"" + game.name + "\" created." )
+  #messages.add_message( request, messages.INFO, "Game \"" + game.name + "\" created." )
   
   return redirect ( "/paigow/game/" + str(game.id) + "/1" )
 
@@ -425,4 +425,8 @@ def game_score( request, game_id, deal_number_str ):
   opponent = session_opponent( request, game, deal_number )
   if not opponent:
     return HttpResponseNotAllowed( "Bad Request" )
-  return HttpResponse( str( game.score_as_of_deal_for_player( player, deal_number+1 ) ) + " - " + str( game.score_as_of_deal_for_player( opponent, deal_number+1 ) ) )
+  ret_val = str( game.score_as_of_deal_for_player( player, deal_number+1 ) ) + " - " + str( game.score_as_of_deal_for_player( opponent, deal_number+1 ) )
+  if game.check_game_over():
+    ret_val = "!" + ret_val
+  print "Score returning: " + ret_val
+  return HttpResponse( ret_val )

@@ -220,6 +220,18 @@ class PGSet:
     from paigow.pghand import PGHand
     return self.has( PGHand.is_pair )
     
+  def has_wong( self ):
+    from paigow.pghand import PGHand
+    return self.has( PGHand.is_wong )
+    
+  def has_gong( self ):
+    from paigow.pghand import PGHand
+    return self.has( PGHand.is_gong )
+    
+  def has_high_nine( self ):
+    from paigow.pghand import PGHand
+    return self.has( PGHand.is_high_nine )
+    
   # convenience for creation
   @classmethod
   def create( cls, tile_list ):

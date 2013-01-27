@@ -47,6 +47,54 @@ def choose_ordering( sum1, diff1, sum2, diff2 ):
   else:
     return 0
 
+# routines to check if one set has something and the other does not
+def which_set_has_it( set1, set2, tst ):
+  if tst( set1 ) and not tst( set2 ):
+    return 1
+  elif tst( set2 ) and not tst( set1 ):
+    return 2
+  else:
+    return None
+
+# return 1 or 2 if one of the sets has one of [ pair, high_nine, gong, wong ]
+# and the other doesn't (or has a later-occuring one).  This assumes that
+# we have already tested and there isn't an only-way.
+def which_has_special_hands( set1, set2 ):
+  if PGStrategyLogging.logging:
+    print "testing for pairs..."
+  pick = which_set_has_it( set1, set2, PGSet.has_pair )
+  if pick:
+    if PGStrategyLogging.logging:
+      print "one pair has it: set" + str(pick)
+    return pick
+  
+  if PGStrategyLogging.logging:
+    print "testing for wong..."
+  pick = which_set_has_it( set1, set2, PGSet.has_wong )
+  if pick:
+    if PGStrategyLogging.logging:
+      print "one pair has it: set" + str(pick)
+    return pick
+
+  if PGStrategyLogging.logging:
+    print "testing for gong..."
+  pick = which_set_has_it( set1, set2, PGSet.has_gong )
+  if pick:
+    if PGStrategyLogging.logging:
+      print "one pair has it: set" + str(pick)
+    return pick
+
+  if PGStrategyLogging.logging:
+    print "testing for high nine..."
+  pick = which_set_has_it( set1, set2, PGSet.has_high_nine )
+  if pick:
+    if PGStrategyLogging.logging:
+      print "one pair has it: set" + str(pick)
+    return pick
+  
+  return None
+  
+
 # we have two sets that are not only way. choose between them.
 def first_set_is_better( set1, set2 ):
   from paigow.pghand import PGHand
@@ -68,20 +116,17 @@ def first_set_is_better( set1, set2 ):
   if PGStrategyLogging.logging:
     print " ... no only way, using heuristics"
   
+  pick = which_has_special_hands( set1, set2 )
+  if pick:
+    if PGStrategyLogging.logging:
+      print "one pair has it: set" + str(pick)
+    return pick == 1
+
   sum1, diff1 = set1.sum_and_diff()
   sum2, diff2 = set2.sum_and_diff()
   if PGStrategyLogging.logging:
     print " ...sum and diff1: " + str(sum1) + "  " + str(diff1)
     print " ...sum and diff2: " + str(sum2) + "  " + str(diff2)  
-  
-  if set1.has_pair() and not set2.has_pair():
-    if PGStrategyLogging.logging:
-      print " ... set1 has a pair but set2 doesn't: using set1"
-    return True
-  elif set2.has_pair() and not set1.has_pair():
-    if PGStrategyLogging.logging:
-      print " ... set2 has a pair but set1 doesn't: using set2"
-    return False
   
   # no only way: check for diffs
   #return set1.is_more_even_than( set2 )
@@ -96,13 +141,15 @@ def auto_set_numerical( set ):
   from paigow.pghand import PGHand
   
   if PGStrategyLogging.logging:
-    print "\n"
+    print "\nauto_set_numerical BEGIN"
   
   picked_ordering = None
   
   # create sets with the three possible combinations.  We'll be re-arranging
   # one of these to create sets so make them editable lists.
   tiles = set.tiles
+  if PGStrategyLogging.logging:
+    print " ... tiles: [ " + tiles[0].name + ", " + tiles[1].name + ", " + tiles[2].name + ", " + tiles[3].name + " ]"
   tiles1 = [ tiles[0], tiles[1], tiles[2], tiles[3] ]
   tiles2 = [ tiles[0], tiles[2], tiles[1], tiles[3] ]
   tiles3 = [ tiles[0], tiles[3], tiles[1], tiles[2] ]
@@ -119,6 +166,7 @@ def auto_set_numerical( set ):
 
 def picked_ordering_for_sets( sets ):
   if PGStrategyLogging.logging:
+    print "\npicked_ordering_for_sets BEGIN..."
     print "set 1: " + str(sets[1])
     print "set 2: " + str(sets[2])
     print "set 3: " + str(sets[3])
@@ -126,12 +174,20 @@ def picked_ordering_for_sets( sets ):
   picked_ordering = None
   
   # convenience vars to test various combinations
-  s1beats2 = sets[1] > sets[2]
-  s2beats1 = sets[2] > sets[1]
-  s1beats3 = sets[1] > sets[3]
-  s3beats1 = sets[3] > sets[1]
-  s2beats3 = sets[2] > sets[3]
-  s3beats2 = sets[3] > sets[2]
+  if True:
+    s1beats2 = first_set_is_better( sets[1], sets[2] )
+    s2beats1 = first_set_is_better( sets[2], sets[1] )
+    s1beats3 = first_set_is_better( sets[1], sets[3] )
+    s3beats1 = first_set_is_better( sets[3], sets[1] )
+    s2beats3 = first_set_is_better( sets[2], sets[3] )
+    s3beats2 = first_set_is_better( sets[3], sets[2] )
+  else:
+    s1beats2 = sets[1] > sets[2]
+    s2beats1 = sets[2] > sets[1]
+    s1beats3 = sets[1] > sets[3]
+    s3beats1 = sets[3] > sets[1]
+    s2beats3 = sets[2] > sets[3]
+    s3beats2 = sets[3] > sets[2]
   
   # see if there is an only-way in there
   if s1beats2 and s1beats3:
@@ -170,6 +226,8 @@ def picked_ordering_for_sets( sets ):
         picked_ordering = 2
     else:
       # bleah, need 3-way comparison, no only ways between.
+      # use the "has" to find the one or ones with pairs etc.
+      
       # choose the one with the smallest difference.
       sum1, diff1 = sets[1].sum_and_diff()
       sum2, diff2 = sets[2].sum_and_diff()
@@ -195,6 +253,8 @@ def picked_ordering_for_sets( sets ):
         else:
           picked_ordering = 2
   
+  if PGStrategyLogging.logging:
+    print "picked_ordering_for_sets END returns " + str(picked_ordering) + "\n"
   return picked_ordering
 
 class PGStrategy:
@@ -247,26 +307,27 @@ class PGStrategyTest( TestCase ):
   def test_auto_set( self ):
     #PGStrategyLogging.logging = True
     set = PGSet.create_with_tile_names( ( "day", "low ten", "mixed five", "eleven" ) )
-    self.assertEqual( auto_set_numerical( set ), 3 )
+    self.assertEqual( auto_set_numerical( set ), 2 )
     set = PGSet.create_with_tile_names( ( "low four", "low ten", "eleven", "low six" ) )
     self.assertEqual( auto_set_numerical( set ), 2 )
     set = PGSet.create_with_tile_names( ( "teen", "low six", "harmony four", "long six" ) )
-    self.assertEqual( auto_set_numerical( set ), 2 )
+    self.assertEqual( auto_set_numerical( set ), 1 )
     set = PGSet.create_with_tile_names( ( "low four", "mixed nine", "high eight", "mixed eight" ) )
     self.assertEqual( auto_set_numerical( set ), 1 )
     set = PGSet.create_with_tile_names( ( "teen", "low ten", "eleven", "mixed nine" ) )
-    self.assertEqual( auto_set_numerical( set ), 2 )
+    self.assertEqual( auto_set_numerical( set ), 3 )
+    set = PGSet.create_with_tile_names( ( "low ten", "mixed nine", "day", "high ten" ) )
+    self.assertEqual( auto_set_numerical( set ), 3 )
   
   def test_x321_set_ordering( self ):
     set1 = PGSet.create_with_tile_names( ( "low ten", "mixed nine", "harmony four", "low four" ) )
     set2 = PGSet.create_with_tile_names( ( "low six", "low six", "low ten", "high seven" ) )
-    self.assertTrue( first_set_is_better( set1, set2 ) )
+    self.assertFalse( first_set_is_better( set1, set2 ) )
     
     set1 = PGSet.create_with_tile_names( ( "eleven", "mixed five", "high eight", "high seven" ) )
     set2 = PGSet.create_with_tile_names( ( "low ten", "mixed nine", "high ten", "mixed five" ) )
-    PGStrategyLogging.logging = True
-    val = first_set_is_better( set1, set2 )
-    self.assertFalse( val )
+    self.assertFalse( first_set_is_better( set1, set2 ) )
+    
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

@@ -14,13 +14,15 @@ class PGHand:
   class Meta:
     app_label = 'paigow'
   
+  # these are rankings; however, the zeros are all in a bunch to try to
+  # avoid those, since they all compare the same and a 1 is much better.
   s_hand_rankings = {
     'hl': 0, # eleven / mixed nine
-    'gk': 1, # low four / low six
-    'fg': 2, # long six / low four
-    'ei': 3, # high ten / low ten
-    'df': 4, # harmony four / long six
-    'dk': 4, # harmony four / low six
+    'gk': 0, # low four / low six
+    'fg': 0, # long six / low four
+    'ei': 0, # high ten / low ten
+    'df': 0, # harmony four / long six
+    'dk': 0, # harmony four / low six
     'ko': 5, # low six / mixed five
     'hi': 6, # eleven / low ten
     'gj': 7, # low four / high seven
@@ -48,7 +50,7 @@ class PGHand:
     'gl': 23, # low four / mixed nine
     'fj': 24, # long six / high seven
     'fn': 24, # long six / mixed seven
-    'dl': 25, # harmony four / mixed nine
+    'dl': 25, # harmony four / mixed nine   # magic number for low hands
     'co': 26, # high eight / mixed five
     'bh': 27, # day / eleven
     'ah': 28, # teen / eleven

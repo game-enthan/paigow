@@ -18,6 +18,8 @@ from django.core.exceptions import ObjectDoesNotExist
 #   ( 4 ) the tiles each player is looking at ( if they're playing )
 #
 
+s_game_goal = 21
+
 class PGGame( models.Model ):
   
   # make sure the DB table name is what we want
@@ -375,7 +377,7 @@ class PGGame( models.Model ):
     num_with_max_score = 0
     for player in self.players():
       player_score = self.score_for_player( player )
-      if player_score >= 21:
+      if player_score >= s_game_goal:
         if player_score > winning_score:
           num_with_max_score = 1
           winning_score = player_score
@@ -459,7 +461,7 @@ class PGGameTest( TestCase ):
     pig1 = self.test_game.player_in_deal( self.player1, self.test_game.current_deal_number )
     pig2 = self.test_game.player_in_deal( self.player2, self.test_game.current_deal_number )
     self.assertFalse( self.test_game.check_game_over() )
-    pig1.add_to_score( 21 )
+    pig1.add_to_score( s_game_goal )
     pig1.save()
     self.assertTrue(  self.test_game.check_game_over() )
   

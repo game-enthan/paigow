@@ -11,6 +11,9 @@
 {% block header-javascript %}
   <script language="javascript">
 
+    //  This says whether or not the game is over, is set dynamically.
+    s_game_is_over = false;
+
     //  This is our state as per button-pushing, which may be a little ahead
     //  of what the server thinks (and may not agree if the server goes down).
     var current_player_state = "{{ setting_tiles_state }}";
@@ -446,7 +449,7 @@
       check_deal_state( true );
     }
     
-    function preview_hands()
+    function do_main_action()
     {
       //  We get clicks whether or not disabled since we're doing the button stuff
       //  manually.  Ignore clicks while we're disabled.  Then don't allow us to
@@ -455,6 +458,13 @@
       if ( $("#preview-hands-button").hasClass("disabled") )
         return;
       $("#preview-hands-button").addClass("disabled");
+      
+      //  If the game is over, this starts a new game against this opponent.
+      if ( s_game_is_over )
+      {
+        location.href = "/paigow/game/new/{{ opponent.id }}";
+        return;
+      }
       
       //  If we are going to the next deal, it's a redirect.  If this user's tiles are
       //  set, then the "Next Deal" button is enabled only if the hands are being compared
@@ -509,7 +519,14 @@
     function set_current_player_state( new_state )
     {
       current_player_state = new_state;
-      if ( current_player_state == "{{ setting_tiles_state }}" )
+      if ( s_game_is_over )
+      {
+        $("#preview-hands-button").removeClass("disabled");
+        $("#preview-hands-button").text( "Next Game" );
+        $("#tiles-are-set-button").addClass("disabled");
+        $(".pgset-button-switch").addClass("disabled");
+      }
+      else if ( current_player_state == "{{ setting_tiles_state }}" )
       {
         $("#preview-hands-button").removeClass("disabled");
         $("#preview-hands-button").text( "Preview Hands" );
@@ -785,6 +802,16 @@
     
     function update_game_score_success( context, data, textStatus, jqXHR )
     {
+      // if the return value starts with "!" then the game is over
+      if ( data[0] == '!' )
+      {
+        //  Remove the "!" from the score.
+        data = data.substring( 1, data.length );
+
+        //  Make sure the button text and their states is appropriate
+        s_game_is_over = true;
+        set_current_player_state( current_player_state );
+      }
       $("#game_score").text( data );
     }
     
@@ -827,7 +854,7 @@
   $("#tiles-are-set-button").click( function( button ) { return tiles_are_set( this ); } );
   
   //  Make the "tiles-are-set" button active
-  $("#preview-hands-button").click( function( button ) { return preview_hands( this ); } );
+  $("#preview-hands-button").click( function( button ) { return do_main_action( this ); } );
   
   //  Start polling for the opponent state
   get_opponent_state();
@@ -837,7 +864,7 @@
   var saved_state = "{{ current_player_state }}";
   if ( saved_state != "{{ setting_tiles_state }}" )
   {
-    preview_hands();
+    do_main_action();
     if ( saved_state == "{{ tiles_are_set_state }}" )
       setTimeout( tiles_are_set, 3000 );
   }
