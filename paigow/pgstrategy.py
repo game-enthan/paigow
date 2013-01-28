@@ -56,6 +56,11 @@ def which_set_has_it( set1, set2, tst ):
   else:
     return None
 
+# convenience: check if the last two tiles in this set match certain
+# values, for use when deciding if we should split pairs
+def last_two_tiles_are_in( set, values ):
+  return set.tiles[2].value_is_in( values ) and set.tiles[3].value_is_in( values )
+
 # take care of special hands
 def ordering_for_special_hands( set ):
   if PGStrategyLogging.logging:
@@ -89,32 +94,31 @@ def ordering_for_special_hands( set ):
        pair_tile.tile_value == 11:
       return ordering
     
-    # we split teens/days if the other two tiles are both
-    # seven or higher
-    if pair_tile.is_teen_or_day() and \
-       loc_set.tiles[2].tile_value >= 7 and \
-       loc_set.tiles[3].tile_value >= 7:
+    # we split teens/days if the other two tiles are both seven or higher
+    # TBD: would we really want this in the 3-hand, with 8/9?
+    #      Teen-bo/seven seems a safer bet than wong/gong
+    if pair_tile.is_teen_or_day() and last_two_tiles_are_in( set, ( 7, 8, 9 ) ):
       switch_it = True
     
     # we split nines if the other two are
     # both within (ten, teen, day)
-    if pair_tile.tile_value == 9 and \
-       ( loc_set.tiles[2].is_teen_or_day() or loc_set.tiles[2].tile_value == 10 ) and \
-       ( loc_set.tiles[3].is_teen_or_day() or loc_set.tiles[3].tile_value == 10 ):
+    elif pair_tile.tile_value == 9 and last_two_tiles_are_in( set, ( 2, 12, 10 ) ):
       switch_it = True
       
     # we split eights if the other two are
     # both within (elevens, teen, day)
-    if pair_tile.tile_value == 8 and \
-       ( loc_set.tiles[2].is_teen_or_day() or loc_set.tiles[2].tile_value == 11 ) and \
-       ( loc_set.tiles[3].is_teen_or_day() or loc_set.tiles[3].tile_value == 11 ):
+    elif pair_tile.tile_value == 8 and last_two_tiles_are_in( set, ( 2, 12, 11 ) ):
       switch_it = True
     
-    # we split sevens if the other two are
-    # both within (teen, day)
-    if pair_tile.tile_value == 7 and \
-       ( loc_set.tiles[2].is_teen_or_day() ) and \
-       ( loc_set.tiles[3].is_teen_or_day() ):
+    # we split sixes and sevens if the other two are teen/day
+    elif (pair_tile.tile_value == 7 or pair_tile.tile_value == 6) and last_two_tiles_are_in( set, ( 2, 12 ) ):
+      switch_it = True
+    
+    # we split gee joon if the other two are in (five, six) or (teen, day)
+    # note we don't want to split them if one is five/six and the other is teen/day;
+    # only if both are five/six or both are teen/day.
+    elif pair_tile.tile_value == 3 and \
+        ( last_two_tiles_are_in( set, ( 2, 12 ) ) or last_two_tiles_are_in( set, ( 5, 6 ) ) ):
       switch_it = True
     
     # if the ordering was 1, then the first two or the last
@@ -407,7 +411,7 @@ class PGStrategyTest( TestCase ):
     set2 = PGSet.create_with_tile_names( ( "low ten", "mixed nine", "high ten", "mixed five" ) )
     self.assertFalse( first_set_is_better( set1, set2 ) )
     
-  def special_ordering_for_teen_pair( self, teen_or_day ):
+  def special_ordering_for_high_pair( self, teen_or_day ):
     # test reordering to get pair
     set = PGSet.create_with_tile_names( ( teen_or_day, "eleven", "high eight", teen_or_day ) )
     self.assertEqual( ordering_for_special_hands( set ), 1 )
@@ -424,11 +428,11 @@ class PGStrategyTest( TestCase ):
     set = PGSet.create_with_tile_names( ( "mixed nine", "high eight", teen_or_day, teen_or_day ) )
     self.assertEqual( ordering_for_special_hands( set ), 2 )
     
-  def test_special_ordering_for_teen_or_day_pairs( self ):
+  def special_ordering_for_high_pair( self ):
     self.special_ordering_for_teen_pair( "teen" )
     self.special_ordering_for_teen_pair( "day" )
   
-  def test_special_ordering_for_high_numbers( self ):
+  def test_special_ordering_for_other_pairs( self ):
     # test reorder sevens to split pair
     set = PGSet.create_with_tile_names( ( "mixed seven", "mixed seven", "teen", "day" ) )
     self.assertEqual( ordering_for_special_hands( set ), 2 )
@@ -444,10 +448,17 @@ class PGStrategyTest( TestCase ):
     # test no reorder eights to make pair
     set = PGSet.create_with_tile_names( ( "low ten", "day", "mixed eight", "mixed eight" ) )
     self.assertEqual( ordering_for_special_hands( set ), 1 )
-
+    
     # test reorder nines to make pair
     set = PGSet.create_with_tile_names( ( "low ten", "day", "mixed nine", "mixed nine" ) )
     self.assertEqual( ordering_for_special_hands( set ), 2 )
+    
+    # test geen joon splitting and not
+    set = PGSet.create_with_tile_names( ( "gee joon", "gee joon", "long six", "low six" ) )
+    self.assertEqual( ordering_for_special_hands( set ), 2 )
+    set = PGSet.create_with_tile_names( ( "gee joon", "gee joon", "long six", "mixed seven" ) )
+    self.assertEqual( ordering_for_special_hands( set ), 1 )
+    
 
 
 # run the test when invoked as a test (this is boilerplate

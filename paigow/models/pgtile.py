@@ -131,9 +131,9 @@ class PGTile( models.Model ):
   def is_gee_joon_tile( self ):
     return self.name == "gee joon"
   
-  def matches_one_of( self, names ):
-    for name in names:
-      if name == self.name:
+  def value_is_in( self, values ):
+    for value in values:
+      if value == self.tile_value:
         return True
     return False
   
