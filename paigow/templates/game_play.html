@@ -224,7 +224,12 @@
 
         new_indices[i] = new_index;
       }
-
+      
+      move_tiles( jqset, lefts, pgtile, source_index, orig_dest_index, dest_index, new_indices );
+    }
+      
+    function move_tiles( jqset, lefts, pgtile, source_index, orig_dest_index, dest_index, new_indices )
+    {
       //  Move the tiles on the screen
       var tiles = tiles_of_jqset( jqset_of_tile( pgtile ) );
       for ( i = 0; i < 4; i++ )
@@ -334,6 +339,27 @@
         source.insertAfter(dest);
       }
     }
+    
+    function rotate_hand( button )
+    {
+      if ($(button).hasClass("disabled"))
+        return;
+      $(".pghand-rotate").addClass("disabled");
+
+      //  Get the set number: it's the first char of the id.
+      var set_num = set_num_of_button( button );
+      
+      //  Move the fourth tile to the second position
+      var pgtile = jqtile_of_nums( set_num, 3 )[0];
+      source_index = 3;
+      orig_dest_index = 1;
+      dest_index = 1;
+      new_indices = [ 0, 2, 3, 1 ];
+      lefts = lefts_of_jqset( jqset_of_num( set_num ) );
+      move_tiles( jqset_of_num( set_num ), lefts, pgtile, source_index, orig_dest_index, dest_index, new_indices )
+
+    }    
+
 
     //  Poll the server for the opponent's state
     function get_opponent_state()
@@ -418,7 +444,7 @@
       //  tiles to the other player if they're ready.
       $("#preview-hands-button").addClass("disabled");
       $("#tiles-are-set-button").addClass("disabled");
-      $(".pgset-button-switch").addClass("disabled");
+      $(".pgset-button").addClass("disabled");
 
       //  User has hit "Tiles are Set" so tell the server of our state.
       $.ajax( {
@@ -482,6 +508,7 @@
       var data_val = undefined;
       if ( current_player_state == "{{ setting_tiles_state }}" )
       {
+        $(".pghand-rotate-button").hide()
         url_cmd = "preview_hands";
         success_val = function( data, textStatus, jqXHR ) { set_all_tiles_for_preview( this, data, textStatus, jqXHR ); };
         data_val = {
@@ -524,14 +551,16 @@
         $("#preview-hands-button").removeClass("disabled");
         $("#preview-hands-button").text( "Next Game" );
         $("#tiles-are-set-button").addClass("disabled");
-        $(".pgset-button-switch").addClass("disabled");
+        $(".pgset-button").addClass("disabled");
+        $(".pghand-rotate-button").hide()
       }
       else if ( current_player_state == "{{ setting_tiles_state }}" )
       {
         $("#preview-hands-button").removeClass("disabled");
         $("#preview-hands-button").text( "Preview Hands" );
         $("#tiles-are-set-button").addClass("disabled");
-        $(".pgset-button-switch").removeClass("disabled");
+        $(".pgset-button").removeClass("disabled");
+        $(".pghand-rotate-button").show()
         setTimeout( function() { enable_disable_tile_draggable( "enable" ) }, 2000 );
       }
       else if ( current_player_state == "{{ preview_hands_state }}" )
@@ -539,7 +568,8 @@
         $("#preview-hands-button").removeClass("disabled");
         $("#preview-hands-button").text( "Unpreview Hands" );
         $("#tiles-are-set-button").removeClass("disabled");
-        $(".pgset-button-switch").removeClass("disabled");
+        $(".pgset-button").removeClass("disabled");
+        $(".pghand-rotate-button").hide()
         enable_disable_tile_draggable( "disable" );
       }
       else if ( current_player_state == "{{ tiles_are_set_state }}" )
@@ -547,7 +577,8 @@
         $("#preview-hands-button").text( "Next Deal" );
         $("#preview-hands-button").addClass("disabled");
         $("#tiles-are-set-button").addClass("disabled");
-        $(".pgset-button-switch").addClass("disabled");
+        $(".pgset-button").addClass("disabled");
+        $(".pghand-rotate-button").hide()
         enable_disable_tile_draggable( "disable" );
       }
       $("#state_player").text( current_player_state );
@@ -640,7 +671,7 @@
 
     function rotate_low_hand_in_set( set_num, force_rotate )
     {
-      //  Rotage the second two tiles as well.
+      //  Rotate the second two tiles as well.
       var jqtile2 = jqtile_of_nums( set_num, 2 );
       var jqtile3 = jqtile_of_nums( set_num, 3 );
 
@@ -855,6 +886,9 @@
   
   //  Make the "tiles-are-set" button active
   $("#preview-hands-button").click( function( button ) { return do_main_action( this ); } );
+  
+  //  Make the "tiles-are-set" button active
+  $(".pghand-rotate-button").click( function( button ) { return rotate_hand( this ); } );
   
   //  Start polling for the opponent state
   get_opponent_state();

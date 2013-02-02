@@ -46,10 +46,13 @@
 	position: absolute;
 }
 
-.pgset-button-switch {
+.pgset-button {
 	position: absolute;
-	left: 0px;
 	cursor: pointer;
+}
+
+.pgset-button-switch {
+	left: 0px;
 }
 
 .pgset-action-buttons {
@@ -61,6 +64,14 @@
 
 .pgset-action-button {
     width: 110px;
+}
+
+.pghand-rotate-button {
+	position: absolute;
+}
+
+.pghand-rotate-button-opponent {
+	visibility: hidden;
 }
 
 .pghand-labels {
@@ -222,6 +233,11 @@
 
 .pgset-medium-3 {
 	top: 390px;
+}
+
+.pghand-rotate-button-medium {
+	top: 50px;
+	left: 135px;
 }
 
 .pghand-labels-medium {

@@ -3,5 +3,8 @@
 <div class="pgtile-div pgtile-div-{{ player_type }} pgtile-div-{{ pgtile_size }}-1" id="{{ pgset_id }}_1_tile_div-{{ player_type }}" tile_id="{{ pgset.tiles.1.tile_char }}">{% tile_image pgset.tiles.1 player_type %}</div>
 <div class="pgtile-div pgtile-div-{{ player_type }} pgtile-div-{{ pgtile_size }}-2" id="{{ pgset_id }}_2_tile_div-{{ player_type }}" tile_id="{{ pgset.tiles.2.tile_char }}">{% tile_image pgset.tiles.2 player_type %}</div>
 <div class="pgtile-div pgtile-div-{{ player_type }} pgtile-div-{{ pgtile_size }}-3" id="{{ pgset_id }}_3_tile_div-{{ player_type }}" tile_id="{{ pgset.tiles.3.tile_char }}">{% tile_image pgset.tiles.3 player_type %}</div>
+<div class="pgset-button pghand-rotate-button pghand-rotate-button-{{ pgtile_size }} pghand-rotate-button-{{ player_type }}" id="{{ pgset_id }}-pghand-rotate">
+		<img src="{% static "img/glyphicons_080_retweet.png" %}"></img>
+</div>
 <div class="pghand-labels pghand-labels-{{ pgtile_size }} pghand-labels-{{ pgtile_size }}-0">{% show_hand_label pgset.tiles.0 pgset.tiles.1 %}</div>
 <div class="pghand-labels pghand-labels-{{ pgtile_size }} pghand-labels-{{ pgtile_size }}-1">{% show_hand_label pgset.tiles.2 pgset.tiles.3 %}</div>
