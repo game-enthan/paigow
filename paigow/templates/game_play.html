@@ -796,24 +796,14 @@
       for ( var set_num = 1; set_num <= 3; set_num++ )
       {
         var ch = data[set_num-1]
-        var jqscore = $("#pgscore-in-deal-" + (set_num-1))
+        var id_start = "#pgscore-in-deal-" + set_num + "-";
         if ( ch == 'W' )
-        {
-          jqscore.css( { color: "ForestGreen" } );
-          jqscore.text( "W  I  N" );
-        }
+          $(id_start + "player").css("opacity", "1.0");
         else if ( ch == 'L' )
-        {
-          jqscore.css( { color: "Crimson" } );
-          jqscore.text( "L  O  S  E" );
-        }
-        else
-        {
-          jqscore.css( { color: "SlateGray" } );
-          jqscore.text( "P  U  S  H" );
-        }
+          $(id_start + "opponent").css("opacity", "1.0");
+        $(id_start + "mid").css("opacity", "1.0");
       }
-      
+
       setTimeout( update_game_score, 2000 )
       
       //  Now we can do the next dea.
@@ -861,6 +851,11 @@
   $("#pgset-div-1-opponent").fadeIn(2000);
   $("#pgset-div-2-opponent").fadeIn(1500);
   $("#pgset-div-3-opponent").fadeIn(3000);
+  
+  //  Scores start as invisible
+  $(".pgscore-player").css("opacity", "0.0");
+  $(".pgscore-mid").css("opacity", "0.0");
+  $(".pgscore-opponent").css("opacity", "0.0");
   
   //  The tiles are draggable
   //  TBD: put this in pgtile.html, how to do that while including it several times
@@ -926,26 +921,38 @@
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
   <table>
     <tr>
-        <td width="48%">
+        <td>
           {% show_deal pgsets player %}
         </td>
-        <td xwidth="8%" valign="top">
+        <td xwidth="80" valign="top">
           <table width="100%" height="100%">
             <tr>
-              <td id="game_score" height="20px" align="center" valign="top">{{ score_player }} - {{ score_opponent }}</td>
+              <td height="20px" align="center" valign="top"><b><span id="game_score">{{ score_player }} - {{ score_opponent }}</span></b></td>
             </tr>
             <tr>
-              <td align="center">
+              <td align="center" valign="center" width="68">
                 <div style="position:relative">
-                  <div id="pgscore-in-deal-0" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }} pgset-{{ pgtile_size }}-1">--</div>
-                  <div id="pgscore-in-deal-1" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }} pgset-{{ pgtile_size }}-2">--</div>
-                  <div id="pgscore-in-deal-2" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }} pgset-{{ pgtile_size }}-3">--</div>
+                  <div id="pgscore-in-deal-1" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }}-1 pgset-{{ pgtile_size }}-1">
+                    <img id="pgscore-in-deal-1-player" class="pgscore pgscore-player" src="{% static "img/glyphicons_224_chevron-left.png" %}"></img>
+                    <img id="pgscore-in-deal-1-mid" class="pgscore pgscore-mid" src="{% static "img/glyphicons_187_more.png" %}"></img>
+                    <img id="pgscore-in-deal-1-opponent" class="pgscore pgscore-opponent" src="{% static "img/glyphicons_223_chevron-right.png" %}"></img>
+                  </div>
+                  <div id="pgscore-in-deal-2" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }}-2 pgset-{{ pgtile_size }}-2">
+                    <img id="pgscore-in-deal-2-player" class="pgscore pgscore-player" src="{% static "img/glyphicons_224_chevron-left.png" %}"></img>
+                    <img id="pgscore-in-deal-2-mid" class="pgscore pgscore-mid" src="{% static "img/glyphicons_187_more.png" %}"></img>
+                    <img id="pgscore-in-deal-2-opponent" class="pgscore pgscore-opponent" src="{% static "img/glyphicons_223_chevron-right.png" %}"></img>
+                  </div>
+                  <div id="pgscore-in-deal-3" class="pgscore-in-deal pgscore-in-deal-{{ pgtile_size }}-3 pgset-{{ pgtile_size }}-3">
+                    <img id="pgscore-in-deal-3-player" class="pgscore pgscore-player" src="{% static "img/glyphicons_224_chevron-left.png" %}"></img>
+                    <img id="pgscore-in-deal-3-mid" class="pgscore pgscore-mid" src="{% static "img/glyphicons_187_more.png" %}"></img>
+                    <img id="pgscore-in-deal-3-opponent" class="pgscore pgscore-opponent" src="{% static "img/glyphicons_223_chevron-right.png" %}"></img>
+                  </div>
                 </div>
               </td>
             </tr>
           </table>
         </td>
-        <td xwidth="46%">
+        <td>
           {% show_deal pgsets opponent %}
         </td>
     </tr>

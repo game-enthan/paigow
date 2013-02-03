@@ -284,7 +284,10 @@ class PGHand:
     
     # check value
     if self.numerical_value() == other.numerical_value():
-      return self.high_tile_beats( other )          # same value, return tile comparison
+      if self.numerical_value() == 0:
+        return False                                # special rules: all zeroes are copies
+      else:
+        return self.high_tile_beats( other )        # same (non-zero) value, return tile comparison
     else:
       return self.numerical_value() > other.numerical_value()  # different values, compare values
   
