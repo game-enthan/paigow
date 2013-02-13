@@ -42,7 +42,7 @@ def request_context( request, params ):
   params['logout_url'] = '/paigow/logout'
   params['home_url'] = '/paigow/home'
   
-  params['activities'] = ( )
+  params['activities'] = ( { 'name': "New Game", 'url': '/paigow/game/new' }, )
   
   # setup players and possible opponents
   player = session_player( request )

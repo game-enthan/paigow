@@ -106,7 +106,6 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li><a class="brand" href="/paigow">{% block branding %}{% endblock %}</a></li>
-              <li class="active"><a href="{{ home_url }}">Home</a></li>
                {% for activity in activities %}
                  <li class="{{ activity.class}}"><a href="{{activity.url}}">{{ activity.name }}</a></li>
                {% endfor %}
