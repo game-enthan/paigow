@@ -9,6 +9,7 @@
 {% block content_title %}{% endblock %}
 
 {% block header-javascript %}
+
   <script language="javascript">
 
     //  This says whether or not the game is over, is set dynamically.
@@ -297,6 +298,11 @@
       var labels = jqset.find(".pghand-labels");
       $(labels[0]).text( hands[0] );
       $(labels[1]).text( hands[1] );
+      
+      //  If this is an opponent's label, then we've got the comparison
+      //  and we can expose who won.
+      if ( set_num > 3 )
+        setTimeout( function() { expose_score_for_set_num( set_num - 3 ); }, 500 );
     }
 
     //  Two hands have switched; restore the switch buttons
@@ -740,6 +746,7 @@
         //  Get the opponent's tile values so we can show them.
         $.ajax( {
           url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/opponent_tiles/{{ pgtile_size }}",
+          dataType: "json",
           context: document.body,
           success: function( data, textStatus, jqXHR ) { get_opponent_tiles_success( this, data, textStatus, jqXHR ); },
           error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to get the opponent's tiles for comparing hands.", errorThrown, textStatus, jqXHR ); }
@@ -749,16 +756,35 @@
       return someone_is_still_setting_tiles;
     }
     
-    function expose_tile_value( jqtile, css_val )
+    function expose_tile_value( jqtile, dots )
     {
-      var jqimg = $(jqtile.children("img")[0]);
-      jqimg.fadeOut( 200, function () { jqimg.css( { 'background-position': css_val } ) } );
-      jqimg.fadeIn(1000);
+      for ( i = 0; i < dots.length; i++ )
+      {
+        var dot = dots[i];
+        var new_div = document.createElement( "div" );
+        $(new_div).addClass( "pgdot" );
+        $(new_div).addClass( "pgdot-{{ pgtile_size }}" );
+        $(new_div).addClass( "pgdot-" + dot.color );
+        $(new_div).addClass( "pgdot-{{ pgtile_size }}-" + dot.index );
+        jqtile.append( $(new_div) );
+      }
+      // var jqimg = $(jqtile.children("img")[0]);
+      // jqimg.fadeOut( 200, function () { jqimg.css( { 'background-position': css_val } ) } );
+      // jqimg.fadeIn(1000);
     }
     
+    s_current_score = "";
     function get_opponent_tiles_success( context, data, textStatus, jqXHR )
     {
-      var sets_array = data.split("|");
+      //  We want to get the score, but we get it all at once so
+      //  we'll save it and expose it bit by bit.
+      get_score_in_deal();
+      
+      //  Data is an array of arrays of arrays:
+      //  3 sets of 4 tiles each of 'n' dots each.  Dots are index/class,
+      //  and we will add objects of strings made up of the class.
+      sets_array = data;
+
       //  We can't do setTimeout in a loop, with a loop variable, because the
       //  lambda expression evaluates its arguments using local variables at the
       //  time of running, and by then they have changed (for instance, set_num is
@@ -769,46 +795,43 @@
 
     function expose_opponent_hand_chained( set_num, sets_array )
     {
-      var set_vals = sets_array[ set_num - 3 ];
-      var tiles_array = set_vals.split(";");
+      var tiles_array = sets_array[ set_num - 4 ];
       for ( var t = 0; t < 4; t++ )
         expose_tile_value( jqtile_of_nums( set_num, t ), tiles_array[t] );
       setTimeout( function() { update_hand_labels( jqset_of_num( set_num ) ) }, 1000 );
       if ( set_num > 4 )
-        setTimeout( function() { expose_opponent_hand_chained( set_num-1, sets_array ); }, 2000 );
+        setTimeout( function() { expose_opponent_hand_chained( set_num-1, sets_array ); }, 1000 );
       else
-        setTimeout( get_score_in_deal, 2000 );
+        setTimeout( update_game_score, 1000 );
     }
       
     function get_score_in_deal()
     {
-        //  Get the opponent's tile values so we can show them.
-        $.ajax( {
-          url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/score_in_deal",
-          context: document.body,
-          success: function( data, textStatus, jqXHR ) { get_score_in_deal_success( this, data, textStatus, jqXHR ); },
-          error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to score the deal.", errorThrown, textStatus, jqXHR ); }
-        } );
+      s_current_score = "";
+
+      //  Get the opponent's tile values so we can show them.
+      $.ajax( {
+        url: "/paigow/data/game/{{ game.id }}/{{ deal_number }}/score_in_deal",
+        context: document.body,
+        success: function( data, textStatus, jqXHR ) { get_score_in_deal_success( this, data, textStatus, jqXHR ); },
+        error: function( jqXHR, textStatus, errorThrown ) { show_ajax_failure( "Error trying to score the deal.", errorThrown, textStatus, jqXHR ); }
+      } );
     }
     
     function get_score_in_deal_success( context, data, textStatus, jqXHR )
     {
-      for ( var set_num = 1; set_num <= 3; set_num++ )
-      {
-        var ch = data[set_num-1]
-        var id_start = "#pgscore-in-deal-" + set_num + "-";
-        if ( ch == 'W' )
-          $(id_start + "player").css("opacity", "1.0");
-        else if ( ch == 'L' )
-          $(id_start + "opponent").css("opacity", "1.0");
-        $(id_start + "mid").css("opacity", "1.0");
-      }
+      s_current_score = data;
+    }
 
-      setTimeout( update_game_score, 2000 )
-      
-      //  Now we can do the next dea.
-      $("#preview-hands-button").removeClass("disabled");
-
+    function expose_score_for_set_num( set_num )
+    {
+      var ch = s_current_score[set_num-1]
+      var id_start = "#pgscore-in-deal-" + set_num + "-";
+      if ( ch == 'W' )
+        $(id_start + "player").css("opacity", "1.0");
+      else if ( ch == 'L' )
+        $(id_start + "opponent").css("opacity", "1.0");
+      $(id_start + "mid").css("opacity", "1.0");
     }
     
     function update_game_score()
@@ -833,74 +856,82 @@
         s_game_is_over = true;
         set_current_player_state( current_player_state );
       }
+      else
+      {
+        s_game_is_over = false;
+        $("#preview-hands-button").removeClass("disabled");
+      }
+
       $("#game_score").text( data );
     }
     
+  function game_play_doc_ready()
+  {
+      //  Fade the sets in, in order.  These set classes don't have sizes so we can use them as
+      //  generic sets.  Note they are 1,2,3 rather than 0-based so the index is the same as
+      //  the number of points assigned (for simplicity).
+      $("#pgset-div-1-player").fadeIn( 500);
+      $("#pgset-div-2-player").fadeIn(1000);
+      $("#pgset-div-3-player").fadeIn(1500);
+      
+      $("#pgset-div-1-opponent").fadeIn(2000);
+      $("#pgset-div-2-opponent").fadeIn(1500);
+      $("#pgset-div-3-opponent").fadeIn(3000);
+      
+      //  Scores start as invisible
+      $(".pgscore-player").css("opacity", "0.0");
+      $(".pgscore-mid").css("opacity", "0.0");
+      $(".pgscore-opponent").css("opacity", "0.0");
+      
+      //  The tiles are draggable
+      //  TBD: put this in pgtile.html, how to do that while including it several times
+      $(".pgtile-div-player").draggable( {
+          //helper: "clone",
+          revert: "invalid",
+          start: function( event, ui ) { drag_tile_start( this, event, ui ); },
+          stop: function( event, ui ) { drag_tile_stop( this, event, ui ); }
+        } );
+    
+      //  The divs holding the sets will be droppable, but only accept tiles.
+      //  They are disabled until a tile is dragged, and only the appropriate
+      //  set or sets are un-disabled.
+      $(".pgset-player").droppable( { 
+          disabled: true
+        } );
+    
+      //  Make the switch buttons active
+      $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
+      
+      //  Make the "tiles-are-set" button active
+      $("#tiles-are-set-button").click( function( button ) { return tiles_are_set( this ); } );
+      
+      //  Make the "tiles-are-set" button active
+      $("#preview-hands-button").click( function( button ) { return do_main_action( this ); } );
+      
+      //  Make the "tiles-are-set" button active
+      $(".pghand-rotate-button").click( function( button ) { return rotate_hand( this ); } );
+      
+      //  Start polling for the opponent state
+      get_opponent_state();
+    
+      //  If the current player state is previewing hands or they're set, we need to do
+      //  the setting all over again to set the DOM state.
+      var saved_state = "{{ current_player_state }}";
+      if ( saved_state != "{{ setting_tiles_state }}" )
+      {
+        do_main_action();
+        if ( saved_state == "{{ tiles_are_set_state }}" )
+          setTimeout( tiles_are_set, 3000 );
+      }
+      else
+        set_current_player_state( "{{ current_player_state }}" );
+  }
+
   </script>
 {% endblock %}
 
 {% block jquery-doc-ready %}
-
-  //  Fade the sets in, in order.  These set classes don't have sizes so we can use them as
-  //  generic sets.  Note they are 1,2,3 rather than 0-based so the index is the same as
-  //  the number of points assigned (for simplicity).
-  $("#pgset-div-1-player").fadeIn( 500);
-  $("#pgset-div-2-player").fadeIn(1000);
-  $("#pgset-div-3-player").fadeIn(1500);
-  
-  $("#pgset-div-1-opponent").fadeIn(2000);
-  $("#pgset-div-2-opponent").fadeIn(1500);
-  $("#pgset-div-3-opponent").fadeIn(3000);
-  
-  //  Scores start as invisible
-  $(".pgscore-player").css("opacity", "0.0");
-  $(".pgscore-mid").css("opacity", "0.0");
-  $(".pgscore-opponent").css("opacity", "0.0");
-  
-  //  The tiles are draggable
-  //  TBD: put this in pgtile.html, how to do that while including it several times
-  $(".pgtile-div-player").draggable( {
-      //helper: "clone",
-      revert: "invalid",
-      start: function( event, ui ) { drag_tile_start( this, event, ui ); },
-      stop: function( event, ui ) { drag_tile_stop( this, event, ui ); }
-    } );
-
-  //  The divs holding the sets will be droppable, but only accept tiles.
-  //  They are disabled until a tile is dragged, and only the appropriate
-  //  set or sets are un-disabled.
-  $(".pgset-player").droppable( { 
-      disabled: true
-    } );
-
-  //  Make the switch buttons active
-  $(".pgset-button-switch").click( function( button ) { return switch_click( this ); } );
-  
-  //  Make the "tiles-are-set" button active
-  $("#tiles-are-set-button").click( function( button ) { return tiles_are_set( this ); } );
-  
-  //  Make the "tiles-are-set" button active
-  $("#preview-hands-button").click( function( button ) { return do_main_action( this ); } );
-  
-  //  Make the "tiles-are-set" button active
-  $(".pghand-rotate-button").click( function( button ) { return rotate_hand( this ); } );
-  
-  //  Start polling for the opponent state
-  get_opponent_state();
-
-  //  If the current player state is previewing hands or they're set, we need to do
-  //  the setting all over again to set the DOM state.
-  var saved_state = "{{ current_player_state }}";
-  if ( saved_state != "{{ setting_tiles_state }}" )
-  {
-    do_main_action();
-    if ( saved_state == "{{ tiles_are_set_state }}" )
-      setTimeout( tiles_are_set, 3000 );
-  }
-  else
-    set_current_player_state( "{{ current_player_state }}" );
-
-
+    game_play_doc_ready();
 {% endblock %}
 
 <!-- 'content' block is placed in base_site.html; override it here to show this content. -->

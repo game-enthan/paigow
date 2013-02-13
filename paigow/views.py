@@ -42,8 +42,7 @@ def request_context( request, params ):
   params['logout_url'] = '/paigow/logout'
   params['home_url'] = '/paigow/home'
   
-  params['activities'] = (
-      { 'name': "Start New Game", 'url': '/paigow/game/new' }, )
+  params['activities'] = ( )
   
   # setup players and possible opponents
   player = session_player( request )
@@ -381,11 +380,11 @@ def unpreview_hands( request, game_id, deal_number ):
 #-------------------------------------------------------------------
 # AJAX response for previewing the opponents tiles when both players
 # have finished setting the tiles.
-def get_opponent_tile_background_position_css_value( request, game_id, deal_number, pgtile_size ):
-  pigo = opponent_in_session_deal( request, game_id, deal_number )
-  if not pigo:
-    return HttpResponseNotAllowed( "Bad Request" )
-  return HttpResponse( pigo.background_position_css_value( pgtile_size ) )
+def get_opponent_tile_dots( request, game_id, deal_number, pgtile_size ):
+   pigo = opponent_in_session_deal( request, game_id, deal_number )
+   if not pigo:
+     return HttpResponseNotAllowed( "Bad Request" )
+   return HttpResponse( pigo.tile_dots( pgtile_size ) )
 
 #-------------------------------------------------------------------
 # AJAX response for previewing the opponents tiles when both players

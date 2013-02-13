@@ -1,1 +1,4 @@
-<img class="pgtile pgtile-{{ player_type }} pgtile-{{ pgtile_size }}" style="background-position: {{ background_position_css_value }};"></img>
+<div class="pgtile-{{ pgtile_size }}" style="background-color:black; position:relative;">
+  {% for dot in dots %}
+    <div class="pgdot pgdot-medium pgdot-{{ dot.color }} pgdot-{{ pgtile_size }}-{{ dot.index }}"></div>{% endfor %}
+</div>

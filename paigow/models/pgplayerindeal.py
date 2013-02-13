@@ -167,15 +167,21 @@ class PGPlayerInDeal(models.Model):
       #print "Player " + str( self.player) + " is ready in game " + str( self.game ) + " but the sets do not compute!"
       raise ValueError
   
-  def background_position_css_value( self, pgtile_size ):
+  def tile_dots( self, pgtile_size ):
     from paigow.pgset import PGSet
-    ret_val = "|"
+    import json
+    ret_val = []
     sets = self.sets()
     for pgset in sets:
+      set_val = []
       for tile in pgset.tiles:
-        ret_val += tile.background_position_css_value( pgtile_size ) + ";"
-      ret_val += "|"
-    return ret_val
+        dot_dicts = []
+        dots = tile.dots()
+        for dot in dots:
+          dot_dicts.append( dot.dict() )
+        set_val.append( dot_dicts )
+      ret_val.append( set_val )
+    return json.dumps( ret_val )
   
   def win_lose_string_against( self, pgpid_opponent ):
     # only do it if both are ready.

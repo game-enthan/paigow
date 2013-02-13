@@ -5,3 +5,4 @@
 from pghand import PGHandTest
 from pgset import PGSetTest
 from pgstrategy import PGStrategyTest
+from pgdot import PGDotTest

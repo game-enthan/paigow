@@ -59,8 +59,10 @@ class PGTile( models.Model ):
   # tiles: this is the x, y of the top-left of the sprite
   # in pixels.  Note we negate this to move the background
   # into position.
-  sprite_left = models.PositiveSmallIntegerField( default = 0 )
-  sprite_top = models.PositiveSmallIntegerField( default = 0 )
+  # sprite_left = models.PositiveSmallIntegerField( default = 0 )
+  # sprite_top = models.PositiveSmallIntegerField( default = 0 )
+
+  dot_sequence = models.CharField( max_length = 2 )
   
   # ----------------------------------------------------------
   # methods
@@ -89,14 +91,14 @@ class PGTile( models.Model ):
       return tiles[1]
   
   # return the background-sprite css value for background-position.
-  def background_position_css_value( self, tile_size ):
-    divisor = 1.0
-    if ( tile_size == "medium" ):
-      divisor = 2.0
-    elif ( tile_size == "small" ):
-      divisor = 4.0
-    ret_val = "-" + str(self.sprite_left/divisor) + "px -" + str(self.sprite_top/divisor) + "px"
-    return ret_val
+  # def background_position_css_value( self, tile_size ):
+  #   divisor = 1.0
+  #   if ( tile_size == "medium" ):
+  #     divisor = 2.0
+  #   elif ( tile_size == "small" ):
+  #     divisor = 4.0
+  #   ret_val = "-" + str(self.sprite_left/divisor) + "px -" + str(self.sprite_top/divisor) + "px"
+  #   return ret_val
   
   # return the tile with the given rank, taking into account whether
   # or not it's the first one.
@@ -114,6 +116,10 @@ class PGTile( models.Model ):
   def blank_tile( cls ):
     return PGTile( tile_char = ' ', tile_rank = 99, pair_rank = 99, tile_value = 99, sprite_left = 0, sprite_top = 0 )
 
+  def dots( self ):
+    from paigow.pgdot import PGDot
+    return PGDot.all_dots( self.dot_sequence )
+  
   # convenience to allow creation of tiles by name.
   # * double-underscore means that what follows is an
   #   adjustment of the field, so below it will query
@@ -150,7 +156,7 @@ class PGTile( models.Model ):
   
   def copies( self, other ):
     return self.tile_rank == other.tile_rank
-  
+
   # overload the math when comparing tiles
   #   def __lt__( self, other ):
   #     return self.tile_rank < other.tile_rank
@@ -242,11 +248,18 @@ class PGTileTest(TestCase):
     self.assertTrue( tile1.copies(tile2) )
     self.assertFalse( tile1.copies(tile3) )
   
-  def test_sprite_values( self ):
-    tile1 = PGTile.with_name( "teen" )
-    self.assertEqual( tile1.background_position_css_value("large"), "-0.0px -250.0px" )
-    self.assertEqual( tile1.background_position_css_value("medium"), "-0.0px -125.0px" )
+  # def test_sprite_values( self ):
+  #   tile1 = PGTile.with_name( "teen" )
+  #   self.assertEqual( tile1.background_position_css_value("large"), "-0.0px -250.0px" )
+  #   self.assertEqual( tile1.background_position_css_value("medium"), "-0.0px -125.0px" )
 
+  def test_dot_sequences( self ):
+    tile1 = PGTile.with_name( "teen" )
+    self.assertEqual( tile1.dot_sequence, "gn" )
+
+  def test_dots( self ):
+    tile1 = PGTile.with_name( "teen" )
+    self.assertEqual( len( tile1.dots() ), 12 )    
 
 # run the test when invoked as a test (this is boilerplate
 # code at the bottom of every python file that has unit

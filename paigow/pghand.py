@@ -375,6 +375,12 @@ class PGHandTest( TestCase ):
     hand1 = PGHand.create_with_tile_names( "gee joon", "low four" )
     self.assertEqual( hand1.ranking(), 61 )
 
+  def test_numerical_value( self ):
+    hand1 = PGHand.create_with_tile_names( "long six", "low four" )
+    self.assertEqual( hand1.numerical_value(), 0 )
+    self.assertEqual( hand1.label(), "0" )
+
+
   # def test_create_all_rankings( self ):
   #   print "\n"
   #   all_hands = []

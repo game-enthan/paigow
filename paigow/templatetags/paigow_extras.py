@@ -82,10 +82,13 @@ def show_pgset( context, pgset, pgset_id, opponent ):
 def tile_image( context, tile, opponent ):
   if ( context['player_type'] == "opponent" ):
     context['pgtile'] = None
-    context['background_position_css_value'] = "0px 0px"
+    # context['background_position_css_value'] = "0px 0px"
+    context['dots'] = []
   else:
+    from paigow.pgdot import PGDot
     context['pgtile'] = tile
-    context['background_position_css_value'] = tile.background_position_css_value( context['pgtile_size'] )
+    # context['background_position_css_value'] = tile.background_position_css_value( context['pgtile_size'] )
+    context['dots'] = PGDot.all_dots( tile.dot_sequence )
   return context
 
 @register.simple_tag( takes_context=True )
