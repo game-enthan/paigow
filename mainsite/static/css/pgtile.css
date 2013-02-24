@@ -3,10 +3,13 @@
 /* --------------------- All sizes ----------------------	*/
 
 .pgtile {
-  float:left;
-  margin-right:5px;
-  background-image:url('/static/pgtiles.jpg');
-  src:url('/static/img_trans.gif');
+  float: left;
+  margin-right: 5px;
+}
+
+.pgplayer-name {
+  font-size: 30px;
+  font-weight: bold;
 }
 
 .pgdot {
@@ -68,13 +71,15 @@
 }
 
 .pgset-action-buttons {
-	position: absolute;
-  left: 20px;
+  position: relative;
   width: 130px;
+  left: 10px;
+  top: 30px;
   text-align: right;
 }
 
 .pgset-action-button {
+  margin-left: 20px;
   width: 110px;
 	cursor: pointer;
 }
@@ -300,11 +305,11 @@
 }
 
 .pgset-action-buttons-medium-1 {
-    top: 105px;
+    xx-top: 105px;
 }
 
 .pgset-action-buttons-medium-2 {
-    top: 135px;
+    xx-top: 135px;
 }
 
 .pgtile-div-medium-0 {
@@ -330,7 +335,7 @@
 }
 
 .pgset-medium-1 {
-	top: 10px;
+	top: 40px;
 }
 
 .pgset-medium-2 {
@@ -338,7 +343,7 @@
 }
 
 .pgset-medium-3 {
-	top: 390px;
+	top: 360px;
 }
 
 .pghand-rotate-button-medium {
@@ -366,7 +371,7 @@
 }
 
 .pgset-button-switch-medium-2 {
-	top: 370px;
+	top: 350px;
 }
 
 .pgscore-in-deal-medium {
@@ -374,15 +379,15 @@
 }
 
 .pgscore-in-deal-medium-1 {
-	top: 60px;
+	top: 90px;
 }
 
 .pgscore-in-deal-medium-2 {
-	top: 250px;
+	top: 260px;
 }
 
 .pgscore-in-deal-medium-3 {
-	top: 440px;
+	top: 415px;
 }
 
 /* ------------------------ Small -----------------------	*/

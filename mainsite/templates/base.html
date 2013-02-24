@@ -23,6 +23,10 @@
   </style>
   {% endblock %}
   {% block extra-stylesheet %}{% endblock %}
+
+  {% if is_mobile %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/mobile.css" %}" />
+  {% endif %}
   
   <!-- Any extra headers for pages that extend this one -->
   {% block extrahead %}{% endblock %}
@@ -107,7 +111,7 @@
             <ul class="nav">
               <li><a class="brand" href="/paigow">{% block branding %}{% endblock %}</a></li>
                {% for activity in activities %}
-                 <li class="{{ activity.class}}"><a href="{{activity.url}}">{{ activity.name }}</a></li>
+                 <li class="{{ activity.class }}"><a href="{{ activity.url }}">{{ activity.name }}</a></li>
                {% endfor %}
               {% block nav-global %}{% endblock %}
             </ul>
@@ -127,7 +131,7 @@
     </div>
 
     <!-- Container -->
-    <div class="container" id="container" style="width:90%;margin-left:130px;margin-right:auto;">
+    <div class="container" id="container" xstyle="width:90%;margin-left:130px;margin-right:auto;">
     
       {% block messages %}
           {% if messages %}

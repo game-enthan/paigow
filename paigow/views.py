@@ -34,6 +34,7 @@ def posted_player_from_id_field( request, field_name ):
 # final setup of the params with stuff common to all views
 def request_context( request, params ):
   from django.utils.html import escape
+  import re
   
   # protect against cross-site request forgery
   params.update( csrf( request ) )
@@ -43,7 +44,13 @@ def request_context( request, params ):
   params['home_url'] = '/paigow/home'
   
   params['activities'] = ( { 'name': "New Game", 'url': '/paigow/game/new' }, )
-  
+  params['is_mobile'] = re.match( '.*mobile.*', request.META['HTTP_USER_AGENT'], re.IGNORECASE )
+  params['is_firefox'] = re.match( '.*mozilla.*', request.META['HTTP_USER_AGENT'], re.IGNORECASE )
+  print request.META['HTTP_USER_AGENT']
+  print "is_mobile: " + str(params['is_mobile'])
+  print "is_firefox: " + str(params['is_firefox'])
+
+
   # setup players and possible opponents
   player = session_player( request )
   params['player'] = player

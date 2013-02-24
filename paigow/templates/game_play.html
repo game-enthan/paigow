@@ -942,15 +942,17 @@
   <br> -->
 
   <!-- player action buttons, down along the left edge. -->
-  <div class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}-1">
+  <div style="position:absolute;">
+  <span style="z-index:10;" class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}-1">
     <span id="preview-hands"><button id="preview-hands-button" type="button" class="btn btn-mini btn-primary pgset-action-button">Preview Hands</button></span>
-  </div>
-  <div class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}-2">
+  </span>
+  <span style="z-index:10;" class="pgset-action-buttons pgset-action-buttons-{{ pgtile_size }}-2">
     <span id="tiles-are-set"><button id="tiles-are-set-button" type="button" class="btn btn-mini btn-primary pgset-action-button disabled">Tiles are set</button></span>
-  </div>
+  </span>
+</div>
 
   <!-- Table of left/right columns, left is your hand, right is the opponent's hand -->
-  <table>
+  <table style="z-index:20;" >
     <tr>
         <td>
           {% show_deal pgsets player %}
