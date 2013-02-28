@@ -344,6 +344,14 @@
       {
         source.insertAfter(dest);
       }
+
+      //  Reset the "spin" buttons to be the righthands
+      var source_name = "" + source_set_num + "-pghand-rotate";
+      var dest_name = "" + dest_set_num + "-pghand-rotate";
+      var source_button = $( "#" + source_name );
+      var dest_button = $( "#" + dest_name );
+      source_button.attr( "id", dest_name );
+      dest_button.attr( "id", source_name );
     }
     
     function rotate_hand( button )
